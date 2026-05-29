@@ -1,9 +1,10 @@
 using System.Diagnostics;
 using NightHeaven.Hosting.Data;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Hosting.Interfaces.Events;
+using NightHeaven.Hosting.Data.Metrics;
+using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Hosting.Interfaces.Timing;
+using NightHeaven.Hosting.Types.Metrics;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -13,7 +14,7 @@ namespace NightHeaven.Server.Services.GameLoop;
 /// Owns the dedicated game-loop thread. Drains tick events from <see cref="IEventBusService" />,
 /// sleeps when idle, exposes basic metrics.
 /// </summary>
-public sealed class GameLoopService : IGameLoopService, IDisposable
+public sealed class GameLoopService : IGameLoopService, IMetricProvider, IDisposable
 {
     private const int MaxTickEventsPerFrame = 256;
     private const double SlowTickThresholdMs = 250;
@@ -62,9 +63,56 @@ public sealed class GameLoopService : IGameLoopService, IDisposable
         }
     }
 
+    public string Prefix => "gameloop";
+
+    public IReadOnlyList<MetricSample> Collect()
+    {
+        double avg, max;
+
+        lock (_metricsSync)
+        {
+            avg = _averageTickMs;
+            max = _maxTickMs;
+        }
+
+        return
+        [
+            new MetricSample(
+                "tick_count",
+                Interlocked.Read(ref _tickCount),
+                MetricType.Counter,
+                Help: "Total game loop iterations"
+            ),
+            new MetricSample(
+                "tick_avg_ms",
+                avg,
+                MetricType.Gauge,
+                Help: "EMA tick elapsed in ms"
+            ),
+            new MetricSample(
+                "tick_max_ms",
+                max,
+                MetricType.Gauge,
+                Help: "Worst tick elapsed in ms"
+            ),
+            new MetricSample(
+                "idle_sleeps_total",
+                Interlocked.Read(ref _idleSleepCount),
+                MetricType.Counter,
+                Help: "Total idle sleeps"
+            )
+        ];
+    }
+
+    public void Dispose()
+    {
+        _cts.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _thread = new Thread(RunLoop)
+        _thread = new(RunLoop)
         {
             IsBackground = true,
             Name = "NightHeaven-GameLoop"
@@ -82,12 +130,6 @@ public sealed class GameLoopService : IGameLoopService, IDisposable
         return Task.CompletedTask;
     }
 
-    public void Dispose()
-    {
-        _cts.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
     private void RunLoop()
     {
         while (!_cts.IsCancellationRequested)
@@ -97,9 +139,7 @@ public sealed class GameLoopService : IGameLoopService, IDisposable
 
             if (_timers is not null)
             {
-                var nowMs = (long)Math.Floor(
-                    Stopwatch.GetTimestamp() * 1000.0 / Stopwatch.Frequency
-                );
+                var nowMs = (long)Math.Floor(Stopwatch.GetTimestamp() * 1000.0 / Stopwatch.Frequency);
                 workUnits += _timers.UpdateTicksDelta(nowMs);
             }
 
