@@ -21,13 +21,9 @@ namespace NightHeaven.Core.Text;
 
 public static class TextEncoding
 {
-    private static Encoding m_UTF8,
-                            m_Unicode,
-                            m_UnicodeLE;
-
-    public static Encoding UTF8 => m_UTF8 ??= new UTF8Encoding(false, false);
-    public static Encoding Unicode => m_Unicode ??= new UnicodeEncoding(true, false, false);
-    public static Encoding UnicodeLE => m_UnicodeLE ??= new UnicodeEncoding(false, false, false);
+    public static Encoding UTF8 { get; } = new UTF8Encoding(false, false);
+    public static Encoding Unicode { get; } = new UnicodeEncoding(true, false, false);
+    public static Encoding UnicodeLE { get; } = new UnicodeEncoding(false, false, false);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int GetByteLengthForEncoding(this Encoding encoding)
@@ -35,8 +31,8 @@ public static class TextEncoding
         {
             "utf-16BE" => 2,
             "utf-16"   => 2,
-            "utf-32BE" => 3,
-            "utf-32"   => 3,
+            "utf-32BE" => 4,
+            "utf-32"   => 4,
             _          => 1
         };
 

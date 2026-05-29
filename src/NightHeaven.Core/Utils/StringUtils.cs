@@ -1,436 +1,235 @@
-using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
+using NightHeaven.Core.Buffers;
+using NightHeaven.Core.Types;
 
 namespace NightHeaven.Core.Utils;
 
 /// <summary>
 /// Provides utility methods for string operations, including various case conversion methods.
 /// </summary>
-public static partial class StringUtils
+public static class StringUtils
 {
-    private static readonly Regex WordSplitterRegex = WordSplitter();
-
     /// <summary>
     /// Converts a string to camelCase.
     /// </summary>
-    /// <param name="text">The string to convert to camelCase.</param>
-    /// <returns>A camelCase version of the input string.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the input text is null or empty.</exception>
     /// <example>
     /// "HelloWorld" becomes "helloWorld"
     /// "API_RESPONSE" becomes "apiResponse"
     /// "user-id" becomes "userId"
     /// </example>
     public static string ToCamelCase(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        if (text.Length < 2)
-        {
-            return text.ToLowerInvariant();
-        }
-
-        var words = WordSplitterRegex.Split(text);
-        var result = new StringBuilder(words[0].ToLowerInvariant());
-
-        for (var i = 1; i < words.Length; i++)
-        {
-            if (string.IsNullOrEmpty(words[i]))
-            {
-                continue;
-            }
-
-            result.Append(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(words[i].ToLowerInvariant()));
-        }
-
-        return result.ToString();
-    }
+        => ConvertCase(text, separator: '\0', StringCasingType.Lower, StringCasingType.Title, splitCamel: true);
 
     /// <summary>
-    /// Converts a string to Dot Case.
+    /// Converts a string to dot.case.
     /// </summary>
-    /// <param name="text">The string to convert to Dot Case.</param>
-    /// <returns>A Dot Case version of the input string.</returns>
     /// <example>
     /// "HelloWorld" becomes "hello.world"
     /// "API_RESPONSE" becomes "api.response"
     /// </example>
     public static string ToDotCase(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        if (text.Length < 2)
-        {
-            return text.ToLowerInvariant();
-        }
-
-        var words = WordSplitterRegex.Split(text);
-        var result = new StringBuilder();
-
-        var isFirst = true;
-
-        foreach (var word in words)
-        {
-            if (string.IsNullOrEmpty(word))
-            {
-                continue;
-            }
-
-            if (!isFirst)
-            {
-                result.Append('.');
-            }
-
-            result.Append(word.ToLowerInvariant());
-            isFirst = false;
-        }
-
-        return result.ToString();
-    }
+        => ConvertCase(text, separator: '.', StringCasingType.Lower, StringCasingType.Lower, splitCamel: true);
 
     /// <summary>
     /// Converts a string to kebab-case.
     /// </summary>
-    /// <param name="text">The string to convert to kebab-case.</param>
-    /// <returns>A kebab-case version of the input string.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the input text is null or empty.</exception>
     /// <example>
     /// "HelloWorld" becomes "hello-world"
     /// "API_RESPONSE" becomes "api-response"
     /// "userId" becomes "user-id"
     /// </example>
     public static string ToKebabCase(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        if (text.Length < 2)
-        {
-            return text.ToLowerInvariant();
-        }
-
-        var words = WordSplitterRegex.Split(text);
-        var result = new StringBuilder();
-
-        var isFirst = true;
-
-        foreach (var word in words)
-        {
-            if (string.IsNullOrEmpty(word))
-            {
-                continue;
-            }
-
-            if (!isFirst)
-            {
-                result.Append('-');
-            }
-
-            result.Append(word.ToLowerInvariant());
-            isFirst = false;
-        }
-
-        return result.ToString();
-    }
+        => ConvertCase(text, separator: '-', StringCasingType.Lower, StringCasingType.Lower, splitCamel: true);
 
     /// <summary>
     /// Converts a string to PascalCase.
     /// </summary>
-    /// <param name="text">The string to convert to PascalCase.</param>
-    /// <returns>A PascalCase version of the input string.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the input text is null or empty.</exception>
     /// <example>
     /// "hello_world" becomes "HelloWorld"
     /// "api-response" becomes "ApiResponse"
     /// "userId" becomes "UserId"
     /// </example>
     public static string ToPascalCase(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        if (text.Length < 2)
-        {
-            return text.ToUpperInvariant();
-        }
-
-        var words = WordSplitterRegex.Split(text);
-        var result = new StringBuilder();
-
-        foreach (var word in words)
-        {
-            if (string.IsNullOrEmpty(word))
-            {
-                continue;
-            }
-
-            result.Append(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(word.ToLowerInvariant()));
-        }
-
-        return result.ToString();
-    }
+        => ConvertCase(text, separator: '\0', StringCasingType.Title, StringCasingType.Title, splitCamel: true);
 
     /// <summary>
-    /// Converts a string to Path Case.
+    /// Converts a string to path/case.
     /// </summary>
-    /// <param name="text">The string to convert to Path Case.</param>
-    /// <returns>A Path Case version of the input string.</returns>
     /// <example>
     /// "HelloWorld" becomes "hello/world"
     /// "API_RESPONSE" becomes "api/response"
     /// </example>
     public static string ToPathCase(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        if (text.Length < 2)
-        {
-            return text.ToLowerInvariant();
-        }
-
-        var words = WordSplitterRegex.Split(text);
-        var result = new StringBuilder();
-
-        var isFirst = true;
-
-        foreach (var word in words)
-        {
-            if (string.IsNullOrEmpty(word))
-            {
-                continue;
-            }
-
-            if (!isFirst)
-            {
-                result.Append('/');
-            }
-
-            result.Append(word.ToLowerInvariant());
-            isFirst = false;
-        }
-
-        return result.ToString();
-    }
+        => ConvertCase(text, separator: '/', StringCasingType.Lower, StringCasingType.Lower, splitCamel: true);
 
     /// <summary>
-    /// Converts a string to Sentence Case.
+    /// Converts a string to Sentence case.
+    /// Camel-case humps are NOT split: only whitespace, underscores and hyphens are word separators.
     /// </summary>
-    /// <param name="text">The string to convert to Sentence Case.</param>
-    /// <returns>A Sentence Case version of the input string.</returns>
     /// <example>
     /// "hello world" becomes "Hello world"
     /// "API_RESPONSE" becomes "Api response"
     /// </example>
     public static string ToSentenceCase(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        if (text.Length < 2)
-        {
-            return text.ToUpperInvariant();
-        }
-
-        // Split only on spaces, underscores, and hyphens, not camelCase
-        var simpleWords = Regex.Split(text, @"[\s_-]+").Where(w => !string.IsNullOrEmpty(w)).ToArray();
-
-        if (simpleWords.Length == 1)
-        {
-            // Single word (possibly camelCase): capitalize first letter, lowercase the rest
-            var word = simpleWords[0];
-
-            return char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant();
-        }
-
-        // Multiple words: capitalize first word, lowercase the rest
-        var result = new StringBuilder();
-
-        for (var i = 0; i < simpleWords.Length; i++)
-        {
-            if (i > 0)
-            {
-                result.Append(' ');
-            }
-
-            var word = simpleWords[i];
-
-            if (i == 0)
-            {
-                result.Append(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(word.ToLowerInvariant()));
-            }
-            else
-            {
-                result.Append(word.ToLowerInvariant());
-            }
-        }
-
-        return result.ToString();
-    }
+        => ConvertCase(text, separator: ' ', StringCasingType.Title, StringCasingType.Lower, splitCamel: false);
 
     /// <summary>
-    /// Converts a string from camelCase or PascalCase to snake_case.
+    /// Converts a string to snake_case.
     /// </summary>
-    /// <param name="text">The string to convert to snake_case.</param>
-    /// <returns>A snake_case version of the input string.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the input text is null or empty.</exception>
     /// <example>
     /// "HelloWorld" becomes "hello_world"
     /// "APIResponse" becomes "api_response"
     /// "userId" becomes "user_id"
     /// </example>
     public static string ToSnakeCase(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        if (text.Length < 2)
-        {
-            return text.ToLowerInvariant();
-        }
-
-        var words = WordSplitterRegex.Split(text);
-        var result = new StringBuilder();
-
-        var isFirst = true;
-
-        foreach (var word in words)
-        {
-            if (string.IsNullOrEmpty(word))
-            {
-                continue;
-            }
-
-            if (!isFirst)
-            {
-                result.Append('_');
-            }
-
-            result.Append(word.ToLowerInvariant());
-            isFirst = false;
-        }
-
-        return result.ToString();
-    }
+        => ConvertCase(text, separator: '_', StringCasingType.Lower, StringCasingType.Lower, splitCamel: true);
 
     /// <summary>
     /// Converts a string to Title Case.
     /// </summary>
-    /// <param name="text">The string to convert to Title Case.</param>
-    /// <returns>A Title Case version of the input string.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the input text is null or empty.</exception>
     /// <example>
     /// "hello_world" becomes "Hello World"
     /// "API_RESPONSE" becomes "Api Response"
     /// "user-id" becomes "User Id"
     /// </example>
     public static string ToTitleCase(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        var words = WordSplitterRegex.Split(text);
-        var result = new StringBuilder();
-
-        var isFirst = true;
-
-        foreach (var word in words)
-        {
-            if (string.IsNullOrEmpty(word))
-            {
-                continue;
-            }
-
-            if (!isFirst)
-            {
-                result.Append(' ');
-            }
-
-            result.Append(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(word.ToLowerInvariant()));
-            isFirst = false;
-        }
-
-        return result.ToString();
-    }
+        => ConvertCase(text, separator: ' ', StringCasingType.Title, StringCasingType.Title, splitCamel: true);
 
     /// <summary>
-    /// Converts a string to Train Case (Pascal Case with hyphens).
+    /// Converts a string to Train-Case.
     /// </summary>
-    /// <param name="text">The string to convert to Train Case.</param>
-    /// <returns>A Train Case version of the input string.</returns>
     /// <example>
     /// "hello_world" becomes "Hello-World"
     /// "apiResponse" becomes "Api-Response"
     /// </example>
     public static string ToTrainCase(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        if (text.Length < 2)
-        {
-            return text.ToUpperInvariant();
-        }
-
-        var words = WordSplitterRegex.Split(text);
-        var result = new StringBuilder();
-
-        var isFirst = true;
-
-        foreach (var word in words)
-        {
-            if (string.IsNullOrEmpty(word))
-            {
-                continue;
-            }
-
-            if (!isFirst)
-            {
-                result.Append('-');
-            }
-
-            result.Append(CultureInfo.InvariantCulture.TextInfo.ToTitleCase(word.ToLowerInvariant()));
-            isFirst = false;
-        }
-
-        return result.ToString();
-    }
+        => ConvertCase(text, separator: '-', StringCasingType.Title, StringCasingType.Title, splitCamel: true);
 
     /// <summary>
     /// Converts a string to UPPER_SNAKE_CASE (screaming snake case).
     /// </summary>
-    /// <param name="text">The string to convert to UPPER_SNAKE_CASE.</param>
-    /// <returns>An UPPER_SNAKE_CASE version of the input string.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the input text is null or empty.</exception>
     /// <example>
     /// "HelloWorld" becomes "HELLO_WORLD"
     /// "apiResponse" becomes "API_RESPONSE"
     /// "user-id" becomes "USER_ID"
     /// </example>
     public static string ToUpperSnakeCase(string text)
-        => ToSnakeCase(text).ToUpperInvariant();
+        => ConvertCase(text, separator: '_', StringCasingType.Upper, StringCasingType.Upper, splitCamel: true);
 
-    [GeneratedRegex(@"[\s_-]|(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])")]
-    private static partial Regex WordSplitter();
+    private static string ConvertCase(
+        string text,
+        char separator,
+        StringCasingType firstWordCasing,
+        StringCasingType otherWordCasing,
+        bool splitCamel
+    )
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return "";
+        }
+
+        var span = text.AsSpan();
+        var sb = ValueStringBuilder.Create(span.Length);
+
+        try
+        {
+            var wordIndex = 0;
+            var i = 0;
+
+            while (i < span.Length)
+            {
+                while (i < span.Length && IsExplicitSeparator(span[i]))
+                {
+                    i++;
+                }
+
+                if (i >= span.Length)
+                {
+                    break;
+                }
+
+                var wordStart = i;
+                i++;
+
+                while (i < span.Length && !IsExplicitSeparator(span[i]))
+                {
+                    if (splitCamel)
+                    {
+                        // lowercase → uppercase: "fooBar" splits between o and B
+                        if (char.IsLower(span[i - 1]) && char.IsUpper(span[i]))
+                        {
+                            break;
+                        }
+
+                        // acronym → word: "APIResponse" splits between I and R
+                        if (i + 1 < span.Length
+                            && char.IsUpper(span[i - 1])
+                            && char.IsUpper(span[i])
+                            && char.IsLower(span[i + 1]))
+                        {
+                            break;
+                        }
+                    }
+
+                    i++;
+                }
+
+                if (wordIndex > 0 && separator != '\0')
+                {
+                    sb.Append(separator);
+                }
+
+                var casing = wordIndex == 0 ? firstWordCasing : otherWordCasing;
+                AppendWord(ref sb, span[wordStart..i], casing);
+
+                wordIndex++;
+            }
+
+            return sb.ToString();
+        }
+        finally
+        {
+            sb.Dispose();
+        }
+    }
+
+    private static bool IsExplicitSeparator(char c)
+        => c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '_' || c == '-';
+
+    private static void AppendWord(ref ValueStringBuilder sb, ReadOnlySpan<char> word, StringCasingType casing)
+    {
+        if (word.IsEmpty)
+        {
+            return;
+        }
+
+        switch (casing)
+        {
+            case StringCasingType.Lower:
+                for (var i = 0; i < word.Length; i++)
+                {
+                    sb.Append(char.ToLowerInvariant(word[i]));
+                }
+
+                break;
+
+            case StringCasingType.Upper:
+                for (var i = 0; i < word.Length; i++)
+                {
+                    sb.Append(char.ToUpperInvariant(word[i]));
+                }
+
+                break;
+
+            case StringCasingType.Title:
+                sb.Append(char.ToUpperInvariant(word[0]));
+
+                for (var i = 1; i < word.Length; i++)
+                {
+                    sb.Append(char.ToLowerInvariant(word[i]));
+                }
+
+                break;
+        }
+    }
 }

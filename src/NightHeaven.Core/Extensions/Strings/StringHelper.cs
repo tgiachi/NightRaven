@@ -21,6 +21,80 @@ namespace NightHeaven.Core.Extensions.Strings;
 
 public static class StringHelpers
 {
+    extension(string value)
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string Capitalize()
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            var chrs = STArrayPool<char>.Shared.Rent(value.Length);
+            var span = chrs.AsSpan(0, value.Length);
+
+            var sliced = value.AsSpan();
+
+            // Copy over the previous span
+            sliced.CopyTo(span);
+
+            var index = 0;
+
+            while (true)
+            {
+                // Special case for titles: skip "the " words except the first one,
+                // so "the lord of the rings" becomes "The Lord Of the Rings".
+                if (index > 0 && sliced.InsensitiveStartsWith("the "))
+                {
+                    sliced = sliced[4..];
+                    index += 4;
+
+                    continue;
+                }
+
+                span[index] = char.ToUpperInvariant(sliced[0]);
+
+                var indexOf = sliced.IndexOf(' ');
+
+                if (indexOf == -1)
+                {
+                    break;
+                }
+
+                if (indexOf == sliced.Length - 1)
+                {
+                    break;
+                }
+
+                sliced = sliced[(indexOf + 1)..];
+                index += indexOf + 1;
+            }
+
+            var str = span.ToString();
+
+            STArrayPool<char>.Shared.Return(chrs);
+
+            return str;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string DefaultIfNullOrEmpty(string def)
+            => string.IsNullOrWhiteSpace(value) ? def : value;
+
+        public string IndentMultiline(string indent = "\t", string lineSeparator = "\n")
+        {
+            var parts = value.Split(lineSeparator);
+
+            for (var i = 0; i < parts.Length; i++)
+            {
+                parts[i] = $"{indent}{parts[i]}";
+            }
+
+            return string.Join(lineSeparator, parts);
+        }
+    }
+
     public static void AppendSpaceWithArticle(this ref ValueStringBuilder builder, string text, bool articleAn)
     {
         if (builder.Length != 0)
@@ -33,75 +107,6 @@ public static class StringHelpers
         }
 
         builder.Append(text);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string Capitalize(this string value)
-    {
-        if (string.IsNullOrEmpty(value))
-        {
-            return value;
-        }
-
-        var chrs = STArrayPool<char>.Shared.Rent(value.Length);
-        var span = chrs.AsSpan(0, value.Length);
-
-        var sliced = value.AsSpan();
-
-        // Copy over the previous span
-        sliced.CopyTo(span);
-
-        var index = 0;
-
-        while (true)
-        {
-            // Special case for titles - words that don't get capitalized
-            if (sliced.InsensitiveStartsWith("the "))
-            {
-                sliced = sliced[4..];
-                index += 4;
-
-                continue;
-            }
-
-            var indexOf = sliced.IndexOf(' ');
-            span[index] = char.ToUpperInvariant(sliced[0]);
-
-            if (indexOf == -1)
-            {
-                break;
-            }
-
-            if (indexOf == sliced.Length - 1)
-            {
-                break;
-            }
-
-            sliced = sliced[(indexOf + 1)..];
-            index += indexOf + 1;
-        }
-
-        var str = span.ToString();
-
-        STArrayPool<char>.Shared.Return(chrs);
-
-        return str;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string DefaultIfNullOrEmpty(this string value, string def)
-        => string.IsNullOrWhiteSpace(value) ? def : value;
-
-    public static string IndentMultiline(this string str, string indent = "\t", string lineSeparator = "\n")
-    {
-        var parts = str.Split(lineSeparator);
-
-        for (var i = 0; i < parts.Length; i++)
-        {
-            parts[i] = $"{indent}{parts[i]}";
-        }
-
-        return string.Join(lineSeparator, parts);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -141,8 +146,22 @@ public static class StringHelpers
     {
         size = 0;
 
-        if (a == ReadOnlySpan<char>.Empty || a.Length == 0)
+        if (a.Length == 0)
         {
+            return;
+        }
+
+        // Removing an empty pattern is a copy: nothing matches, nothing is removed.
+        if (b.Length == 0)
+        {
+            if (a.Length > buffer.Length)
+            {
+                throw new ArgumentException("Destination buffer is too small", nameof(buffer));
+            }
+
+            a.CopyTo(buffer);
+            size = a.Length;
+
             return;
         }
 
@@ -151,37 +170,28 @@ public static class StringHelpers
         while (true)
         {
             var indexOf = sliced.IndexOf(b, comparison);
+            var copyLength = indexOf == -1 ? sliced.Length : indexOf;
+
+            if (size + copyLength > buffer.Length)
+            {
+                throw new ArgumentException("Destination buffer is too small", nameof(buffer));
+            }
+
+            sliced[..copyLength].CopyTo(buffer[size..]);
+            size += copyLength;
 
             if (indexOf == -1)
-            {
-                indexOf = sliced.Length;
-            }
-
-            if (size + indexOf > buffer.Length)
-            {
-                throw new OutOfMemoryException(nameof(buffer));
-            }
-
-            sliced[..indexOf].CopyTo(buffer[size..]);
-            size += indexOf;
-
-            if (indexOf == sliced.Length)
             {
                 break;
             }
 
-            sliced = sliced[(indexOf + 1)..];
+            sliced = sliced[(indexOf + b.Length)..];
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string Remove(this ReadOnlySpan<char> a, ReadOnlySpan<char> b, StringComparison comparison)
     {
-        if (a == ReadOnlySpan<char>.Empty)
-        {
-            return null;
-        }
-
         if (a.Length == 0)
         {
             return "";

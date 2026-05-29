@@ -135,12 +135,7 @@ public ref struct ValueStringBuilder
             Grow(count);
         }
 
-        var dst = _chars.Slice(Length, count);
-
-        for (var i = 0; i < dst.Length; i++)
-        {
-            dst[i] = c;
-        }
+        _chars.Slice(Length, count).Fill(c);
         Length += count;
     }
 
@@ -377,7 +372,7 @@ public ref struct ValueStringBuilder
             throw new ArgumentOutOfRangeException(nameof(count));
         }
 
-        var slice = _chars;
+        var slice = _chars.Slice(startIndex, count);
 
         while (true)
         {
@@ -408,7 +403,7 @@ public ref struct ValueStringBuilder
             throw new ArgumentOutOfRangeException(nameof(count));
         }
 
-        var slice = _chars;
+        var slice = _chars.Slice(startIndex, count);
 
         while (true)
         {
@@ -449,7 +444,7 @@ public ref struct ValueStringBuilder
         return false;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private void AppendSlow(string? s)
     {
         var pos = Length;

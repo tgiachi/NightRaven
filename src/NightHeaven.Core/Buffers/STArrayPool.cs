@@ -9,13 +9,18 @@ using NightHeaven.Core.Types;
 
 namespace NightHeaven.Core.Buffers;
 
-/// Adaptation of the ArrayPool
-/// <T>
-/// .Shared (TlsOverPerCoreLockedStacksArrayPool) for single threaded *unsafe* usage.
 /// <summary>
-/// Represents STArrayPool.
+/// Thread-safe ArrayPool adaptation. Each calling thread keeps its own
+/// bucket cache via <see cref="ThreadLocal{T}"/>, avoiding cross-thread
+/// contention while letting <see cref="Trim"/> reach every thread's state
+/// during Gen2 GC callbacks.
 /// </summary>
-public class STArrayPool<T> : ArrayPool<T>
+[System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Reliability",
+    "CA1001:Types that own disposable fields should be disposable",
+    Justification = "STArrayPool is a process-lifetime singleton; the ThreadLocal handle is intentionally never disposed."
+)]
+public sealed class STArrayPool<T> : ArrayPool<T>
 {
 #if DEBUG_ARRAYPOOL
     private static readonly ConditionalWeakTable<T[], STArrayPoolRentReturnStatus> _rentedArrays = new();
@@ -26,26 +31,29 @@ public class STArrayPool<T> : ArrayPool<T>
 
     public static STArrayPool<T> Shared { get; } = new();
 
-    private int _trimCallbackCreated;
-    private static STArrayPoolBucket<T>[] _cacheBuckets;
-    private readonly STArrayPoolStack<T>[] _buckets = new STArrayPoolStack<T>[BucketCount];
+    private readonly ThreadLocal<STArrayPoolThreadState<T>> _state =
+        new(static () => new STArrayPoolThreadState<T>(BucketCount), trackAllValues: true);
 
-    private STArrayPool() { }
+    private STArrayPool()
+    {
+        Gen2GcCallback.Register(static o => ((STArrayPool<T>)o).Trim(), this);
+    }
 
     public override T[] Rent(int minimumLength)
     {
-        T[] buffer;
+        T[]? buffer;
 
         var bucketIndex = SelectBucketIndex(minimumLength);
-        var cachedBuckets = _cacheBuckets;
+        var state = _state.Value!;
+        var cacheBuckets = state.CacheBuckets;
 
-        if (cachedBuckets is not null && (uint)bucketIndex < (uint)cachedBuckets.Length)
+        if ((uint)bucketIndex < (uint)cacheBuckets.Length)
         {
-            buffer = cachedBuckets[bucketIndex].Array;
+            buffer = cacheBuckets[bucketIndex].Array;
 
             if (buffer is not null)
             {
-                cachedBuckets[bucketIndex].Array = null;
+                cacheBuckets[bucketIndex].Array = null;
             #if DEBUG_ARRAYPOOL
                 _rentedArrays.AddOrUpdate(
                     buffer,
@@ -56,7 +64,7 @@ public class STArrayPool<T> : ArrayPool<T>
             }
         }
 
-        var buckets = _buckets;
+        var buckets = state.Buckets;
 
         if ((uint)bucketIndex < (uint)buckets.Length)
         {
@@ -112,9 +120,10 @@ public class STArrayPool<T> : ArrayPool<T>
         }
 
         var bucketIndex = SelectBucketIndex(array.Length);
-        var cacheBuckets = _cacheBuckets ?? InitializeBuckets();
+        var state = _state.Value!;
+        var cacheBuckets = state.CacheBuckets;
 
-        if ((uint)bucketIndex < (uint)_cacheBuckets!.Length)
+        if ((uint)bucketIndex < (uint)cacheBuckets.Length)
         {
             if (clearArray)
             {
@@ -148,7 +157,7 @@ public class STArrayPool<T> : ArrayPool<T>
 
             if (prev is not null)
             {
-                var bucket = _buckets[bucketIndex] ?? CreateBucketStack(bucketIndex);
+                var bucket = state.Buckets[bucketIndex] ?? CreateBucketStack(state, bucketIndex);
                 bucket.TryPush(prev);
             }
         }
@@ -156,77 +165,72 @@ public class STArrayPool<T> : ArrayPool<T>
 
     public bool Trim()
     {
-        var ticks = //Core.TickCount;
-            DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
+        var ticks = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
         var pressure = GetMemoryPressure();
 
-        var buckets = _buckets;
+        foreach (var state in _state.Values)
+        {
+            if (state is null)
+            {
+                continue;
+            }
+
+            TrimState(state, ticks, pressure);
+        }
+
+        return true;
+    }
+
+    private static void TrimState(STArrayPoolThreadState<T> state, long ticks, STArrayPoolMemoryPressureType pressure)
+    {
+        var buckets = state.Buckets;
 
         for (var i = 0; i < buckets.Length; i++)
         {
             buckets[i]?.Trim(ticks, pressure, GetMaxSizeForBucket(i));
         }
 
-        if (_cacheBuckets == null)
-        {
-            return true;
-        }
+        var cacheBuckets = state.CacheBuckets;
 
         // Under high pressure, release all cached buckets
         if (pressure == STArrayPoolMemoryPressureType.High)
         {
-            Array.Clear(_cacheBuckets);
+            Array.Clear(cacheBuckets);
+
+            return;
         }
-        else
+
+        uint threshold = pressure switch
         {
-            uint threshold = pressure switch
+            STArrayPoolMemoryPressureType.Medium => 10000,
+            _                                    => 30000
+        };
+
+        for (var i = 0; i < cacheBuckets.Length; i++)
+        {
+            ref var b = ref cacheBuckets[i];
+
+            if (b.Array is null)
             {
-                STArrayPoolMemoryPressureType.Medium => 10000,
-                _                                    => 30000
-            };
+                continue;
+            }
 
-            var cacheBuckets = _cacheBuckets;
+            var lastSeen = b.Ticks;
 
-            for (var i = 0; i < cacheBuckets.Length; i++)
+            if (lastSeen == 0)
             {
-                ref var b = ref cacheBuckets[i];
-
-                if (b.Array is null)
-                {
-                    continue;
-                }
-
-                var lastSeen = b.Ticks;
-
-                if (lastSeen == 0)
-                {
-                    b.Ticks = ticks;
-                }
-                else if (ticks - lastSeen >= threshold)
-                {
-                    b.Array = null;
-                }
+                b.Ticks = ticks;
+            }
+            else if (ticks - lastSeen >= threshold)
+            {
+                b.Array = null;
+                b.Ticks = 0;
             }
         }
-
-        return true;
     }
 
-    private STArrayPoolStack<T> CreateBucketStack(int bucketIndex)
-        => _buckets[bucketIndex] = new(StackArraySize);
-
-    private STArrayPoolBucket<T>[] InitializeBuckets()
-    {
-        Debug.Assert(_cacheBuckets is null, $"Non-null {nameof(_cacheBuckets)}");
-        var buckets = new STArrayPoolBucket<T>[BucketCount];
-
-        if (Interlocked.Exchange(ref _trimCallbackCreated, 1) == 0)
-        {
-            Gen2GcCallback.Register(o => ((STArrayPool<T>)o).Trim(), this);
-        }
-
-        return _cacheBuckets = buckets;
-    }
+    private static STArrayPoolStack<T> CreateBucketStack(STArrayPoolThreadState<T> state, int bucketIndex)
+        => state.Buckets[bucketIndex] = new(StackArraySize);
 
     // Buffers are bucketed so that a request between 2^(n-1) + 1 and 2^n is given a buffer of 2^n
     // Bucket index is log2(bufferSize - 1) with the exception that buffers between 1 and 16 bytes
