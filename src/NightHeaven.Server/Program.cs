@@ -13,7 +13,7 @@ using Serilog;
 
 await ConsoleApp.RunAsync(
     args,
-    (CancellationToken cancellationToken, string? rootDirectory = null) =>
+    (CancellationToken cancellationToken, string? rootDirectory = null, bool debug = false) =>
     {
         rootDirectory ??= Environment.GetEnvironmentVariable("NIGHTHEAVEN_ROOT");
 
@@ -24,7 +24,13 @@ await ConsoleApp.RunAsync(
         Console.WriteLine($"NightHeaven UO Server v{VersionUtils.GetVersion()}");
         Console.WriteLine($"Root Directory: {directoriesConfig.Root}");
 
-        var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(
+            new WebApplicationOptions
+            {
+                Args = args,
+                EnvironmentName = debug ? Environments.Development : null
+            }
+        );
 
         Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
