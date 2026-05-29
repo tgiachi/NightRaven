@@ -1,7 +1,12 @@
 using ConsoleAppFramework;
+using Microsoft.Extensions.Hosting;
 using NightHeaven.Core.Data.Directories;
 using NightHeaven.Core.Types;
 using NightHeaven.Core.Utils;
+using NightHeaven.Hosting.Interfaces.Services;
+using NightHeaven.Server.Data.Events;
+using NightHeaven.Server.Extensions;
+using NightHeaven.Server.Services.Diagnostics;
 using Serilog;
 
 await ConsoleApp.RunAsync(
@@ -27,7 +32,21 @@ await ConsoleApp.RunAsync(
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
+        // NightHeaven event bus + game loop (priority 0 / 10) and the diagnostic handler.
+        builder.Services.AddNightHeavenEventBus();
+        builder.Services.AddTickEventHandler<ServerStartedHandler, ServerStartedEvent>();
+
         var app = builder.Build();
+
+        // Publish a tick event the moment the host is up; the handler logs the thread it runs on.
+        var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+        lifetime.ApplicationStarted.Register(
+            () =>
+            {
+                var bus = app.Services.GetRequiredService<IEventBusService>();
+                bus.Publish(new ServerStartedEvent(DateTimeOffset.UtcNow));
+            }
+        );
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

@@ -1,0 +1,9 @@
+using NightHeaven.Hosting.Interfaces.Events;
+
+namespace NightHeaven.Server.Data.Events;
+
+/// <summary>
+/// Tick event published once after the host has fully started.
+/// Used by diagnostic handlers to confirm the game-loop thread is alive.
+/// </summary>
+public sealed record ServerStartedEvent(DateTimeOffset At) : ITickEvent;
