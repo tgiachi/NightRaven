@@ -1,12 +1,13 @@
 using ConsoleAppFramework;
-using Microsoft.Extensions.Hosting;
 using NightHeaven.Core.Data.Directories;
 using NightHeaven.Core.Types;
 using NightHeaven.Core.Utils;
+using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Server.Data.Events;
 using NightHeaven.Server.Extensions;
 using NightHeaven.Server.Services.Diagnostics;
+using NightHeaven.Server.Services.Metrics;
 using Serilog;
 
 await ConsoleApp.RunAsync(
@@ -36,6 +37,13 @@ await ConsoleApp.RunAsync(
         builder.Services.AddNightHeavenEventBus();
         builder.Services.AddTickEventHandler<ServerStartedHandler, ServerStartedEvent>();
 
+        // Metrics: needs the timer wheel for the background refresh.
+        builder.Services.AddNightHeavenTimerWheel();
+        builder.Services.AddNightHeavenMetrics();
+        builder.Services.AddMetricProvider<NightHeaven.Server.Services.EventBus.EventBusService>();
+        builder.Services.AddMetricProvider<NightHeaven.Server.Services.GameLoop.GameLoopService>();
+        builder.Services.AddMetricProvider<NightHeaven.Server.Services.Timing.TimerWheelService>();
+
         var app = builder.Build();
 
         // Publish a tick event the moment the host is up; the handler logs the thread it runs on.
@@ -55,6 +63,15 @@ await ConsoleApp.RunAsync(
         }
 
         app.UseHttpsRedirection();
+
+        app.MapGet(
+               "/metrics",
+               (IMetricsService metrics) => Results.Text(
+                   OpenMetricsFormatter.Format(metrics.GetSnapshot()),
+                   contentType: "application/openmetrics-text; version=1.0.0; charset=utf-8"
+               )
+           )
+           .WithName("GetMetrics");
 
         var summaries = new[]
         {
