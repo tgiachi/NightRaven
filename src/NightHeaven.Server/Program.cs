@@ -7,7 +7,10 @@ using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Server.Data.Events;
 using NightHeaven.Server.Extensions;
 using NightHeaven.Server.Services.Diagnostics;
+using NightHeaven.Server.Services.EventBus;
+using NightHeaven.Server.Services.GameLoop;
 using NightHeaven.Server.Services.Metrics;
+using NightHeaven.Server.Services.Timing;
 using Serilog;
 
 await ConsoleApp.RunAsync(
@@ -40,9 +43,9 @@ await ConsoleApp.RunAsync(
         // Metrics: needs the timer wheel for the background refresh.
         builder.Services.AddNightHeavenTimerWheel();
         builder.Services.AddNightHeavenMetrics();
-        builder.Services.AddMetricProvider<NightHeaven.Server.Services.EventBus.EventBusService>();
-        builder.Services.AddMetricProvider<NightHeaven.Server.Services.GameLoop.GameLoopService>();
-        builder.Services.AddMetricProvider<NightHeaven.Server.Services.Timing.TimerWheelService>();
+        builder.Services.AddMetricProvider<EventBusService>();
+        builder.Services.AddMetricProvider<GameLoopService>();
+        builder.Services.AddMetricProvider<TimerWheelService>();
 
         var app = builder.Build();
 
