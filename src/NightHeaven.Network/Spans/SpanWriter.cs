@@ -199,20 +199,23 @@ public ref struct SpanWriter : IDisposable
             return new(0, null, false);
         }
 
+        // Capture the length BEFORE `this = default`, otherwise the reset zeroes
+        // `_position` and the returned SpanOwner reports length 0.
+        var length = _position;
         var currentPoolBuffer = _arrayToReturnToPool;
 
         if (currentPoolBuffer is not null)
         {
             this = default;
 
-            return new(_position, currentPoolBuffer, true);
+            return new(length, currentPoolBuffer, true);
         }
 
-        var ownedBuffer = STArrayPool<byte>.Shared.Rent(_position);
-        _buffer[.._position].CopyTo(ownedBuffer);
+        var ownedBuffer = STArrayPool<byte>.Shared.Rent(length);
+        _buffer[..length].CopyTo(ownedBuffer);
         this = default;
 
-        return new(_position, ownedBuffer, true);
+        return new(length, ownedBuffer, true);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
