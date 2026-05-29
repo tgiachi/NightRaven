@@ -2,6 +2,7 @@ using NightHeaven.Hosting.Data.Metrics;
 using NightHeaven.Hosting.Data.Timing;
 using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Hosting.Interfaces.Timing;
+using NightHeaven.Hosting.Types.Metrics;
 using NightHeaven.Server.Services.Timing.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -231,7 +232,60 @@ public sealed class TimerWheelService : ITimerService, IMetricProvider
     }
 
     public IReadOnlyList<MetricSample> Collect()
-        => throw new NotImplementedException();
+    {
+        int active;
+
+        lock (_syncRoot)
+        {
+            active = _timersById.Count;
+        }
+
+        var executed = Interlocked.Read(ref _totalExecuted);
+        var elapsedSwTicks = Interlocked.Read(ref _totalCallbackElapsedStopwatchTicks);
+        var avgMs = executed == 0
+            ? 0
+            : System.Diagnostics.Stopwatch.GetElapsedTime(0, elapsedSwTicks / executed).TotalMilliseconds;
+
+        return
+        [
+            new MetricSample(
+                "active",
+                active,
+                MetricType.Gauge,
+                Help: "Currently registered timers"
+            ),
+            new MetricSample(
+                "registered_total",
+                Interlocked.Read(ref _totalRegistered),
+                MetricType.Counter,
+                Help: "Total registrations since start"
+            ),
+            new MetricSample(
+                "executed_total",
+                executed,
+                MetricType.Counter,
+                Help: "Total callback invocations"
+            ),
+            new MetricSample(
+                "callback_errors_total",
+                Interlocked.Read(ref _callbackErrors),
+                MetricType.Counter,
+                Help: "Total callback exceptions"
+            ),
+            new MetricSample(
+                "callback_avg_ms",
+                avgMs,
+                MetricType.Gauge,
+                Help: "Average callback duration"
+            ),
+            new MetricSample(
+                "processed_ticks_total",
+                Interlocked.Read(ref _totalProcessedTicks),
+                MetricType.Counter,
+                Help: "Total wheel ticks processed"
+            )
+        ];
+    }
 
     private void ProcessTick()
     {
