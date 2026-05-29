@@ -27,6 +27,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj" />
+      <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj" />
       <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj" />
     </ItemGroup>
 
