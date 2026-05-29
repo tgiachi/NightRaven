@@ -3,18 +3,24 @@ using NightHeaven.Network.Client;
 namespace NightHeaven.Network.Interfaces;
 
 /// <summary>
-/// Defines a middleware component that can inspect and transform
-/// incoming network payloads before they are dispatched as events.
+/// Transforms raw network bytes for a client connection.
 /// </summary>
+/// <remarks>
+/// Middleware operates on raw bytes and MUST NOT assume any message, packet, or frame
+/// semantics — framing and protocol parsing are the consumer's responsibility, applied
+/// to the <c>OnDataReceived</c> output of the client. Returning
+/// <see cref="ReadOnlyMemory{T}.Empty" /> from either method drops the payload and
+/// short-circuits the remaining pipeline.
+/// </remarks>
 public interface INetMiddleware
 {
     /// <summary>
-    /// Processes a payload for a specific client.
+    /// Transforms an incoming payload before it is dispatched to consumers.
     /// </summary>
     /// <param name="client">Client associated with the payload, if available.</param>
-    /// <param name="data">Incoming payload.</param>
+    /// <param name="data">Incoming bytes.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>The transformed payload. Return <see cref="ReadOnlyMemory{T}.Empty" /> to drop the payload.</returns>
+    /// <returns>Transformed bytes, or <see cref="ReadOnlyMemory{T}.Empty" /> to drop the payload.</returns>
     ValueTask<ReadOnlyMemory<byte>> ProcessAsync(
         NightHeavenTCPClient? client,
         ReadOnlyMemory<byte> data,
@@ -22,12 +28,12 @@ public interface INetMiddleware
     );
 
     /// <summary>
-    /// Processes an outgoing payload before it is sent to the socket.
+    /// Transforms an outgoing payload before it is written to the socket.
     /// </summary>
     /// <param name="client">Client associated with the payload, if available.</param>
-    /// <param name="data">Outgoing payload.</param>
+    /// <param name="data">Outgoing bytes.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>The transformed payload. Return <see cref="ReadOnlyMemory{T}.Empty" /> to drop the payload.</returns>
+    /// <returns>Transformed bytes, or <see cref="ReadOnlyMemory{T}.Empty" /> to drop the payload.</returns>
     ValueTask<ReadOnlyMemory<byte>> ProcessSendAsync(
         NightHeavenTCPClient? client,
         ReadOnlyMemory<byte> data,

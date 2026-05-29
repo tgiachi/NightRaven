@@ -24,6 +24,7 @@ The differentiator is not the language or a paradigm. It's that a new shard oper
 ## Architectural rules
 
 - **`NightHeaven.Core` is gameplay-agnostic.** No combat, skills, items, packets, or UO concepts. Only primitives (buffers, collections, strings, encoding, RNG, logging, event bus, etc.).
+- **`NightHeaven.Network` is transport-agnostic.** The middleware pipeline transforms bytes only and does not know about messages, packets, or frames. Protocol-specific framing/parsing lives in dedicated modules that consume `NightHeavenTCPClient.OnDataReceived` and publish typed events on `IEventBus`.
 - **UO-specific logic lives in modules** that opt-in through the event bus and plugin system.
 - **Event bus first.** Cross-subsystem communication goes through `IEventBus`; do not inject services directly across module boundaries.
 - **Testability is non-negotiable.** New services come with an interface, DI registration, and a test suite in `tests/NightHeaven.Tests/` mirroring the production folder layout.

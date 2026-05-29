@@ -22,6 +22,7 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
 
     private readonly ILogger _logger = Log.ForContext<NightHeavenTCPClient>();
     private readonly NetMiddlewarePipeline _middlewarePipeline;
+    private readonly INetFramer? _framer;
     private readonly Socket _socket;
     private readonly SemaphoreSlim _sendLock = new(1, 1);
     private readonly CancellationTokenSource _internalCancellationTokenSource = new();
@@ -30,6 +31,8 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
 
     private CancellationTokenRegistration _externalCancellationTokenRegistration;
     private Task? _receiveLoopTask;
+    private byte[]? _pendingBuffer;
+    private int _pendingLength;
     private int _started;
     private int _closed;
 
@@ -38,17 +41,23 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
     /// </summary>
     /// <param name="socket">Connected socket.</param>
     /// <param name="middlewares">Optional middleware list.</param>
+    /// <param name="framer">
+    /// Optional framer. When supplied, the receive loop accumulates middleware output and
+    /// emits <see cref="OnDataReceived" /> once per complete frame instead of once per socket read.
+    /// </param>
     /// <param name="receiveBufferSize">Receive chunk size in bytes.</param>
     /// <param name="historyBufferCapacity">Max number of received bytes to keep in history.</param>
     public NightHeavenTCPClient(
         Socket socket,
         IEnumerable<INetMiddleware>? middlewares = null,
+        INetFramer? framer = null,
         int receiveBufferSize = DefaultReceiveBufferSize,
         int historyBufferCapacity = DefaultHistoryBufferCapacity
     )
     {
         _socket = socket;
         _middlewarePipeline = new(middlewares);
+        _framer = framer;
         _receiveBuffer = new(historyBufferCapacity);
         ReceiveBufferSize = receiveBufferSize;
         SessionId = Interlocked.Increment(ref _sessionIdSequence);
@@ -203,13 +212,14 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
     public static async Task<NightHeavenTCPClient> ConnectAsync(
         IPEndPoint endPoint,
         IEnumerable<INetMiddleware>? middlewares = null,
+        INetFramer? framer = null,
         CancellationToken cancellationToken = default
     )
     {
         var socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         await socket.ConnectAsync(endPoint, cancellationToken);
 
-        var client = new NightHeavenTCPClient(socket, middlewares);
+        var client = new NightHeavenTCPClient(socket, middlewares, framer);
         await client.StartAsync(cancellationToken);
 
         return client;
@@ -399,16 +409,16 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
                     break;
                 }
 
+                lock (_receiveBufferSync)
+                {
+                    _receiveBuffer.PushBackRange(buffer.AsSpan(0, received));
+                }
+
                 var chunk = STArrayPool<byte>.Shared.Rent(received);
 
                 try
                 {
                     buffer.AsSpan(0, received).CopyTo(chunk);
-
-                    lock (_receiveBufferSync)
-                    {
-                        _receiveBuffer.PushBackRange(chunk.AsSpan(0, received));
-                    }
 
                     var chunkMemory = new ReadOnlyMemory<byte>(chunk, 0, received);
                     var processed = await _middlewarePipeline.ExecuteAsync(
@@ -417,9 +427,22 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
                                         _internalCancellationTokenSource.Token
                                     );
 
-                    if (!processed.IsEmpty)
+                    if (processed.IsEmpty)
                     {
-                        OnDataReceived?.Invoke(this, new(this, processed));
+                        continue;
+                    }
+
+                    if (_framer is null)
+                    {
+                        // Fresh copy so the event handler can outlive the pooled chunk.
+                        var payload = new byte[processed.Length];
+                        processed.CopyTo(payload);
+                        OnDataReceived?.Invoke(this, new(this, payload));
+                    }
+                    else
+                    {
+                        AppendPending(processed.Span);
+                        EmitFrames();
                     }
                 }
                 finally
@@ -440,8 +463,94 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
         finally
         {
             STArrayPool<byte>.Shared.Return(buffer);
+            ReleasePendingBuffer();
             await CloseAsync();
         }
+    }
+
+    private void AppendPending(ReadOnlySpan<byte> data)
+    {
+        if (data.IsEmpty)
+        {
+            return;
+        }
+
+        if (_pendingBuffer is null)
+        {
+            _pendingBuffer = STArrayPool<byte>.Shared.Rent(Math.Max(ReceiveBufferSize, data.Length));
+        }
+
+        var required = _pendingLength + data.Length;
+
+        if (required > _pendingBuffer.Length)
+        {
+            var newCapacity = Math.Max(required, _pendingBuffer.Length * 2);
+            var newBuffer = STArrayPool<byte>.Shared.Rent(newCapacity);
+            _pendingBuffer.AsSpan(0, _pendingLength).CopyTo(newBuffer);
+            STArrayPool<byte>.Shared.Return(_pendingBuffer);
+            _pendingBuffer = newBuffer;
+        }
+
+        data.CopyTo(_pendingBuffer.AsSpan(_pendingLength));
+        _pendingLength += data.Length;
+    }
+
+    private void EmitFrames()
+    {
+        if (_framer is null || _pendingBuffer is null)
+        {
+            return;
+        }
+
+        while (_pendingLength > 0)
+        {
+            var view = _pendingBuffer.AsSpan(0, _pendingLength);
+
+            if (!_framer.TryReadFrame(view, out var frameLength))
+            {
+                break;
+            }
+
+            if (frameLength <= 0 || frameLength > _pendingLength)
+            {
+                // Malformed framer report; abandon the remaining buffer to avoid an infinite loop.
+                _pendingLength = 0;
+
+                break;
+            }
+
+            // Fresh copy so handlers can safely retain the payload.
+            var frame = new byte[frameLength];
+            view[..frameLength].CopyTo(frame);
+
+            ConsumePending(frameLength);
+
+            OnDataReceived?.Invoke(this, new(this, frame));
+        }
+    }
+
+    private void ConsumePending(int count)
+    {
+        var remaining = _pendingLength - count;
+
+        if (remaining > 0 && _pendingBuffer is not null)
+        {
+            _pendingBuffer.AsSpan(count, remaining).CopyTo(_pendingBuffer);
+        }
+
+        _pendingLength = remaining;
+    }
+
+    private void ReleasePendingBuffer()
+    {
+        if (_pendingBuffer is null)
+        {
+            return;
+        }
+
+        STArrayPool<byte>.Shared.Return(_pendingBuffer);
+        _pendingBuffer = null;
+        _pendingLength = 0;
     }
 
     /// <inheritdoc />

@@ -20,6 +20,7 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
     private readonly Lock _middlewareSync = new();
     private readonly ConcurrentDictionary<long, NightHeavenTCPClient> _clients = new();
     private readonly IPEndPoint _endPoint;
+    private readonly INetFramer? _framer;
     private readonly int _receiveBufferSize;
     private readonly int _historyBufferCapacity;
 
@@ -32,9 +33,22 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
     /// <summary>
     /// Initializes a TCP server bound to the given endpoint.
     /// </summary>
-    public NightHeavenTCPServer(IPEndPoint endPoint, int receiveBufferSize = 8192, int historyBufferCapacity = 65536)
+    /// <param name="endPoint">Endpoint to bind on every <see cref="StartAsync" />.</param>
+    /// <param name="framer">
+    /// Optional framer template. The same instance is shared by all accepted clients,
+    /// so implementations must be stateless or thread-safe.
+    /// </param>
+    /// <param name="receiveBufferSize">Per-client receive chunk size.</param>
+    /// <param name="historyBufferCapacity">Per-client history buffer capacity.</param>
+    public NightHeavenTCPServer(
+        IPEndPoint endPoint,
+        INetFramer? framer = null,
+        int receiveBufferSize = 8192,
+        int historyBufferCapacity = 65536
+    )
     {
         _endPoint = endPoint;
+        _framer = framer;
         _receiveBufferSize = receiveBufferSize;
         _historyBufferCapacity = historyBufferCapacity;
     }
@@ -180,6 +194,7 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
                 var client = new NightHeavenTCPClient(
                     clientSocket,
                     middlewareSnapshot,
+                    _framer,
                     _receiveBufferSize,
                     _historyBufferCapacity
                 );
