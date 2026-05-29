@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NightHeaven.Hosting.Interfaces;
+using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Hosting.Internal;
 
 namespace NightHeaven.Hosting.Extensions;

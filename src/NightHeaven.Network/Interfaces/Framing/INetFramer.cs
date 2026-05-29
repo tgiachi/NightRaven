@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.Interfaces;
+namespace NightHeaven.Network.Interfaces.Framing;
 
 /// <summary>
 /// Extracts discrete frames from a continuous byte stream.

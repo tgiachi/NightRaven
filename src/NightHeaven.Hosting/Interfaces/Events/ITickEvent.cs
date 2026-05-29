@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Interfaces;
+namespace NightHeaven.Hosting.Interfaces.Events;
 
 /// <summary>
 /// Marker for events dispatched through the deterministic game-loop tick path.

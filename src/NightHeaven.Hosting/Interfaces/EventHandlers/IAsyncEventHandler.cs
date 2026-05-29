@@ -1,4 +1,6 @@
-namespace NightHeaven.Hosting.Interfaces;
+using NightHeaven.Hosting.Interfaces.Events;
+
+namespace NightHeaven.Hosting.Interfaces.EventHandlers;
 
 /// <summary>
 /// Handles a single <typeparamref name="TEvent" /> on the asynchronous path.

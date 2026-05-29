@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Interfaces;
+namespace NightHeaven.Hosting.Interfaces.Events;
 
 /// <summary>
 /// Marker base interface for every message routed through NightHeaven's event bus.

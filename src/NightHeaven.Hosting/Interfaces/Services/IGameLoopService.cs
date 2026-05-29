@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Interfaces;
+namespace NightHeaven.Hosting.Interfaces.Services;
 
 /// <summary>
 /// Owns the dedicated game-loop thread that drains tick events from <see cref="IEventBusService" />.

@@ -1,6 +1,6 @@
 using NightHeaven.Network.Client;
 
-namespace NightHeaven.Network.Interfaces;
+namespace NightHeaven.Network.Interfaces.Middleware;
 
 /// <summary>
 /// Transforms raw network bytes for a client connection.

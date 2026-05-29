@@ -1,5 +1,7 @@
 using System.Threading.Channels;
-using NightHeaven.Hosting.Interfaces;
+using NightHeaven.Hosting.Interfaces.EventHandlers;
+using NightHeaven.Hosting.Interfaces.Events;
+using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Server.Services.EventBus.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;

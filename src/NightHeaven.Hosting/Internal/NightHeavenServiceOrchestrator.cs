@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Hosting;
-using NightHeaven.Hosting.Interfaces;
+using NightHeaven.Hosting.Interfaces.EventHandlers;
+using NightHeaven.Hosting.Interfaces.Events;
+using NightHeaven.Hosting.Interfaces.Services;
 using Serilog;
 
 namespace NightHeaven.Hosting.Internal;

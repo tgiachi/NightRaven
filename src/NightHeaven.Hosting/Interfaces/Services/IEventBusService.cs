@@ -1,4 +1,6 @@
-namespace NightHeaven.Hosting.Interfaces;
+using NightHeaven.Hosting.Interfaces.Events;
+
+namespace NightHeaven.Hosting.Interfaces.Services;
 
 /// <summary>
 /// Routes <see cref="INightHeavenEvent" /> instances to registered handlers.

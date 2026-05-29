@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightHeaven.Hosting.Interfaces;
+using NightHeaven.Hosting.Interfaces.EventHandlers;
+using NightHeaven.Hosting.Interfaces.Events;
+using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Server.Services.EventBus.Internal;
 using NightHeaven.Tests.Hosting.EventBus.Support;
 

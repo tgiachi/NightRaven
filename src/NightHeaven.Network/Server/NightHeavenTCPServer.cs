@@ -3,7 +3,9 @@ using System.Net;
 using System.Net.Sockets;
 using NightHeaven.Network.Client;
 using NightHeaven.Network.Events;
-using NightHeaven.Network.Interfaces;
+using NightHeaven.Network.Interfaces.Encryption;
+using NightHeaven.Network.Interfaces.Framing;
+using NightHeaven.Network.Interfaces.Middleware;
 using Serilog;
 
 namespace NightHeaven.Network.Server;

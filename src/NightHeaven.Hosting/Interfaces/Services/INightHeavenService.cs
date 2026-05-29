@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 
-namespace NightHeaven.Hosting.Interfaces;
+namespace NightHeaven.Hosting.Interfaces.Services;
 
 /// <summary>
 /// Marker interface for services orchestrated by NightHeaven's hosting layer.

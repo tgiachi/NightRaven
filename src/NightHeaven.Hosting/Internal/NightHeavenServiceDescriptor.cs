@@ -1,4 +1,4 @@
-using NightHeaven.Hosting.Interfaces;
+using NightHeaven.Hosting.Interfaces.Services;
 
 namespace NightHeaven.Hosting.Internal;
 

@@ -1,5 +1,7 @@
 using NightHeaven.Network.Client;
-using NightHeaven.Network.Interfaces;
+using NightHeaven.Network.Interfaces.Encryption;
+using NightHeaven.Network.Interfaces.Framing;
+using NightHeaven.Network.Interfaces.Middleware;
 using NightHeaven.Network.Pipeline;
 
 namespace NightHeaven.Tests.Network.Pipeline;
