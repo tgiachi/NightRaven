@@ -457,12 +457,13 @@ public ref struct SpanWriter : IDisposable
         Write((byte)0);
     }
 
-    private static int GetTerminatorWidth(Encoding encoding) => encoding switch
-    {
-        UnicodeEncoding => 2,
-        UTF32Encoding   => 4,
-        _               => 1
-    };
+    private static int GetTerminatorWidth(Encoding encoding)
+        => encoding switch
+        {
+            UnicodeEncoding => 2,
+            UTF32Encoding   => 4,
+            _               => 1
+        };
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void GrowIfNeeded(int count)

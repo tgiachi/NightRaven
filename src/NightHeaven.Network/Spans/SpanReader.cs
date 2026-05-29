@@ -357,12 +357,13 @@ public ref struct SpanReader : IDisposable
         return Position;
     }
 
-    private static int GetTerminatorWidth(Encoding encoding) => encoding switch
-    {
-        UnicodeEncoding => 2,
-        UTF32Encoding   => 4,
-        _               => 1
-    };
+    private static int GetTerminatorWidth(Encoding encoding)
+        => encoding switch
+        {
+            UnicodeEncoding => 2,
+            UTF32Encoding   => 4,
+            _               => 1
+        };
 
     private static int IndexOfTerminator(ReadOnlySpan<byte> span, int terminatorWidth)
     {

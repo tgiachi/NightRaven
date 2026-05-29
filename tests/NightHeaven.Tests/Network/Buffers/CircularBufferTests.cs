@@ -53,6 +53,26 @@ public class CircularBufferTests
     }
 
     [Fact]
+    public void PushBackRange_MatchesPerByteSequence()
+    {
+        // Equivalence regression: PushBackRange must produce the same logical contents
+        // as a sequence of PushBack calls with the same data.
+        var sequential = new CircularBuffer<byte>(8);
+        var bulk = new CircularBuffer<byte>(8);
+
+        ReadOnlySpan<byte> data = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+
+        foreach (var b in data)
+        {
+            sequential.PushBack(b);
+        }
+
+        bulk.PushBackRange(data);
+
+        Assert.Equal(sequential.ToArray(), bulk.ToArray());
+    }
+
+    [Fact]
     public void PushBackRange_OverCapacity_KeepsOnlyLastN()
     {
         var buffer = new CircularBuffer<byte>(4);
@@ -80,25 +100,5 @@ public class CircularBufferTests
 
         Assert.Equal(6, buffer.Size);
         Assert.Equal(new byte[] { 5, 6, 7, 8, 9, 10 }, buffer.ToArray());
-    }
-
-    [Fact]
-    public void PushBackRange_MatchesPerByteSequence()
-    {
-        // Equivalence regression: PushBackRange must produce the same logical contents
-        // as a sequence of PushBack calls with the same data.
-        var sequential = new CircularBuffer<byte>(8);
-        var bulk = new CircularBuffer<byte>(8);
-
-        ReadOnlySpan<byte> data = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-
-        foreach (var b in data)
-        {
-            sequential.PushBack(b);
-        }
-
-        bulk.PushBackRange(data);
-
-        Assert.Equal(sequential.ToArray(), bulk.ToArray());
     }
 }

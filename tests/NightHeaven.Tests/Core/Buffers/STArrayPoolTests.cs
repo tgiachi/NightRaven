@@ -5,6 +5,61 @@ namespace NightHeaven.Tests.Core.Buffers;
 public class STArrayPoolTests
 {
     [Fact]
+    public void Rent_FromMultipleThreads_DoesNotCorruptState()
+    {
+        // Regression: previous implementation shared bucket arrays across threads
+        // and would deadlock or corrupt under concurrent access. With ThreadLocal
+        // state, each thread sees its own buckets.
+        const int threadCount = 8;
+        const int iterations = 1000;
+        var pool = STArrayPool<byte>.Shared;
+        var errors = 0;
+
+        var threads = new Thread[threadCount];
+
+        for (var t = 0; t < threadCount; t++)
+        {
+            threads[t] = new(
+                () =>
+                {
+                    try
+                    {
+                        for (var i = 0; i < iterations; i++)
+                        {
+                            var buffer = pool.Rent(256);
+                            Assert.True(buffer.Length >= 256);
+                            pool.Return(buffer);
+                        }
+                    }
+                    catch
+                    {
+                        Interlocked.Increment(ref errors);
+                    }
+                }
+            );
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Start();
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        Assert.Equal(0, errors);
+    }
+
+    [Fact]
+    public void Rent_NegativeLength_Throws()
+    {
+        var pool = STArrayPool<byte>.Shared;
+        Assert.Throws<ArgumentOutOfRangeException>(() => pool.Rent(-1));
+    }
+
+    [Fact]
     public void Rent_ReturnsArrayOfAtLeastRequestedLength()
     {
         var pool = STArrayPool<int>.Shared;
@@ -31,13 +86,6 @@ public class STArrayPoolTests
     }
 
     [Fact]
-    public void Rent_NegativeLength_Throws()
-    {
-        var pool = STArrayPool<byte>.Shared;
-        Assert.Throws<ArgumentOutOfRangeException>(() => pool.Rent(-1));
-    }
-
-    [Fact]
     public void RentReturn_RoundTrip_ReusesBuffer()
     {
         var pool = STArrayPool<long>.Shared;
@@ -57,13 +105,6 @@ public class STArrayPoolTests
     }
 
     [Fact]
-    public void Return_NullArray_DoesNotThrow()
-    {
-        var pool = STArrayPool<int>.Shared;
-        pool.Return(null);
-    }
-
-    [Fact]
     public void Return_ArrayNotFromPool_Throws()
     {
         var pool = STArrayPool<int>.Shared;
@@ -73,48 +114,9 @@ public class STArrayPoolTests
     }
 
     [Fact]
-    public void Rent_FromMultipleThreads_DoesNotCorruptState()
+    public void Return_NullArray_DoesNotThrow()
     {
-        // Regression: previous implementation shared bucket arrays across threads
-        // and would deadlock or corrupt under concurrent access. With ThreadLocal
-        // state, each thread sees its own buckets.
-        const int threadCount = 8;
-        const int iterations = 1000;
-        var pool = STArrayPool<byte>.Shared;
-        var errors = 0;
-
-        var threads = new Thread[threadCount];
-
-        for (var t = 0; t < threadCount; t++)
-        {
-            threads[t] = new Thread(() =>
-            {
-                try
-                {
-                    for (var i = 0; i < iterations; i++)
-                    {
-                        var buffer = pool.Rent(256);
-                        Assert.True(buffer.Length >= 256);
-                        pool.Return(buffer);
-                    }
-                }
-                catch
-                {
-                    Interlocked.Increment(ref errors);
-                }
-            });
-        }
-
-        foreach (var thread in threads)
-        {
-            thread.Start();
-        }
-
-        foreach (var thread in threads)
-        {
-            thread.Join();
-        }
-
-        Assert.Equal(0, errors);
+        var pool = STArrayPool<int>.Shared;
+        pool.Return(null);
     }
 }

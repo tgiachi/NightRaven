@@ -255,6 +255,35 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
         where TMiddleware : INetMiddleware
         => _middlewarePipeline.ContainsMiddleware<TMiddleware>();
 
+    /// <inheritdoc />
+    public void Dispose()
+
+        // Sync-over-async: best effort. Prefer DisposeAsync.
+        => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        await CloseAsync();
+
+        // Drain the receive loop before disposing the resources it relies on.
+        if (_receiveLoopTask is not null)
+        {
+            try
+            {
+                await _receiveLoopTask;
+            }
+            catch
+            {
+                // Loop failures are already surfaced via OnException.
+            }
+        }
+
+        _sendLock.Dispose();
+        _internalCancellationTokenSource.Dispose();
+        _socket.Dispose();
+    }
+
     /// <summary>
     /// Returns a snapshot of recent received bytes from the circular history buffer.
     /// </summary>
@@ -357,6 +386,79 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
         _receiveLoopTask = Task.Run(ReceiveLoopAsync, CancellationToken.None);
 
         return Task.CompletedTask;
+    }
+
+    private void AppendPending(ReadOnlySpan<byte> data)
+    {
+        if (data.IsEmpty)
+        {
+            return;
+        }
+
+        if (_pendingBuffer is null)
+        {
+            _pendingBuffer = STArrayPool<byte>.Shared.Rent(Math.Max(ReceiveBufferSize, data.Length));
+        }
+
+        var required = _pendingLength + data.Length;
+
+        if (required > _pendingBuffer.Length)
+        {
+            var newCapacity = Math.Max(required, _pendingBuffer.Length * 2);
+            var newBuffer = STArrayPool<byte>.Shared.Rent(newCapacity);
+            _pendingBuffer.AsSpan(0, _pendingLength).CopyTo(newBuffer);
+            STArrayPool<byte>.Shared.Return(_pendingBuffer);
+            _pendingBuffer = newBuffer;
+        }
+
+        data.CopyTo(_pendingBuffer.AsSpan(_pendingLength));
+        _pendingLength += data.Length;
+    }
+
+    private void ConsumePending(int count)
+    {
+        var remaining = _pendingLength - count;
+
+        if (remaining > 0 && _pendingBuffer is not null)
+        {
+            _pendingBuffer.AsSpan(count, remaining).CopyTo(_pendingBuffer);
+        }
+
+        _pendingLength = remaining;
+    }
+
+    private void EmitFrames()
+    {
+        if (_framer is null || _pendingBuffer is null)
+        {
+            return;
+        }
+
+        while (_pendingLength > 0)
+        {
+            var view = _pendingBuffer.AsSpan(0, _pendingLength);
+
+            if (!_framer.TryReadFrame(view, out var frameLength))
+            {
+                break;
+            }
+
+            if (frameLength <= 0 || frameLength > _pendingLength)
+            {
+                // Malformed framer report; abandon the remaining buffer to avoid an infinite loop.
+                _pendingLength = 0;
+
+                break;
+            }
+
+            // Fresh copy so handlers can safely retain the payload.
+            var frame = new byte[frameLength];
+            view[..frameLength].CopyTo(frame);
+
+            ConsumePending(frameLength);
+
+            OnDataReceived?.Invoke(this, new(this, frame));
+        }
     }
 
     private void RaiseConnected()
@@ -468,79 +570,6 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
         }
     }
 
-    private void AppendPending(ReadOnlySpan<byte> data)
-    {
-        if (data.IsEmpty)
-        {
-            return;
-        }
-
-        if (_pendingBuffer is null)
-        {
-            _pendingBuffer = STArrayPool<byte>.Shared.Rent(Math.Max(ReceiveBufferSize, data.Length));
-        }
-
-        var required = _pendingLength + data.Length;
-
-        if (required > _pendingBuffer.Length)
-        {
-            var newCapacity = Math.Max(required, _pendingBuffer.Length * 2);
-            var newBuffer = STArrayPool<byte>.Shared.Rent(newCapacity);
-            _pendingBuffer.AsSpan(0, _pendingLength).CopyTo(newBuffer);
-            STArrayPool<byte>.Shared.Return(_pendingBuffer);
-            _pendingBuffer = newBuffer;
-        }
-
-        data.CopyTo(_pendingBuffer.AsSpan(_pendingLength));
-        _pendingLength += data.Length;
-    }
-
-    private void EmitFrames()
-    {
-        if (_framer is null || _pendingBuffer is null)
-        {
-            return;
-        }
-
-        while (_pendingLength > 0)
-        {
-            var view = _pendingBuffer.AsSpan(0, _pendingLength);
-
-            if (!_framer.TryReadFrame(view, out var frameLength))
-            {
-                break;
-            }
-
-            if (frameLength <= 0 || frameLength > _pendingLength)
-            {
-                // Malformed framer report; abandon the remaining buffer to avoid an infinite loop.
-                _pendingLength = 0;
-
-                break;
-            }
-
-            // Fresh copy so handlers can safely retain the payload.
-            var frame = new byte[frameLength];
-            view[..frameLength].CopyTo(frame);
-
-            ConsumePending(frameLength);
-
-            OnDataReceived?.Invoke(this, new(this, frame));
-        }
-    }
-
-    private void ConsumePending(int count)
-    {
-        var remaining = _pendingLength - count;
-
-        if (remaining > 0 && _pendingBuffer is not null)
-        {
-            _pendingBuffer.AsSpan(count, remaining).CopyTo(_pendingBuffer);
-        }
-
-        _pendingLength = remaining;
-    }
-
     private void ReleasePendingBuffer()
     {
         if (_pendingBuffer is null)
@@ -551,35 +580,5 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
         STArrayPool<byte>.Shared.Return(_pendingBuffer);
         _pendingBuffer = null;
         _pendingLength = 0;
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        // Sync-over-async: best effort. Prefer DisposeAsync.
-        DisposeAsync().AsTask().GetAwaiter().GetResult();
-    }
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-    {
-        await CloseAsync();
-
-        // Drain the receive loop before disposing the resources it relies on.
-        if (_receiveLoopTask is not null)
-        {
-            try
-            {
-                await _receiveLoopTask;
-            }
-            catch
-            {
-                // Loop failures are already surfaced via OnException.
-            }
-        }
-
-        _sendLock.Dispose();
-        _internalCancellationTokenSource.Dispose();
-        _socket.Dispose();
     }
 }

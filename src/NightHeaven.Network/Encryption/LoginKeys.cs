@@ -9,7 +9,9 @@ namespace NightHeaven.Network.Encryption;
 public readonly struct LoginKeys
 {
     private static readonly ConcurrentDictionary<(int Major, int Minor, int Revision), LoginKeys> _cache = new();
-    private static readonly Lazy<LoginKeys[]> _legacyKeys = new(BuildLegacyKeys, LazyThreadSafetyMode.ExecutionAndPublication);
+
+    private static readonly Lazy<LoginKeys[]> _legacyKeys =
+        new(BuildLegacyKeys, LazyThreadSafetyMode.ExecutionAndPublication);
 
     private LoginKeys(uint key1, uint key2)
     {
@@ -37,7 +39,10 @@ public readonly struct LoginKeys
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static LoginKeys GetKeys(int major, int minor, int revision)
-        => _cache.GetOrAdd((major, minor, revision), static key => ComputeKeys((uint)key.Major, (uint)key.Minor, (uint)key.Revision));
+        => _cache.GetOrAdd(
+            (major, minor, revision),
+            static key => ComputeKeys((uint)key.Major, (uint)key.Minor, (uint)key.Revision)
+        );
 
     private static LoginKeys[] BuildLegacyKeys()
     {

@@ -30,10 +30,10 @@ public static class TextEncoding
         => encoding.BodyName switch
         {
             "utf-16BE" => 2,
-            "utf-16" => 2,
+            "utf-16"   => 2,
             "utf-32BE" => 4,
-            "utf-32" => 4,
-            _ => 1
+            "utf-32"   => 4,
+            _          => 1
         };
 
     // Unlike the one built into the encoder, this avoids local init

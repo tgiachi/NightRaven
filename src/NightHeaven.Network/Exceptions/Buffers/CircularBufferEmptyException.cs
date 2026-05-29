@@ -6,7 +6,5 @@ namespace NightHeaven.Network.Exceptions.Buffers;
 public sealed class CircularBufferEmptyException : InvalidOperationException
 {
     public CircularBufferEmptyException(string? message = null)
-        : base(message ?? "Circular buffer is empty.")
-    {
-    }
+        : base(message ?? "Circular buffer is empty.") { }
 }

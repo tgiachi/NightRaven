@@ -7,9 +7,28 @@ namespace NightHeaven.Tests.Network.Server;
 public class NightHeavenTCPServerTests
 {
     [Fact]
+    public async Task Start_AcceptsClient()
+    {
+        await using var server = new NightHeavenTCPServer(new(IPAddress.Loopback, 0));
+        await server.StartAsync(CancellationToken.None);
+
+        var connectedSignal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        server.OnClientConnect += (_, _) => connectedSignal.TrySetResult(true);
+
+        using var client = new TcpClient();
+        await client.ConnectAsync(IPAddress.Loopback, server.Port);
+
+        var connected = await connectedSignal.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        Assert.True(connected);
+
+        await server.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
     public async Task Start_BindsAndListens()
     {
-        await using var server = new NightHeavenTCPServer(new IPEndPoint(IPAddress.Loopback, 0));
+        await using var server = new NightHeavenTCPServer(new(IPAddress.Loopback, 0));
 
         await server.StartAsync(CancellationToken.None);
 
@@ -24,7 +43,7 @@ public class NightHeavenTCPServerTests
     {
         // Regression: previous implementation kept a single socket field, so Stop closed
         // it and a subsequent Start tried to listen on a disposed socket.
-        await using var server = new NightHeavenTCPServer(new IPEndPoint(IPAddress.Loopback, 0));
+        await using var server = new NightHeavenTCPServer(new(IPAddress.Loopback, 0));
 
         await server.StartAsync(CancellationToken.None);
         var firstPort = server.Port;
@@ -38,25 +57,6 @@ public class NightHeavenTCPServerTests
 
         Assert.True(server.IsRunning);
         Assert.True(server.Port > 0);
-
-        await server.StopAsync(CancellationToken.None);
-    }
-
-    [Fact]
-    public async Task Start_AcceptsClient()
-    {
-        await using var server = new NightHeavenTCPServer(new IPEndPoint(IPAddress.Loopback, 0));
-        await server.StartAsync(CancellationToken.None);
-
-        var connectedSignal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-        server.OnClientConnect += (_, _) => connectedSignal.TrySetResult(true);
-
-        using var client = new TcpClient();
-        await client.ConnectAsync(IPAddress.Loopback, server.Port);
-
-        var connected = await connectedSignal.Task.WaitAsync(TimeSpan.FromSeconds(5));
-
-        Assert.True(connected);
 
         await server.StopAsync(CancellationToken.None);
     }

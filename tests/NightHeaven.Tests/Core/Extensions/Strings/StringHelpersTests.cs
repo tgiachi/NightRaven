@@ -4,43 +4,37 @@ namespace NightHeaven.Tests.Core.Extensions.Strings;
 
 public class StringHelpersTests
 {
-    [Theory]
-    [InlineData("hello world", "Hello World")]
-    [InlineData("lord of the rings", "Lord Of the Rings")]
-    [InlineData("the lord of the rings", "The Lord Of the Rings")]
-    [InlineData("the lord", "The Lord")]
-    [InlineData("a", "A")]
-    public void Capitalize_VariousInputs_CapitalizesEachWordAndSkipsInternalThe(string input, string expected)
-    {
-        Assert.Equal(expected, input.Capitalize());
-    }
+    [Fact]
+    public void Capitalize_EmptyInput_ReturnsEmpty()
+        => Assert.Equal("", "".Capitalize());
 
     [Fact]
     public void Capitalize_NullInput_ReturnsNull()
+        => Assert.Null(((string?)null).Capitalize());
+
+    [Theory, InlineData("hello world", "Hello World"), InlineData("lord of the rings", "Lord Of the Rings"),
+     InlineData("the lord of the rings", "The Lord Of the Rings"), InlineData("the lord", "The Lord"), InlineData("a", "A")]
+    public void Capitalize_VariousInputs_CapitalizesEachWordAndSkipsInternalThe(string input, string expected)
+        => Assert.Equal(expected, input.Capitalize());
+
+    [Fact]
+    public void DefaultIfNullOrEmpty_BlankInput_ReturnsDefault()
     {
-        Assert.Null(((string?)null).Capitalize());
+        Assert.Equal("fallback", "".DefaultIfNullOrEmpty("fallback"));
+        Assert.Equal("fallback", "   ".DefaultIfNullOrEmpty("fallback"));
     }
 
     [Fact]
-    public void Capitalize_EmptyInput_ReturnsEmpty()
-    {
-        Assert.Equal("", "".Capitalize());
-    }
+    public void DefaultIfNullOrEmpty_NonBlankInput_ReturnsInput()
+        => Assert.Equal("value", "value".DefaultIfNullOrEmpty("fallback"));
 
-    [Theory]
-    [InlineData("", "x", "")]
-    [InlineData("abc", "", "abc")]
-    [InlineData("aXbXcXdXe", "X", "abcde")]
-    [InlineData("xyzabc123abc", "abc", "xyz123")]
-    [InlineData("nothing here", "missing", "nothing here")]
-    [InlineData("aaaa", "aa", "")]
-    public void Remove_StringPatterns_RemovesAllOccurrences(string input, string pattern, string expected)
+    [Fact]
+    public void IndentMultiline_PrependsIndentToEachLine()
     {
-        // Regression: previous implementation advanced by 1 instead of pattern.Length,
-        // leaving stray characters in the output for multi-char patterns.
-        var result = input.AsSpan().Remove(pattern.AsSpan(), StringComparison.Ordinal);
+        var input = "one\ntwo\nthree";
+        var result = input.IndentMultiline("  ");
 
-        Assert.Equal(expected, result);
+        Assert.Equal("  one\n  two\n  three", result);
     }
 
     [Fact]
@@ -65,13 +59,16 @@ public class StringHelpersTests
         Assert.True(threw);
     }
 
-    [Fact]
-    public void IndentMultiline_PrependsIndentToEachLine()
+    [Theory, InlineData("", "x", ""), InlineData("abc", "", "abc"), InlineData("aXbXcXdXe", "X", "abcde"),
+     InlineData("xyzabc123abc", "abc", "xyz123"), InlineData("nothing here", "missing", "nothing here"),
+     InlineData("aaaa", "aa", "")]
+    public void Remove_StringPatterns_RemovesAllOccurrences(string input, string pattern, string expected)
     {
-        var input = "one\ntwo\nthree";
-        var result = input.IndentMultiline("  ");
+        // Regression: previous implementation advanced by 1 instead of pattern.Length,
+        // leaving stray characters in the output for multi-char patterns.
+        var result = input.AsSpan().Remove(pattern.AsSpan(), StringComparison.Ordinal);
 
-        Assert.Equal("  one\n  two\n  three", result);
+        Assert.Equal(expected, result);
     }
 
     [Fact]
@@ -86,23 +83,10 @@ public class StringHelpersTests
     [Fact]
     public void Wrap_ShortText_FitsInSingleLine()
     {
-        var lines = "abc def".Wrap(perLine: 10, maxLines: 5);
+        var lines = "abc def".Wrap(10, 5);
 
         Assert.NotNull(lines);
         Assert.Single(lines!);
         Assert.Equal("abc def", lines![0]);
-    }
-
-    [Fact]
-    public void DefaultIfNullOrEmpty_BlankInput_ReturnsDefault()
-    {
-        Assert.Equal("fallback", "".DefaultIfNullOrEmpty("fallback"));
-        Assert.Equal("fallback", "   ".DefaultIfNullOrEmpty("fallback"));
-    }
-
-    [Fact]
-    public void DefaultIfNullOrEmpty_NonBlankInput_ReturnsInput()
-    {
-        Assert.Equal("value", "value".DefaultIfNullOrEmpty("fallback"));
     }
 }

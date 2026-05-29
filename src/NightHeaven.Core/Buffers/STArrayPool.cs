@@ -3,6 +3,7 @@
 
 using System.Buffers;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using NightHeaven.Core.Types;
@@ -11,11 +12,11 @@ namespace NightHeaven.Core.Buffers;
 
 /// <summary>
 /// Thread-safe ArrayPool adaptation. Each calling thread keeps its own
-/// bucket cache via <see cref="ThreadLocal{T}"/>, avoiding cross-thread
-/// contention while letting <see cref="Trim"/> reach every thread's state
+/// bucket cache via <see cref="ThreadLocal{T}" />, avoiding cross-thread
+/// contention while letting <see cref="Trim" /> reach every thread's state
 /// during Gen2 GC callbacks.
 /// </summary>
-[System.Diagnostics.CodeAnalysis.SuppressMessage(
+[SuppressMessage(
     "Reliability",
     "CA1001:Types that own disposable fields should be disposable",
     Justification = "STArrayPool is a process-lifetime singleton; the ThreadLocal handle is intentionally never disposed."
@@ -32,7 +33,7 @@ public sealed class STArrayPool<T> : ArrayPool<T>
     public static STArrayPool<T> Shared { get; } = new();
 
     private readonly ThreadLocal<STArrayPoolThreadState<T>> _state =
-        new(static () => new STArrayPoolThreadState<T>(BucketCount), trackAllValues: true);
+        new(static () => new(BucketCount), true);
 
     private STArrayPool()
     {
@@ -54,12 +55,12 @@ public sealed class STArrayPool<T> : ArrayPool<T>
             if (buffer is not null)
             {
                 cacheBuckets[bucketIndex].Array = null;
-#if DEBUG_ARRAYPOOL
+            #if DEBUG_ARRAYPOOL
                 _rentedArrays.AddOrUpdate(
                     buffer,
                     new STArrayPoolRentReturnStatus { IsRented = true }
                 );
-#endif
+            #endif
                 return buffer;
             }
         }
@@ -76,12 +77,12 @@ public sealed class STArrayPool<T> : ArrayPool<T>
 
                 if (buffer is not null)
                 {
-#if DEBUG_ARRAYPOOL
+                #if DEBUG_ARRAYPOOL
                     _rentedArrays.AddOrUpdate(
                         buffer,
                         new STArrayPoolRentReturnStatus { IsRented = true }
                     );
-#endif
+                #endif
                     return buffer;
                 }
             }
@@ -102,12 +103,12 @@ public sealed class STArrayPool<T> : ArrayPool<T>
 
         var array = GC.AllocateUninitializedArray<T>(minimumLength);
 
-#if DEBUG_ARRAYPOOL
+    #if DEBUG_ARRAYPOOL
         _rentedArrays.AddOrUpdate(
             array,
             new STArrayPoolRentReturnStatus { IsRented = true, StackTrace = Environment.StackTrace }
         );
-#endif
+    #endif
 
         return array;
     }
@@ -130,7 +131,7 @@ public sealed class STArrayPool<T> : ArrayPool<T>
                 Array.Clear(array);
             }
 
-#if DEBUG_ARRAYPOOL
+        #if DEBUG_ARRAYPOOL
             if (array.Length != GetMaxSizeForBucket(bucketIndex) || !_rentedArrays.TryGetValue(array, out var status))
             {
                 throw new ArgumentException("Buffer is not from the pool", nameof(array));
@@ -144,12 +145,12 @@ public sealed class STArrayPool<T> : ArrayPool<T>
             // Mark it as returned
             status.IsRented = false;
             status.StackTrace = Environment.StackTrace;
-#else
+        #else
             if (array.Length != GetMaxSizeForBucket(bucketIndex))
             {
                 throw new ArgumentException("Buffer is not from the pool", nameof(array));
             }
-#endif
+        #endif
 
             ref var bucketArray = ref cacheBuckets[bucketIndex];
             var prev = bucketArray.Array;
@@ -203,7 +204,7 @@ public sealed class STArrayPool<T> : ArrayPool<T>
         uint threshold = pressure switch
         {
             STArrayPoolMemoryPressureType.Medium => 10000,
-            _ => 30000
+            _                                    => 30000
         };
 
         for (var i = 0; i < cacheBuckets.Length; i++)

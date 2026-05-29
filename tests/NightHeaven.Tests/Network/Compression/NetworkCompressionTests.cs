@@ -30,6 +30,13 @@ public class NetworkCompressionTests
     }
 
     [Fact]
+    public void CompressToMemory_EmptyInput_ReturnsEmpty()
+    {
+        var result = NetworkCompression.CompressToMemory(ReadOnlyMemory<byte>.Empty);
+        Assert.True(result.IsEmpty);
+    }
+
+    [Fact]
     public void Decompress_CalledManyTimes_DoesNotRebuildTree()
     {
         // Regression-style: the decompression tree used to be built per call.
@@ -53,18 +60,11 @@ public class NetworkCompressionTests
     }
 
     [Fact]
-    public void CompressToMemory_EmptyInput_ReturnsEmpty()
-    {
-        var result = NetworkCompression.CompressToMemory(ReadOnlyMemory<byte>.Empty);
-        Assert.True(result.IsEmpty);
-    }
-
-    [Fact]
     public void ProcessReceive_WithFlagFalse_PassesThrough()
     {
         var input = new ReadOnlyMemory<byte>(new byte[] { 1, 2, 3 });
 
-        var (halt, consumed) = NetworkCompression.ProcessReceive(ref input, isCompressed: false, out var output);
+        var (halt, consumed) = NetworkCompression.ProcessReceive(ref input, false, out var output);
 
         Assert.False(halt);
         Assert.Equal(3, consumed);
@@ -85,7 +85,7 @@ public class NetworkCompressionTests
         Assert.False(compressed.IsEmpty);
 
         var asReadOnly = (ReadOnlyMemory<byte>)compressed;
-        var (halt, _) = NetworkCompression.ProcessReceive(ref asReadOnly, isCompressed: true, out var output);
+        var (halt, _) = NetworkCompression.ProcessReceive(ref asReadOnly, true, out var output);
 
         Assert.False(halt);
         Assert.Equal(input, output.ToArray());

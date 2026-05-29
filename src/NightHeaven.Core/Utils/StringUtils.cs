@@ -17,7 +17,7 @@ public static class StringUtils
     /// "user-id" becomes "userId"
     /// </example>
     public static string ToCamelCase(string text)
-        => ConvertCase(text, separator: '\0', StringCasingType.Lower, StringCasingType.Title, splitCamel: true);
+        => ConvertCase(text, '\0', StringCasingType.Lower, StringCasingType.Title, true);
 
     /// <summary>
     /// Converts a string to dot.case.
@@ -27,7 +27,7 @@ public static class StringUtils
     /// "API_RESPONSE" becomes "api.response"
     /// </example>
     public static string ToDotCase(string text)
-        => ConvertCase(text, separator: '.', StringCasingType.Lower, StringCasingType.Lower, splitCamel: true);
+        => ConvertCase(text, '.', StringCasingType.Lower, StringCasingType.Lower, true);
 
     /// <summary>
     /// Converts a string to kebab-case.
@@ -38,7 +38,7 @@ public static class StringUtils
     /// "userId" becomes "user-id"
     /// </example>
     public static string ToKebabCase(string text)
-        => ConvertCase(text, separator: '-', StringCasingType.Lower, StringCasingType.Lower, splitCamel: true);
+        => ConvertCase(text, '-', StringCasingType.Lower, StringCasingType.Lower, true);
 
     /// <summary>
     /// Converts a string to PascalCase.
@@ -49,7 +49,7 @@ public static class StringUtils
     /// "userId" becomes "UserId"
     /// </example>
     public static string ToPascalCase(string text)
-        => ConvertCase(text, separator: '\0', StringCasingType.Title, StringCasingType.Title, splitCamel: true);
+        => ConvertCase(text, '\0', StringCasingType.Title, StringCasingType.Title, true);
 
     /// <summary>
     /// Converts a string to path/case.
@@ -59,7 +59,7 @@ public static class StringUtils
     /// "API_RESPONSE" becomes "api/response"
     /// </example>
     public static string ToPathCase(string text)
-        => ConvertCase(text, separator: '/', StringCasingType.Lower, StringCasingType.Lower, splitCamel: true);
+        => ConvertCase(text, '/', StringCasingType.Lower, StringCasingType.Lower, true);
 
     /// <summary>
     /// Converts a string to Sentence case.
@@ -70,7 +70,7 @@ public static class StringUtils
     /// "API_RESPONSE" becomes "Api response"
     /// </example>
     public static string ToSentenceCase(string text)
-        => ConvertCase(text, separator: ' ', StringCasingType.Title, StringCasingType.Lower, splitCamel: false);
+        => ConvertCase(text, ' ', StringCasingType.Title, StringCasingType.Lower, false);
 
     /// <summary>
     /// Converts a string to snake_case.
@@ -81,7 +81,7 @@ public static class StringUtils
     /// "userId" becomes "user_id"
     /// </example>
     public static string ToSnakeCase(string text)
-        => ConvertCase(text, separator: '_', StringCasingType.Lower, StringCasingType.Lower, splitCamel: true);
+        => ConvertCase(text, '_', StringCasingType.Lower, StringCasingType.Lower, true);
 
     /// <summary>
     /// Converts a string to Title Case.
@@ -92,7 +92,7 @@ public static class StringUtils
     /// "user-id" becomes "User Id"
     /// </example>
     public static string ToTitleCase(string text)
-        => ConvertCase(text, separator: ' ', StringCasingType.Title, StringCasingType.Title, splitCamel: true);
+        => ConvertCase(text, ' ', StringCasingType.Title, StringCasingType.Title, true);
 
     /// <summary>
     /// Converts a string to Train-Case.
@@ -102,7 +102,7 @@ public static class StringUtils
     /// "apiResponse" becomes "Api-Response"
     /// </example>
     public static string ToTrainCase(string text)
-        => ConvertCase(text, separator: '-', StringCasingType.Title, StringCasingType.Title, splitCamel: true);
+        => ConvertCase(text, '-', StringCasingType.Title, StringCasingType.Title, true);
 
     /// <summary>
     /// Converts a string to UPPER_SNAKE_CASE (screaming snake case).
@@ -113,7 +113,44 @@ public static class StringUtils
     /// "user-id" becomes "USER_ID"
     /// </example>
     public static string ToUpperSnakeCase(string text)
-        => ConvertCase(text, separator: '_', StringCasingType.Upper, StringCasingType.Upper, splitCamel: true);
+        => ConvertCase(text, '_', StringCasingType.Upper, StringCasingType.Upper, true);
+
+    private static void AppendWord(ref ValueStringBuilder sb, ReadOnlySpan<char> word, StringCasingType casing)
+    {
+        if (word.IsEmpty)
+        {
+            return;
+        }
+
+        switch (casing)
+        {
+            case StringCasingType.Lower:
+                for (var i = 0; i < word.Length; i++)
+                {
+                    sb.Append(char.ToLowerInvariant(word[i]));
+                }
+
+                break;
+
+            case StringCasingType.Upper:
+                for (var i = 0; i < word.Length; i++)
+                {
+                    sb.Append(char.ToUpperInvariant(word[i]));
+                }
+
+                break;
+
+            case StringCasingType.Title:
+                sb.Append(char.ToUpperInvariant(word[0]));
+
+                for (var i = 1; i < word.Length; i++)
+                {
+                    sb.Append(char.ToLowerInvariant(word[i]));
+                }
+
+                break;
+        }
+    }
 
     private static string ConvertCase(
         string text,
@@ -162,10 +199,10 @@ public static class StringUtils
                         }
 
                         // acronym → word: "APIResponse" splits between I and R
-                        if (i + 1 < span.Length
-                            && char.IsUpper(span[i - 1])
-                            && char.IsUpper(span[i])
-                            && char.IsLower(span[i + 1]))
+                        if (i + 1 < span.Length &&
+                            char.IsUpper(span[i - 1]) &&
+                            char.IsUpper(span[i]) &&
+                            char.IsLower(span[i + 1]))
                         {
                             break;
                         }
@@ -195,41 +232,4 @@ public static class StringUtils
 
     private static bool IsExplicitSeparator(char c)
         => c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '_' || c == '-';
-
-    private static void AppendWord(ref ValueStringBuilder sb, ReadOnlySpan<char> word, StringCasingType casing)
-    {
-        if (word.IsEmpty)
-        {
-            return;
-        }
-
-        switch (casing)
-        {
-            case StringCasingType.Lower:
-                for (var i = 0; i < word.Length; i++)
-                {
-                    sb.Append(char.ToLowerInvariant(word[i]));
-                }
-
-                break;
-
-            case StringCasingType.Upper:
-                for (var i = 0; i < word.Length; i++)
-                {
-                    sb.Append(char.ToUpperInvariant(word[i]));
-                }
-
-                break;
-
-            case StringCasingType.Title:
-                sb.Append(char.ToUpperInvariant(word[0]));
-
-                for (var i = 1; i < word.Length; i++)
-                {
-                    sb.Append(char.ToLowerInvariant(word[i]));
-                }
-
-                break;
-        }
-    }
 }

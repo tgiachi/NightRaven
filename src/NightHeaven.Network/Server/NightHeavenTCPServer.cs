@@ -96,6 +96,14 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
         return this;
     }
 
+    /// <inheritdoc />
+    public void Dispose()
+        => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+        => await StopAsync(CancellationToken.None);
+
     /// <summary>
     /// Starts accepting clients. Recreates the listening socket on every call,
     /// so Stop/Start cycles are supported.
@@ -250,7 +258,7 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
                               };
         client.OnDisconnected += (_, args) =>
                                  {
-                                     _clients.TryRemove(args.Client.SessionId, out NightHeavenTCPClient? _);
+                                     _clients.TryRemove(args.Client.SessionId, out var _);
                                      _logger.Information(
                                          "OnClientDisconnect. SessionId={SessionId}, RemoteEndPoint={RemoteEndPoint}",
                                          args.Client.SessionId,
@@ -258,17 +266,5 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
                                      );
                                      OnClientDisconnect?.Invoke(this, args);
                                  };
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        DisposeAsync().AsTask().GetAwaiter().GetResult();
-    }
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-    {
-        await StopAsync(CancellationToken.None);
     }
 }

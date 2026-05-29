@@ -6,7 +6,5 @@ namespace NightHeaven.Network.Exceptions.Buffers;
 public sealed class CircularBufferIndexOutOfRangeException : ArgumentOutOfRangeException
 {
     public CircularBufferIndexOutOfRangeException(string paramName, int index, int size)
-        : base(paramName, index, $"Cannot access index {index}. Buffer size is {size}.")
-    {
-    }
+        : base(paramName, index, $"Cannot access index {index}. Buffer size is {size}.") { }
 }

@@ -5,23 +5,22 @@ namespace NightHeaven.Tests.Core.Buffers;
 public class RawInterpolatedStringHandlerTests
 {
     [Fact]
-    public void Handler_AppendLiteralAndFormatted_ProducesExpectedText()
+    public void Handler_AppendFormatted_WithAlignment_PadsLeft()
     {
-        var handler = new RawInterpolatedStringHandler(literalLength: 7, formattedCount: 1);
-        handler.AppendLiteral("value=");
-        handler.AppendFormatted(42);
+        var handler = new RawInterpolatedStringHandler(0, 1);
+        handler.AppendFormatted("ab".AsSpan(), 5);
 
-        Assert.Equal("value=42", handler.Text.ToString());
+        Assert.Equal("   ab", handler.Text.ToString());
         handler.Clear();
     }
 
     [Fact]
-    public void Handler_AppendFormattedString_WritesString()
+    public void Handler_AppendFormatted_WithNegativeAlignment_PadsRight()
     {
         var handler = new RawInterpolatedStringHandler(0, 1);
-        handler.AppendFormatted("abc");
+        handler.AppendFormatted("ab".AsSpan(), -5);
 
-        Assert.Equal("abc", handler.Text.ToString());
+        Assert.Equal("ab   ", handler.Text.ToString());
         handler.Clear();
     }
 
@@ -36,33 +35,23 @@ public class RawInterpolatedStringHandlerTests
     }
 
     [Fact]
-    public void Handler_AppendFormatted_WithAlignment_PadsLeft()
+    public void Handler_AppendFormattedString_WritesString()
     {
         var handler = new RawInterpolatedStringHandler(0, 1);
-        handler.AppendFormatted("ab".AsSpan(), alignment: 5);
+        handler.AppendFormatted("abc");
 
-        Assert.Equal("   ab", handler.Text.ToString());
+        Assert.Equal("abc", handler.Text.ToString());
         handler.Clear();
     }
 
     [Fact]
-    public void Handler_AppendFormatted_WithNegativeAlignment_PadsRight()
+    public void Handler_AppendLiteralAndFormatted_ProducesExpectedText()
     {
-        var handler = new RawInterpolatedStringHandler(0, 1);
-        handler.AppendFormatted("ab".AsSpan(), alignment: -5);
+        var handler = new RawInterpolatedStringHandler(7, 1);
+        handler.AppendLiteral("value=");
+        handler.AppendFormatted(42);
 
-        Assert.Equal("ab   ", handler.Text.ToString());
-        handler.Clear();
-    }
-
-    [Fact]
-    public void Handler_LargeAppend_GrowsBuffer()
-    {
-        var handler = new RawInterpolatedStringHandler(0, 1);
-        var big = new string('a', 1024);
-        handler.AppendLiteral(big);
-
-        Assert.Equal(big, handler.Text.ToString());
+        Assert.Equal("value=42", handler.Text.ToString());
         handler.Clear();
     }
 
@@ -74,5 +63,16 @@ public class RawInterpolatedStringHandlerTests
         handler.Clear();
 
         Assert.Equal(0, handler.Text.Length);
+    }
+
+    [Fact]
+    public void Handler_LargeAppend_GrowsBuffer()
+    {
+        var handler = new RawInterpolatedStringHandler(0, 1);
+        var big = new string('a', 1024);
+        handler.AppendLiteral(big);
+
+        Assert.Equal(big, handler.Text.ToString());
+        handler.Clear();
     }
 }
