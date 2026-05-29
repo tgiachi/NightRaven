@@ -2,14 +2,12 @@ using ConsoleAppFramework;
 using NightHeaven.Core.Data.Directories;
 using NightHeaven.Core.Types;
 using NightHeaven.Core.Utils;
-using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Server.Data.Events;
 using NightHeaven.Server.Extensions;
 using NightHeaven.Server.Services.Diagnostics;
 using NightHeaven.Server.Services.EventBus;
 using NightHeaven.Server.Services.GameLoop;
-using NightHeaven.Server.Services.Metrics;
 using NightHeaven.Server.Services.Timing;
 using Serilog;
 
@@ -67,14 +65,7 @@ await ConsoleApp.RunAsync(
 
         app.UseHttpsRedirection();
 
-        app.MapGet(
-               "/metrics",
-               (IMetricsService metrics) => Results.Text(
-                   OpenMetricsFormatter.Format(metrics.GetSnapshot()),
-                   "text/plain; charset=utf-8"
-               )
-           )
-           .WithName("GetMetrics");
+        app.MapNightHeavenMetrics();
 
         app.Run();
     }
