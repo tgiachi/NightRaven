@@ -35,7 +35,7 @@ Group by domain first, not by technical suffix.
 | `Data.Config` | Configuration models |
 | `Data.Notifications` | Notification DTO |
 | `Data.Internal.*` | Internal-only data models |
-| `Interfaces` | Contracts only |
+| `Interfaces.<Domain>` | Contracts grouped by domain (one subfolder per domain) |
 | `Services` | Service implementations |
 | `Internal` | Implementation details not part of public API |
 | `Subscribers` | `IEventBus` subscriber classes |
@@ -78,7 +78,25 @@ If a class implements `IDisposable` or `IAsyncDisposable`, `Dispose`/`DisposeAsy
 
 ## 5. Interfaces
 
-- Interfaces live only under `Interfaces` namespaces.
+- Interfaces live only under `Interfaces` namespaces, **grouped by domain** in a subfolder per domain (mirrors the rule for enums in `Types.<Domain>`).
+- File path and namespace MUST match the domain bucket:
+
+```
+src/<Project>/Interfaces/<Domain>/IFoo.cs   →   namespace <Project>.Interfaces.<Domain>;
+```
+
+- Examples:
+
+```
+src/NightHeaven.Hosting/Interfaces/Events/INightHeavenEvent.cs    → namespace NightHeaven.Hosting.Interfaces.Events;
+src/NightHeaven.Hosting/Interfaces/Events/IAsyncEvent.cs          → namespace NightHeaven.Hosting.Interfaces.Events;
+src/NightHeaven.Hosting/Interfaces/EventHandlers/IAsyncEventHandler.cs → namespace NightHeaven.Hosting.Interfaces.EventHandlers;
+src/NightHeaven.Hosting/Interfaces/Services/IEventBusService.cs   → namespace NightHeaven.Hosting.Interfaces.Services;
+src/NightHeaven.Network/Interfaces/Encryption/IClientEncryption.cs → namespace NightHeaven.Network.Interfaces.Encryption;
+src/NightHeaven.Network/Interfaces/Framing/INetFramer.cs           → namespace NightHeaven.Network.Interfaces.Framing;
+```
+
+- Flat `Interfaces/` directories (interfaces without a domain bucket) are forbidden.
 - Every interface must have XML docs (`///`).
 - Interface names must use `I` prefix and clear domain naming.
 
