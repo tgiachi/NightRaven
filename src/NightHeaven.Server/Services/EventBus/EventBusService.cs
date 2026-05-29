@@ -1,7 +1,9 @@
 using System.Threading.Channels;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
+using NightHeaven.Hosting.Data.Metrics;
 using NightHeaven.Hosting.Interfaces.Events;
+using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Hosting.Interfaces.Services;
+using NightHeaven.Hosting.Types.Metrics;
 using NightHeaven.Server.Services.EventBus.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -13,19 +15,24 @@ namespace NightHeaven.Server.Services.EventBus;
 /// sequential handler invocation on the calling thread (with await per handler), and
 /// queues ITickEvent into a bounded-by-budget channel drained by the game loop.
 /// </summary>
-public sealed class EventBusService : IEventBusService
+public sealed class EventBusService : IEventBusService, IMetricProvider
 {
     private readonly ILogger _logger = Log.ForContext<EventBusService>();
     private readonly HandlerRegistry _registry;
     private readonly Channel<TickEnvelope> _tickQueue;
 
     private int _tickQueueDepth;
+    private long _asyncEventsPublished;
+    private long _tickEventsPublished;
+    private long _handlerErrors;
+
+    public string Prefix => "bus";
 
     public EventBusService(IServiceProvider serviceProvider)
     {
-        _registry = new HandlerRegistry(serviceProvider);
+        _registry = new(serviceProvider);
         _tickQueue = Channel.CreateUnbounded<TickEnvelope>(
-            new UnboundedChannelOptions
+            new()
             {
                 SingleReader = true,
                 SingleWriter = false
@@ -36,39 +43,6 @@ public sealed class EventBusService : IEventBusService
     public Action<Type, Exception, INightHeavenEvent>? OnEventError { get; set; }
 
     public int CurrentTickQueueDepth => Volatile.Read(ref _tickQueueDepth);
-
-    public async Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
-        where TEvent : IAsyncEvent
-    {
-        var handlers = _registry.ResolveAsync<TEvent>();
-
-        for (var i = 0; i < handlers.Length; i++)
-        {
-            try
-            {
-                await handlers[i].HandleAsync(evt, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(
-                    ex,
-                    "Async handler {Handler} failed for {Event}",
-                    handlers[i].GetType().Name,
-                    typeof(TEvent).Name
-                );
-                OnEventError?.Invoke(handlers[i].GetType(), ex, evt);
-            }
-        }
-    }
-
-    public void Publish<TEvent>(TEvent evt)
-        where TEvent : ITickEvent
-    {
-        if (_tickQueue.Writer.TryWrite(new TickEnvelope<TEvent>(evt)))
-        {
-            Interlocked.Increment(ref _tickQueueDepth);
-        }
-    }
 
     public int DrainTickEvents(int maxItems)
     {
@@ -84,6 +58,81 @@ public sealed class EventBusService : IEventBusService
         return processed;
     }
 
+    public void Publish<TEvent>(TEvent evt)
+        where TEvent : ITickEvent
+    {
+        if (_tickQueue.Writer.TryWrite(new TickEnvelope<TEvent>(evt)))
+        {
+            Interlocked.Increment(ref _tickQueueDepth);
+            Interlocked.Increment(ref _tickEventsPublished);
+        }
+    }
+
+    public async Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
+        where TEvent : IAsyncEvent
+    {
+        Interlocked.Increment(ref _asyncEventsPublished);
+        var handlers = _registry.ResolveAsync<TEvent>();
+
+        for (var i = 0; i < handlers.Length; i++)
+        {
+            try
+            {
+                await handlers[i].HandleAsync(evt, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Interlocked.Increment(ref _handlerErrors);
+                _logger.Error(
+                    ex,
+                    "Async handler {Handler} failed for {Event}",
+                    handlers[i].GetType().Name,
+                    typeof(TEvent).Name
+                );
+                OnEventError?.Invoke(handlers[i].GetType(), ex, evt);
+            }
+        }
+    }
+
+    public IReadOnlyList<MetricSample> Collect()
+        =>
+        [
+            new MetricSample(
+                "async_events_total",
+                Interlocked.Read(ref _asyncEventsPublished),
+                MetricType.Counter,
+                Help: "Total async events published"
+            ),
+            new MetricSample(
+                "tick_events_total",
+                Interlocked.Read(ref _tickEventsPublished),
+                MetricType.Counter,
+                Help: "Total tick events enqueued"
+            ),
+            new MetricSample(
+                "tick_queue_depth",
+                Volatile.Read(ref _tickQueueDepth),
+                MetricType.Gauge,
+                Help: "Current number of tick events queued"
+            ),
+            new MetricSample(
+                "handler_errors_total",
+                Interlocked.Read(ref _handlerErrors),
+                MetricType.Counter,
+                Help: "Total handler exceptions across async and tick paths"
+            )
+        ];
+
+    public Task StartAsync(CancellationToken cancellationToken)
+        => Task.CompletedTask;
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _tickQueue.Writer.TryComplete();
+
+        return Task.CompletedTask;
+    }
+
     internal void InvokeTickHandlers<TEvent>(TEvent evt)
         where TEvent : ITickEvent
     {
@@ -97,6 +146,7 @@ public sealed class EventBusService : IEventBusService
             }
             catch (Exception ex)
             {
+                Interlocked.Increment(ref _handlerErrors);
                 _logger.Error(
                     ex,
                     "Tick handler {Handler} failed for {Event}",
@@ -106,15 +156,5 @@ public sealed class EventBusService : IEventBusService
                 OnEventError?.Invoke(handlers[i].GetType(), ex, evt);
             }
         }
-    }
-
-    public Task StartAsync(CancellationToken cancellationToken)
-        => Task.CompletedTask;
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _tickQueue.Writer.TryComplete();
-
-        return Task.CompletedTask;
     }
 }
