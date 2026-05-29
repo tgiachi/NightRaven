@@ -54,12 +54,12 @@ public sealed class STArrayPool<T> : ArrayPool<T>
             if (buffer is not null)
             {
                 cacheBuckets[bucketIndex].Array = null;
-            #if DEBUG_ARRAYPOOL
+#if DEBUG_ARRAYPOOL
                 _rentedArrays.AddOrUpdate(
                     buffer,
                     new STArrayPoolRentReturnStatus { IsRented = true }
                 );
-            #endif
+#endif
                 return buffer;
             }
         }
@@ -76,12 +76,12 @@ public sealed class STArrayPool<T> : ArrayPool<T>
 
                 if (buffer is not null)
                 {
-                #if DEBUG_ARRAYPOOL
+#if DEBUG_ARRAYPOOL
                     _rentedArrays.AddOrUpdate(
                         buffer,
                         new STArrayPoolRentReturnStatus { IsRented = true }
                     );
-                #endif
+#endif
                     return buffer;
                 }
             }
@@ -102,12 +102,12 @@ public sealed class STArrayPool<T> : ArrayPool<T>
 
         var array = GC.AllocateUninitializedArray<T>(minimumLength);
 
-    #if DEBUG_ARRAYPOOL
+#if DEBUG_ARRAYPOOL
         _rentedArrays.AddOrUpdate(
             array,
             new STArrayPoolRentReturnStatus { IsRented = true, StackTrace = Environment.StackTrace }
         );
-    #endif
+#endif
 
         return array;
     }
@@ -130,7 +130,7 @@ public sealed class STArrayPool<T> : ArrayPool<T>
                 Array.Clear(array);
             }
 
-        #if DEBUG_ARRAYPOOL
+#if DEBUG_ARRAYPOOL
             if (array.Length != GetMaxSizeForBucket(bucketIndex) || !_rentedArrays.TryGetValue(array, out var status))
             {
                 throw new ArgumentException("Buffer is not from the pool", nameof(array));
@@ -144,12 +144,12 @@ public sealed class STArrayPool<T> : ArrayPool<T>
             // Mark it as returned
             status.IsRented = false;
             status.StackTrace = Environment.StackTrace;
-        #else
+#else
             if (array.Length != GetMaxSizeForBucket(bucketIndex))
             {
                 throw new ArgumentException("Buffer is not from the pool", nameof(array));
             }
-        #endif
+#endif
 
             ref var bucketArray = ref cacheBuckets[bucketIndex];
             var prev = bucketArray.Array;
@@ -203,7 +203,7 @@ public sealed class STArrayPool<T> : ArrayPool<T>
         uint threshold = pressure switch
         {
             STArrayPoolMemoryPressureType.Medium => 10000,
-            _                                    => 30000
+            _ => 30000
         };
 
         for (var i = 0; i < cacheBuckets.Length; i++)

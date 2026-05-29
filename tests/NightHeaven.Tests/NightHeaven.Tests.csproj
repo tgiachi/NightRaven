@@ -5,11 +5,14 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
+        <!-- CS1591: missing XML doc from Tomlyn source-generated context (test-only). -->
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="10.0.1"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0"/>
+        <PackageReference Include="Tomlyn" Version="2.4.1"/>
         <PackageReference Include="xunit" Version="2.9.3"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5"/>
     </ItemGroup>
@@ -20,6 +23,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\NightHeaven.Core\NightHeaven.Core.csproj"/>
+        <ProjectReference Include="..\..\src\NightHeaven.Network\NightHeaven.Network.csproj"/>
     </ItemGroup>
 
 </Project>

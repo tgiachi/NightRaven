@@ -322,7 +322,7 @@ public ref struct RawInterpolatedStringHandler
         _pos += value.Length;
     }
 
-#region AppendFormatted
+    #region AppendFormatted
 
     // Design note:
     // The compiler requires a AppendFormatted overload for anything that might be within an interpolation expression;
@@ -398,7 +398,7 @@ public ref struct RawInterpolatedStringHandler
     // apply is ReadOnlySpan<char>, which isn't supported by either string.Format nor StringBuilder.AppendFormat, but more
     // importantly which can't be boxed to be passed to ICustomFormatter.Format.
 
-#region AppendFormatted T
+    #region AppendFormatted T
 
     /// <summary>Writes the specified value to the handler.</summary>
     /// <param name="value">The value to write.</param>
@@ -552,9 +552,9 @@ public ref struct RawInterpolatedStringHandler
         }
     }
 
-#endregion
+    #endregion
 
-#region AppendFormatted ReadOnlySpan<char>
+    #region AppendFormatted ReadOnlySpan<char>
 
     /// <summary>Writes the specified character span to the handler.</summary>
     /// <param name="value">The span to write.</param>
@@ -618,9 +618,9 @@ public ref struct RawInterpolatedStringHandler
         }
     }
 
-#endregion
+    #endregion
 
-#region AppendFormatted string
+    #region AppendFormatted string
 
     /// <summary>Writes the specified value to the handler.</summary>
     /// <param name="value">The value to write.</param>
@@ -673,9 +673,9 @@ public ref struct RawInterpolatedStringHandler
             // string is implicitly convertible to both. Just delegate to the T-based implementation.
             AppendFormatted<string?>(value, alignment, format);
 
-#endregion
+    #endregion
 
-#region AppendFormatted object
+    #region AppendFormatted object
 
     /// <summary>Writes the specified value to the handler.</summary>
     /// <param name="value">The value to write.</param>
@@ -692,7 +692,7 @@ public ref struct RawInterpolatedStringHandler
             // exists purely to help make cases from (b) compile. Just delegate to the T-based implementation.
             AppendFormatted<object?>(value, alignment, format);
 
-#endregion
+    #endregion
 
-#endregion
+    #endregion
 }
