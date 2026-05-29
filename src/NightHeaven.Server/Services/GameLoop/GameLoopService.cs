@@ -3,6 +3,7 @@ using NightHeaven.Hosting.Data;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
 using NightHeaven.Hosting.Interfaces.Events;
 using NightHeaven.Hosting.Interfaces.Services;
+using NightHeaven.Hosting.Interfaces.Timing;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -19,6 +20,7 @@ public sealed class GameLoopService : IGameLoopService, IDisposable
 
     private readonly ILogger _logger = Log.ForContext<GameLoopService>();
     private readonly IEventBusService _bus;
+    private readonly ITimerService? _timers;
     private readonly GameLoopConfig _config;
     private readonly CancellationTokenSource _cts = new();
     private readonly Lock _metricsSync = new();
@@ -29,10 +31,11 @@ public sealed class GameLoopService : IGameLoopService, IDisposable
     private double _maxTickMs;
     private long _idleSleepCount;
 
-    public GameLoopService(IEventBusService bus, GameLoopConfig config)
+    public GameLoopService(IEventBusService bus, GameLoopConfig config, ITimerService? timers = null)
     {
         _bus = bus;
         _config = config;
+        _timers = timers;
     }
 
     public long TickCount => Interlocked.Read(ref _tickCount);
@@ -91,6 +94,15 @@ public sealed class GameLoopService : IGameLoopService, IDisposable
         {
             var tickStart = Stopwatch.GetTimestamp();
             var workUnits = _bus.DrainTickEvents(MaxTickEventsPerFrame);
+
+            if (_timers is not null)
+            {
+                var nowMs = (long)Math.Floor(
+                    Stopwatch.GetTimestamp() * 1000.0 / Stopwatch.Frequency
+                );
+                workUnits += _timers.UpdateTicksDelta(nowMs);
+            }
+
             var elapsed = Stopwatch.GetElapsedTime(tickStart);
 
             UpdateMetrics(elapsed);

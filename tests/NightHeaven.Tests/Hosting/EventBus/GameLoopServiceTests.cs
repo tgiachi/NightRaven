@@ -91,6 +91,41 @@ public class GameLoopServiceTests
         Assert.Equal(new[] { "tick:A:99" }, timeline);
     }
 
+    [Fact]
+    public async Task RunLoop_WithTimerService_FiresRegisteredTimer()
+    {
+        var bus = new NightHeaven.Server.Services.EventBus.EventBusService(
+            new Microsoft.Extensions.DependencyInjection.ServiceCollection().BuildServiceProvider()
+        );
+        var timerCfg = new NightHeaven.Hosting.Data.Timing.TimerWheelConfig
+        {
+            TickDuration = TimeSpan.FromMilliseconds(8),
+            WheelSize = 64
+        };
+        var timer = new NightHeaven.Server.Services.Timing.TimerWheelService(timerCfg);
+
+        var loop = new NightHeaven.Server.Services.GameLoop.GameLoopService(
+            bus,
+            new GameLoopConfig { IdleSleepMs = 1 },
+            timer
+        );
+
+        var fired = 0;
+        timer.RegisterTimer("ping", TimeSpan.FromMilliseconds(50), () => fired++);
+
+        await loop.StartAsync(CancellationToken.None);
+
+        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(2);
+        while (DateTime.UtcNow < deadline && Volatile.Read(ref fired) == 0)
+        {
+            await Task.Delay(10);
+        }
+
+        await loop.StopAsync(CancellationToken.None);
+
+        Assert.True(Volatile.Read(ref fired) >= 1, "expected the timer to fire at least once");
+    }
+
     private static (EventBusService bus, GameLoopService loop) Build(
         Action<ServiceCollection> configure,
         GameLoopConfig? config = null
