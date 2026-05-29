@@ -127,6 +127,119 @@ public class TimerWheelServiceTests
         Assert.Equal(0, svc.UnregisterTimersByName("b"));
     }
 
+    [Fact]
+    public void UpdateTicksDelta_FirstCall_InitializesAndReturnsZero()
+    {
+        var svc = NewService();
+        Assert.Equal(0, svc.UpdateTicksDelta(1000));
+    }
+
+    [Fact]
+    public void UpdateTicksDelta_NegativeTimestamp_Throws()
+    {
+        var svc = NewService();
+        Assert.Throws<ArgumentOutOfRangeException>(() => svc.UpdateTicksDelta(-1));
+    }
+
+    [Fact]
+    public void UpdateTicksDelta_AdvancesByWholeTicks()
+    {
+        var svc = NewService(tickDurationMs: 8);
+        svc.UpdateTicksDelta(0);
+        var processed = svc.UpdateTicksDelta(24); // 24/8 = 3 ticks
+        Assert.Equal(3, processed);
+    }
+
+    [Fact]
+    public void UpdateTicksDelta_PartialTick_DoesNotAdvance()
+    {
+        var svc = NewService(tickDurationMs: 8);
+        svc.UpdateTicksDelta(0);
+        Assert.Equal(0, svc.UpdateTicksDelta(7)); // <8 ms
+    }
+
+    [Fact]
+    public void OneShot_FiresExactlyOnceAtDueTime()
+    {
+        var svc = NewService(tickDurationMs: 8, wheelSize: 8);
+        var calls = 0;
+        svc.RegisterTimer("once", TimeSpan.FromMilliseconds(8), () => calls++);
+
+        svc.UpdateTicksDelta(0);
+        svc.UpdateTicksDelta(8);  // due
+        svc.UpdateTicksDelta(16); // would re-fire if repeating
+        svc.UpdateTicksDelta(24);
+
+        Assert.Equal(1, calls);
+    }
+
+    [Fact]
+    public void Repeating_FiresEveryInterval()
+    {
+        var svc = NewService(tickDurationMs: 8, wheelSize: 8);
+        var calls = 0;
+        svc.RegisterTimer("rep", TimeSpan.FromMilliseconds(16), () => calls++, repeat: true);
+
+        svc.UpdateTicksDelta(0);
+        svc.UpdateTicksDelta(80); // 80/8 = 10 ticks → fires at 16, 32, 48, 64, 80 = 5 times
+
+        Assert.Equal(5, calls);
+    }
+
+    [Fact]
+    public void Delay_PostponesFirstExecution_ThenIntervalApplies()
+    {
+        var svc = NewService(tickDurationMs: 8, wheelSize: 16);
+        var fireTimestamps = new List<long>();
+        var current = 0L;
+        svc.RegisterTimer(
+            "delayed",
+            TimeSpan.FromMilliseconds(8),
+            () => fireTimestamps.Add(current),
+            delay: TimeSpan.FromMilliseconds(24),
+            repeat: true
+        );
+
+        svc.UpdateTicksDelta(0);
+        for (var step = 8; step <= 48; step += 8)
+        {
+            current = step;
+            svc.UpdateTicksDelta(step);
+        }
+
+        // 0..24 ms: no fire. At 24 ms first fire. Then 32, 40, 48.
+        Assert.Equal(new[] { 24L, 32L, 40L, 48L }, fireTimestamps);
+    }
+
+    [Fact]
+    public void CancelById_BeforeFire_PreventsCallback()
+    {
+        var svc = NewService(tickDurationMs: 8, wheelSize: 8);
+        var calls = 0;
+        var id = svc.RegisterTimer("c", TimeSpan.FromMilliseconds(8), () => calls++);
+
+        svc.UpdateTicksDelta(0);
+        svc.UnregisterTimer(id);
+        svc.UpdateTicksDelta(16);
+
+        Assert.Equal(0, calls);
+    }
+
+    [Fact]
+    public void CancelByName_BeforeFire_PreventsAllOfThem()
+    {
+        var svc = NewService(tickDurationMs: 8, wheelSize: 8);
+        var calls = 0;
+        svc.RegisterTimer("group", TimeSpan.FromMilliseconds(8), () => calls++);
+        svc.RegisterTimer("group", TimeSpan.FromMilliseconds(8), () => calls++);
+
+        svc.UpdateTicksDelta(0);
+        svc.UnregisterTimersByName("group");
+        svc.UpdateTicksDelta(16);
+
+        Assert.Equal(0, calls);
+    }
+
     private static TimerWheelService NewService(int tickDurationMs = 8, int wheelSize = 16)
         => new(new TimerWheelConfig
         {

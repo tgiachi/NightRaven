@@ -181,10 +181,150 @@ public sealed class TimerWheelService : ITimerService, IMetricProvider
     }
 
     public int UpdateTicksDelta(long timestampMilliseconds)
-        => throw new NotImplementedException();
+    {
+        if (timestampMilliseconds < 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(timestampMilliseconds),
+                "Timestamp must be non-negative."
+            );
+        }
+
+        long ticksToProcess;
+
+        lock (_syncRoot)
+        {
+            if (_lastTimestampMilliseconds < 0)
+            {
+                _lastTimestampMilliseconds = timestampMilliseconds;
+
+                return 0;
+            }
+
+            var deltaMilliseconds = timestampMilliseconds - _lastTimestampMilliseconds;
+
+            if (deltaMilliseconds <= 0)
+            {
+                return 0;
+            }
+
+            _lastTimestampMilliseconds = timestampMilliseconds;
+            _accumulatedMilliseconds += deltaMilliseconds;
+            ticksToProcess = (long)Math.Floor(_accumulatedMilliseconds / _tickDurationMs);
+
+            if (ticksToProcess <= 0)
+            {
+                return 0;
+            }
+
+            _accumulatedMilliseconds -= ticksToProcess * _tickDurationMs;
+        }
+
+        for (var i = 0; i < ticksToProcess; i++)
+        {
+            ProcessTick();
+        }
+
+        Interlocked.Add(ref _totalProcessedTicks, ticksToProcess);
+
+        return ticksToProcess > int.MaxValue ? int.MaxValue : (int)ticksToProcess;
+    }
 
     public IReadOnlyList<MetricSample> Collect()
         => throw new NotImplementedException();
+
+    private void ProcessTick()
+    {
+        List<TimerEntry> dueEntries = [];
+
+        lock (_syncRoot)
+        {
+            _currentTick++;
+            var slotIndex = (int)(_currentTick % _wheel.Length);
+            var bucket = _wheel[slotIndex];
+            var node = bucket.First;
+
+            while (node is not null)
+            {
+                var next = node.Next;
+                var entry = node.Value;
+
+                if (entry.Cancelled)
+                {
+                    bucket.Remove(node);
+                    entry.Node = null;
+                    node = next;
+
+                    continue;
+                }
+
+                if (entry.RemainingRounds > 0)
+                {
+                    entry.RemainingRounds--;
+                    node = next;
+
+                    continue;
+                }
+
+                bucket.Remove(node);
+                entry.Node = null;
+                dueEntries.Add(entry);
+
+                if (!entry.Repeat)
+                {
+                    RemoveFromIndexes(entry);
+                }
+
+                node = next;
+            }
+        }
+
+        foreach (var entry in dueEntries)
+        {
+            ExecuteEntry(entry);
+        }
+    }
+
+    private void ExecuteEntry(TimerEntry entry)
+    {
+        var startedAt = System.Diagnostics.Stopwatch.GetTimestamp();
+
+        try
+        {
+            entry.Callback();
+        }
+        catch (Exception ex)
+        {
+            Interlocked.Increment(ref _callbackErrors);
+            _logger.Error(
+                ex,
+                "Timer callback failed for timer '{TimerName}' ({TimerId})",
+                entry.Name,
+                entry.Id
+            );
+        }
+        finally
+        {
+            Interlocked.Increment(ref _totalExecuted);
+            Interlocked.Add(
+                ref _totalCallbackElapsedStopwatchTicks,
+                System.Diagnostics.Stopwatch.GetTimestamp() - startedAt
+            );
+        }
+
+        if (!entry.Repeat)
+        {
+            return;
+        }
+
+        lock (_syncRoot)
+        {
+            if (!entry.Cancelled && _timersById.ContainsKey(entry.Id))
+            {
+                ScheduleEntry(entry, entry.Interval);
+            }
+        }
+    }
 
     private bool RemoveEntryById(string timerId)
     {
