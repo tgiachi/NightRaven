@@ -2,38 +2,33 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NightHeaven.Hosting.Data.Metrics;
 using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Hosting.Types.Metrics;
 using NightHeaven.Server.Extensions;
 
 namespace NightHeaven.Tests.Hosting.Metrics;
 
 public class MetricsExtensionsTests
 {
-    [Fact]
-    public void AddNightHeavenMetrics_RegistersServiceAndConfig()
+    private sealed class NamedProvider : IMetricProvider
     {
-        var services = new ServiceCollection();
-        services.AddNightHeavenTimerWheel();
-        services.AddNightHeavenMetrics();
+        public string Prefix => "named";
 
-        var sp = services.BuildServiceProvider();
-
-        Assert.NotNull(sp.GetService<IMetricsService>());
-        Assert.NotNull(sp.GetService<MetricsConfig>());
+        public IReadOnlyList<MetricSample> Collect()
+            => [new("v", 1)];
     }
 
     [Fact]
-    public void AddNightHeavenMetrics_OrchestratorRegisteredOnce()
+    public void AddMetricProvider_AliasesAnExistingSingletonAsIMetricProvider()
     {
         var services = new ServiceCollection();
-        services.AddNightHeavenTimerWheel();
-        services.AddNightHeavenMetrics();
+        services.AddSingleton<NamedProvider>();
+        services.AddMetricProvider<NamedProvider>();
 
         var sp = services.BuildServiceProvider();
-        var hosted = sp.GetServices<IHostedService>().ToArray();
+        var providers = sp.GetServices<IMetricProvider>().ToArray();
 
-        Assert.Single(hosted);
-        Assert.Equal("NightHeavenServiceOrchestrator", hosted[0].GetType().Name);
+        Assert.Single(providers);
+        Assert.IsType<NamedProvider>(providers[0]);
+        Assert.Same(sp.GetRequiredService<NamedProvider>(), providers[0]);
     }
 
     [Fact]
@@ -59,24 +54,29 @@ public class MetricsExtensionsTests
     }
 
     [Fact]
-    public void AddMetricProvider_AliasesAnExistingSingletonAsIMetricProvider()
+    public void AddNightHeavenMetrics_OrchestratorRegisteredOnce()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<NamedProvider>();
-        services.AddMetricProvider<NamedProvider>();
+        services.AddNightHeavenTimerWheel();
+        services.AddNightHeavenMetrics();
 
         var sp = services.BuildServiceProvider();
-        var providers = sp.GetServices<IMetricProvider>().ToArray();
+        var hosted = sp.GetServices<IHostedService>().ToArray();
 
-        Assert.Single(providers);
-        Assert.IsType<NamedProvider>(providers[0]);
-        Assert.Same(sp.GetRequiredService<NamedProvider>(), providers[0]);
+        Assert.Single(hosted);
+        Assert.Equal("NightHeavenServiceOrchestrator", hosted[0].GetType().Name);
     }
 
-    private sealed class NamedProvider : IMetricProvider
+    [Fact]
+    public void AddNightHeavenMetrics_RegistersServiceAndConfig()
     {
-        public string Prefix => "named";
-        public IReadOnlyList<MetricSample> Collect()
-            => [new MetricSample("v", 1, MetricType.Gauge)];
+        var services = new ServiceCollection();
+        services.AddNightHeavenTimerWheel();
+        services.AddNightHeavenMetrics();
+
+        var sp = services.BuildServiceProvider();
+
+        Assert.NotNull(sp.GetService<IMetricsService>());
+        Assert.NotNull(sp.GetService<MetricsConfig>());
     }
 }

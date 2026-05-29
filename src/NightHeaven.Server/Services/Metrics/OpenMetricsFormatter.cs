@@ -19,7 +19,7 @@ public static class OpenMetricsFormatter
     {
         var sb = new StringBuilder(256);
         var groups = snapshot.Samples
-            .GroupBy(s => GetEmittedName(s), StringComparer.Ordinal);
+                             .GroupBy(s => GetEmittedName(s), StringComparer.Ordinal);
 
         foreach (var group in groups)
         {
@@ -49,22 +49,31 @@ public static class OpenMetricsFormatter
         return sb.ToString();
     }
 
-    private static string GetEmittedName(MetricSample sample)
+    private static void AppendEscaped(StringBuilder sb, string value)
     {
-        if (sample.Type == MetricType.Counter && !sample.Name.EndsWith("_total", StringComparison.Ordinal))
+        foreach (var c in value)
         {
-            return sample.Name + "_total";
+            switch (c)
+            {
+                case '\\':
+                    sb.Append(@"\\");
+
+                    break;
+                case '"':
+                    sb.Append(@"\""");
+
+                    break;
+                case '\n':
+                    sb.Append(@"\n");
+
+                    break;
+                default:
+                    sb.Append(c);
+
+                    break;
+            }
         }
-
-        return sample.Name;
     }
-
-    private static string TypeName(MetricType type) => type switch
-    {
-        MetricType.Counter => "counter",
-        MetricType.Gauge   => "gauge",
-        _                  => "unknown"
-    };
 
     private static void AppendTags(StringBuilder sb, IReadOnlyDictionary<string, string>? tags)
     {
@@ -92,17 +101,21 @@ public static class OpenMetricsFormatter
         sb.Append('}');
     }
 
-    private static void AppendEscaped(StringBuilder sb, string value)
+    private static string GetEmittedName(MetricSample sample)
     {
-        foreach (var c in value)
+        if (sample.Type == MetricType.Counter && !sample.Name.EndsWith("_total", StringComparison.Ordinal))
         {
-            switch (c)
-            {
-                case '\\': sb.Append(@"\\"); break;
-                case '"':  sb.Append(@"\"""); break;
-                case '\n': sb.Append(@"\n"); break;
-                default:   sb.Append(c);    break;
-            }
+            return sample.Name + "_total";
         }
+
+        return sample.Name;
     }
+
+    private static string TypeName(MetricType type)
+        => type switch
+        {
+            MetricType.Counter => "counter",
+            MetricType.Gauge   => "gauge",
+            _                  => "unknown"
+        };
 }

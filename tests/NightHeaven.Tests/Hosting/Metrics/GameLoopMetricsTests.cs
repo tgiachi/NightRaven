@@ -1,6 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightHeaven.Hosting.Data;
-using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Hosting.Types.Metrics;
 using NightHeaven.Server.Services.EventBus;
 using NightHeaven.Server.Services.GameLoop;
@@ -10,13 +8,6 @@ namespace NightHeaven.Tests.Hosting.Metrics;
 public class GameLoopMetricsTests
 {
     [Fact]
-    public void Prefix_IsGameloop()
-    {
-        var (_, loop) = Build();
-        Assert.Equal("gameloop", ((IMetricProvider)loop).Prefix);
-    }
-
-    [Fact]
     public async Task Collect_AfterStartStop_TickCountIsPositive()
     {
         var (_, loop) = Build();
@@ -24,18 +15,18 @@ public class GameLoopMetricsTests
         await Task.Delay(50);
         await loop.StopAsync(CancellationToken.None);
 
-        Assert.True(((IMetricProvider)loop).Collect().Single(s => s.Name == "tick_count").Value > 0);
+        Assert.True(loop.Collect().Single(s => s.Name == "tick_count").Value > 0);
     }
 
     [Fact]
     public void Collect_ReturnsAllFourCanonicalSamples()
     {
         var (_, loop) = Build();
-        var names = ((IMetricProvider)loop).Collect().Select(s => s.Name).ToHashSet();
+        var names = loop.Collect().Select(s => s.Name).ToHashSet();
 
-        Assert.Contains("tick_count",        names);
-        Assert.Contains("tick_avg_ms",       names);
-        Assert.Contains("tick_max_ms",       names);
+        Assert.Contains("tick_count", names);
+        Assert.Contains("tick_avg_ms", names);
+        Assert.Contains("tick_max_ms", names);
         Assert.Contains("idle_sleeps_total", names);
     }
 
@@ -43,18 +34,26 @@ public class GameLoopMetricsTests
     public void Collect_TypeAssignmentMatchesSpec()
     {
         var (_, loop) = Build();
-        var byName = ((IMetricProvider)loop).Collect().ToDictionary(s => s.Name, s => s);
+        var byName = loop.Collect().ToDictionary(s => s.Name, s => s);
 
         Assert.Equal(MetricType.Counter, byName["tick_count"].Type);
         Assert.Equal(MetricType.Counter, byName["idle_sleeps_total"].Type);
-        Assert.Equal(MetricType.Gauge,   byName["tick_avg_ms"].Type);
-        Assert.Equal(MetricType.Gauge,   byName["tick_max_ms"].Type);
+        Assert.Equal(MetricType.Gauge, byName["tick_avg_ms"].Type);
+        Assert.Equal(MetricType.Gauge, byName["tick_max_ms"].Type);
+    }
+
+    [Fact]
+    public void Prefix_IsGameloop()
+    {
+        var (_, loop) = Build();
+        Assert.Equal("gameloop", loop.Prefix);
     }
 
     private static (EventBusService bus, GameLoopService loop) Build()
     {
         var bus = new EventBusService(new ServiceCollection().BuildServiceProvider());
-        var loop = new GameLoopService(bus, new GameLoopConfig { IdleSleepMs = 1 });
+        var loop = new GameLoopService(bus, new() { IdleSleepMs = 1 });
+
         return (bus, loop);
     }
 }

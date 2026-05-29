@@ -28,18 +28,19 @@ public sealed class MetricsService : IMetricsService
         _providers = providers.ToArray();
         _timer = timer;
         _config = config;
-        _latestSnapshot = new MetricsSnapshot(DateTimeOffset.MinValue, Array.Empty<MetricSample>());
+        _latestSnapshot = new(DateTimeOffset.MinValue, Array.Empty<MetricSample>());
     }
 
-    public MetricsSnapshot GetSnapshot() => Volatile.Read(ref _latestSnapshot);
+    public MetricsSnapshot GetSnapshot()
+        => Volatile.Read(ref _latestSnapshot);
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         RefreshSnapshot();
         _timerId = _timer.RegisterTimer(
-            name: RefreshTimerName,
-            interval: _config.RefreshInterval,
-            callback: RefreshSnapshot,
+            RefreshTimerName,
+            _config.RefreshInterval,
+            RefreshSnapshot,
             repeat: true
         );
 
@@ -86,6 +87,6 @@ public sealed class MetricsService : IMetricsService
             }
         }
 
-        Volatile.Write(ref _latestSnapshot, new MetricsSnapshot(collectedAt, samples));
+        Volatile.Write(ref _latestSnapshot, new(collectedAt, samples));
     }
 }

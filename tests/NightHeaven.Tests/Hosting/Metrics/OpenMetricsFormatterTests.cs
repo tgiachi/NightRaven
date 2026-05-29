@@ -7,6 +7,34 @@ namespace NightHeaven.Tests.Hosting.Metrics;
 public class OpenMetricsFormatterTests
 {
     [Fact]
+    public void Format_CounterAlreadyEndingInTotal_LeavesNameAsIs()
+    {
+        var snapshot = new MetricsSnapshot(
+            DateTimeOffset.UtcNow,
+            [new("requests_total", 123, MetricType.Counter)]
+        );
+
+        var text = OpenMetricsFormatter.Format(snapshot);
+
+        Assert.Contains("# TYPE requests_total counter\n", text);
+        Assert.DoesNotContain("requests_total_total", text);
+    }
+
+    [Fact]
+    public void Format_CounterMissingTotalSuffix_AppendsIt()
+    {
+        var snapshot = new MetricsSnapshot(
+            DateTimeOffset.UtcNow,
+            [new("connections", 7, MetricType.Counter)]
+        );
+
+        var text = OpenMetricsFormatter.Format(snapshot);
+
+        Assert.Contains("# TYPE connections_total counter\n", text);
+        Assert.Contains("connections_total 7\n", text);
+    }
+
+    [Fact]
     public void Format_EmptySnapshot_EmitsOnlyEof()
     {
         var snapshot = new MetricsSnapshot(DateTimeOffset.UtcNow, []);
@@ -16,11 +44,30 @@ public class OpenMetricsFormatterTests
     }
 
     [Fact]
+    public void Format_MultipleSamplesSameName_EmitOneHelpAndTypeBlockOnly()
+    {
+        var snapshot = new MetricsSnapshot(
+            DateTimeOffset.UtcNow,
+            [
+                new("conn", 1, MetricType.Gauge, new Dictionary<string, string> { ["zone"] = "a" }, "Active connections"),
+                new("conn", 2, MetricType.Gauge, new Dictionary<string, string> { ["zone"] = "b" })
+            ]
+        );
+
+        var text = OpenMetricsFormatter.Format(snapshot);
+
+        Assert.Equal(1, CountOccurrences(text, "# TYPE conn gauge"));
+        Assert.Equal(1, CountOccurrences(text, "# HELP conn"));
+        Assert.Contains(@"conn{zone=""a""} 1", text);
+        Assert.Contains(@"conn{zone=""b""} 2", text);
+    }
+
+    [Fact]
     public void Format_SingleGauge_EmitsHelpTypeAndValue()
     {
         var snapshot = new MetricsSnapshot(
             DateTimeOffset.UtcNow,
-            [new MetricSample("tick_queue_depth", 42, MetricType.Gauge, Help: "Tick events pending")]
+            [new("tick_queue_depth", 42, Help: "Tick events pending")]
         );
 
         var text = OpenMetricsFormatter.Format(snapshot);
@@ -32,51 +79,16 @@ public class OpenMetricsFormatterTests
     }
 
     [Fact]
-    public void Format_CounterMissingTotalSuffix_AppendsIt()
+    public void Format_TagValueWithNewline_IsEscaped()
     {
         var snapshot = new MetricsSnapshot(
             DateTimeOffset.UtcNow,
-            [new MetricSample("connections", 7, MetricType.Counter)]
+            [new("x", 1, MetricType.Gauge, new Dictionary<string, string> { ["k"] = "line1\nline2" })]
         );
 
         var text = OpenMetricsFormatter.Format(snapshot);
 
-        Assert.Contains("# TYPE connections_total counter\n", text);
-        Assert.Contains("connections_total 7\n", text);
-    }
-
-    [Fact]
-    public void Format_CounterAlreadyEndingInTotal_LeavesNameAsIs()
-    {
-        var snapshot = new MetricsSnapshot(
-            DateTimeOffset.UtcNow,
-            [new MetricSample("requests_total", 123, MetricType.Counter)]
-        );
-
-        var text = OpenMetricsFormatter.Format(snapshot);
-
-        Assert.Contains("# TYPE requests_total counter\n", text);
-        Assert.DoesNotContain("requests_total_total", text);
-    }
-
-    [Fact]
-    public void Format_WithTags_EmitsLabelSet()
-    {
-        var snapshot = new MetricsSnapshot(
-            DateTimeOffset.UtcNow,
-            [
-                new MetricSample(
-                    "handler_errors_total",
-                    5,
-                    MetricType.Counter,
-                    new Dictionary<string, string> { ["handler"] = "MovementHandler", ["path"] = "tick" }
-                )
-            ]
-        );
-
-        var text = OpenMetricsFormatter.Format(snapshot);
-
-        Assert.Matches(@"handler_errors_total\{(handler=""MovementHandler"",path=""tick""|path=""tick"",handler=""MovementHandler"")\} 5\n", text);
+        Assert.Contains(@"x{k=""line1\nline2""} 1", text);
     }
 
     [Fact]
@@ -85,7 +97,7 @@ public class OpenMetricsFormatterTests
         var snapshot = new MetricsSnapshot(
             DateTimeOffset.UtcNow,
             [
-                new MetricSample(
+                new(
                     "x",
                     1,
                     MetricType.Gauge,
@@ -100,46 +112,39 @@ public class OpenMetricsFormatterTests
     }
 
     [Fact]
-    public void Format_TagValueWithNewline_IsEscaped()
-    {
-        var snapshot = new MetricsSnapshot(
-            DateTimeOffset.UtcNow,
-            [new MetricSample("x", 1, MetricType.Gauge, new Dictionary<string, string> { ["k"] = "line1\nline2" })]
-        );
-
-        var text = OpenMetricsFormatter.Format(snapshot);
-
-        Assert.Contains(@"x{k=""line1\nline2""} 1", text);
-    }
-
-    [Fact]
-    public void Format_MultipleSamplesSameName_EmitOneHelpAndTypeBlockOnly()
+    public void Format_WithTags_EmitsLabelSet()
     {
         var snapshot = new MetricsSnapshot(
             DateTimeOffset.UtcNow,
             [
-                new MetricSample("conn", 1, MetricType.Gauge, new Dictionary<string, string> { ["zone"] = "a" }, Help: "Active connections"),
-                new MetricSample("conn", 2, MetricType.Gauge, new Dictionary<string, string> { ["zone"] = "b" })
+                new(
+                    "handler_errors_total",
+                    5,
+                    MetricType.Counter,
+                    new Dictionary<string, string> { ["handler"] = "MovementHandler", ["path"] = "tick" }
+                )
             ]
         );
 
         var text = OpenMetricsFormatter.Format(snapshot);
 
-        Assert.Equal(1, CountOccurrences(text, "# TYPE conn gauge"));
-        Assert.Equal(1, CountOccurrences(text, "# HELP conn"));
-        Assert.Contains(@"conn{zone=""a""} 1", text);
-        Assert.Contains(@"conn{zone=""b""} 2", text);
+        Assert.Matches(
+            @"handler_errors_total\{(handler=""MovementHandler"",path=""tick""|path=""tick"",handler=""MovementHandler"")\} 5\n",
+            text
+        );
     }
 
     private static int CountOccurrences(string haystack, string needle)
     {
         var count = 0;
         var idx = 0;
+
         while ((idx = haystack.IndexOf(needle, idx, StringComparison.Ordinal)) >= 0)
         {
             count++;
             idx += needle.Length;
         }
+
         return count;
     }
 }
