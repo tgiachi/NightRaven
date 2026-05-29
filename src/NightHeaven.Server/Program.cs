@@ -71,7 +71,7 @@ await ConsoleApp.RunAsync(
                "/metrics",
                (IMetricsService metrics) => Results.Text(
                    OpenMetricsFormatter.Format(metrics.GetSnapshot()),
-                   contentType: "application/openmetrics-text; version=1.0.0; charset=utf-8"
+                   contentType: "text/plain; charset=utf-8"
                )
            )
            .WithName("GetMetrics");
