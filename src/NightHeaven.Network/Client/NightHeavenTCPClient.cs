@@ -3,7 +3,6 @@ using System.Net.Sockets;
 using NightHeaven.Core.Buffers;
 using NightHeaven.Network.Buffers;
 using NightHeaven.Network.Events;
-using NightHeaven.Network.Interfaces.Encryption;
 using NightHeaven.Network.Interfaces.Framing;
 using NightHeaven.Network.Interfaces.Middleware;
 using NightHeaven.Network.Pipeline;

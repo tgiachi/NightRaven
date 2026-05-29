@@ -19,12 +19,11 @@ public interface IEventBusService : INightHeavenService
     int CurrentTickQueueDepth { get; }
 
     /// <summary>
-    /// Dispatches <paramref name="evt" /> to every registered
-    /// <see cref="IAsyncEventHandler{TEvent}" /> sequentially. The returned task
-    /// completes when all handlers have finished (or thrown).
+    /// Drains up to <paramref name="maxItems" /> tick events, invoking their handlers on the calling thread.
+    /// Intended for the game loop only; do not call from application code.
     /// </summary>
-    Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
-        where TEvent : IAsyncEvent;
+    /// <returns>Number of events actually processed.</returns>
+    int DrainTickEvents(int maxItems);
 
     /// <summary>
     /// Enqueues <paramref name="evt" /> for processing on the next game loop tick.
@@ -34,9 +33,10 @@ public interface IEventBusService : INightHeavenService
         where TEvent : ITickEvent;
 
     /// <summary>
-    /// Drains up to <paramref name="maxItems" /> tick events, invoking their handlers on the calling thread.
-    /// Intended for the game loop only; do not call from application code.
+    /// Dispatches <paramref name="evt" /> to every registered
+    /// <see cref="IAsyncEventHandler{TEvent}" /> sequentially. The returned task
+    /// completes when all handlers have finished (or thrown).
     /// </summary>
-    /// <returns>Number of events actually processed.</returns>
-    int DrainTickEvents(int maxItems);
+    Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
+        where TEvent : IAsyncEvent;
 }

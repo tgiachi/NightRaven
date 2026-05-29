@@ -25,14 +25,14 @@ public interface ITimerService : INightHeavenService
         bool repeat = false
     );
 
+    /// <summary>Cancels every registered timer.</summary>
+    void UnregisterAllTimers();
+
     /// <summary>Cancels one timer by id. Returns true if a registered timer was found and removed.</summary>
     bool UnregisterTimer(string timerId);
 
     /// <summary>Cancels every timer with the given name. Returns the number of timers removed.</summary>
     int UnregisterTimersByName(string name);
-
-    /// <summary>Cancels every registered timer.</summary>
-    void UnregisterAllTimers();
 
     /// <summary>
     /// Advances the wheel using an absolute monotonic timestamp in milliseconds.

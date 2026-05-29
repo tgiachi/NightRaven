@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using NightHeaven.Hosting.Data;
+using NightHeaven.Hosting.Data.Timing;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Hosting.Interfaces.Events;
-using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Server.Services.EventBus;
 using NightHeaven.Server.Services.GameLoop;
+using NightHeaven.Server.Services.Timing;
 using NightHeaven.Tests.Hosting.EventBus.Support;
 
 namespace NightHeaven.Tests.Hosting.EventBus;
@@ -12,24 +12,15 @@ namespace NightHeaven.Tests.Hosting.EventBus;
 public class GameLoopServiceTests
 {
     [Fact]
-    public async Task StartStop_StartsAndJoinsThread()
-    {
-        var (_, loop) = Build(_ => { });
-
-        await loop.StartAsync(CancellationToken.None);
-        await loop.StopAsync(CancellationToken.None);
-    }
-
-    [Fact]
     public async Task RunLoop_DrainsPublishedTickEvents()
     {
         var timeline = new List<string>();
-        var (bus, loop) = Build(services =>
-        {
-            services.AddSingleton<ITickEventHandler<TestTickEvent>>(
-                _ => new TimelineTickHandler("A", timeline)
-            );
-        });
+        var (bus, loop) = Build(
+            services =>
+            {
+                services.AddSingleton<ITickEventHandler<TestTickEvent>>(_ => new TimelineTickHandler("A", timeline));
+            }
+        );
 
         await loop.StartAsync(CancellationToken.None);
 
@@ -37,13 +28,16 @@ public class GameLoopServiceTests
         bus.Publish(new TestTickEvent(2));
         bus.Publish(new TestTickEvent(3));
 
-        await WaitForAsync(() =>
-        {
-            lock (timeline)
+        await WaitForAsync(
+            () =>
             {
-                return timeline.Count >= 3;
-            }
-        }, TimeSpan.FromSeconds(2));
+                lock (timeline)
+                {
+                    return timeline.Count >= 3;
+                }
+            },
+            TimeSpan.FromSeconds(2)
+        );
 
         await loop.StopAsync(CancellationToken.None);
 
@@ -54,7 +48,7 @@ public class GameLoopServiceTests
     [Fact]
     public async Task RunLoop_IdleWhenNoWork_DoesNotSpinAtFullCpu()
     {
-        var (_, loop) = Build(_ => { }, new GameLoopConfig { IdleSleepMs = 5 });
+        var (_, loop) = Build(_ => { }, new() { IdleSleepMs = 5 });
 
         await loop.StartAsync(CancellationToken.None);
         await Task.Delay(50);
@@ -65,48 +59,19 @@ public class GameLoopServiceTests
     }
 
     [Fact]
-    public async Task StopAsync_DrainsResidualQueueGracefully()
-    {
-        var timeline = new List<string>();
-        var (bus, loop) = Build(services =>
-        {
-            services.AddSingleton<ITickEventHandler<TestTickEvent>>(
-                _ => new TimelineTickHandler("A", timeline)
-            );
-        });
-
-        await loop.StartAsync(CancellationToken.None);
-        bus.Publish(new TestTickEvent(99));
-
-        await WaitForAsync(() =>
-        {
-            lock (timeline)
-            {
-                return timeline.Count == 1;
-            }
-        }, TimeSpan.FromSeconds(2));
-
-        await loop.StopAsync(CancellationToken.None);
-
-        Assert.Equal(new[] { "tick:A:99" }, timeline);
-    }
-
-    [Fact]
     public async Task RunLoop_WithTimerService_FiresRegisteredTimer()
     {
-        var bus = new NightHeaven.Server.Services.EventBus.EventBusService(
-            new Microsoft.Extensions.DependencyInjection.ServiceCollection().BuildServiceProvider()
-        );
-        var timerCfg = new NightHeaven.Hosting.Data.Timing.TimerWheelConfig
+        var bus = new EventBusService(new ServiceCollection().BuildServiceProvider());
+        var timerCfg = new TimerWheelConfig
         {
             TickDuration = TimeSpan.FromMilliseconds(8),
             WheelSize = 64
         };
-        var timer = new NightHeaven.Server.Services.Timing.TimerWheelService(timerCfg);
+        var timer = new TimerWheelService(timerCfg);
 
-        var loop = new NightHeaven.Server.Services.GameLoop.GameLoopService(
+        var loop = new GameLoopService(
             bus,
-            new GameLoopConfig { IdleSleepMs = 1 },
+            new() { IdleSleepMs = 1 },
             timer
         );
 
@@ -116,6 +81,7 @@ public class GameLoopServiceTests
         await loop.StartAsync(CancellationToken.None);
 
         var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(2);
+
         while (DateTime.UtcNow < deadline && Volatile.Read(ref fired) == 0)
         {
             await Task.Delay(10);
@@ -124,6 +90,45 @@ public class GameLoopServiceTests
         await loop.StopAsync(CancellationToken.None);
 
         Assert.True(Volatile.Read(ref fired) >= 1, "expected the timer to fire at least once");
+    }
+
+    [Fact]
+    public async Task StartStop_StartsAndJoinsThread()
+    {
+        var (_, loop) = Build(_ => { });
+
+        await loop.StartAsync(CancellationToken.None);
+        await loop.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task StopAsync_DrainsResidualQueueGracefully()
+    {
+        var timeline = new List<string>();
+        var (bus, loop) = Build(
+            services =>
+            {
+                services.AddSingleton<ITickEventHandler<TestTickEvent>>(_ => new TimelineTickHandler("A", timeline));
+            }
+        );
+
+        await loop.StartAsync(CancellationToken.None);
+        bus.Publish(new TestTickEvent(99));
+
+        await WaitForAsync(
+            () =>
+            {
+                lock (timeline)
+                {
+                    return timeline.Count == 1;
+                }
+            },
+            TimeSpan.FromSeconds(2)
+        );
+
+        await loop.StopAsync(CancellationToken.None);
+
+        Assert.Equal(new[] { "tick:A:99" }, timeline);
     }
 
     private static (EventBusService bus, GameLoopService loop) Build(
@@ -136,6 +141,7 @@ public class GameLoopServiceTests
         var sp = services.BuildServiceProvider();
         var bus = new EventBusService(sp);
         var loop = new GameLoopService(bus, config ?? new GameLoopConfig());
+
         return (bus, loop);
     }
 

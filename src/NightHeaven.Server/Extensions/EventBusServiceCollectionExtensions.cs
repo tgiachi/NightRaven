@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using NightHeaven.Hosting.Data;
 using NightHeaven.Hosting.Extensions;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
@@ -16,6 +15,19 @@ public static class EventBusServiceCollectionExtensions
 {
     private const int EventBusPriority = 0;
     private const int GameLoopPriority = 10;
+
+    /// <summary>
+    /// Registers <typeparamref name="THandler" /> as an <see cref="IAsyncEventHandler{TEvent}" /> singleton.
+    /// </summary>
+    public static IServiceCollection AddAsyncEventHandler<THandler, TEvent>(this IServiceCollection services)
+        where THandler : class, IAsyncEventHandler<TEvent>
+        where TEvent : IAsyncEvent
+    {
+        services.AddSingleton<THandler>();
+        services.AddSingleton<IAsyncEventHandler<TEvent>>(sp => sp.GetRequiredService<THandler>());
+
+        return services;
+    }
 
     /// <summary>
     /// Registers <see cref="EventBusService" /> and <see cref="GameLoopService" /> with the
@@ -37,19 +49,6 @@ public static class EventBusServiceCollectionExtensions
 
         services.AddNightHeavenService<IEventBusService, EventBusService>(EventBusPriority);
         services.AddNightHeavenService<IGameLoopService, GameLoopService>(GameLoopPriority);
-
-        return services;
-    }
-
-    /// <summary>
-    /// Registers <typeparamref name="THandler" /> as an <see cref="IAsyncEventHandler{TEvent}" /> singleton.
-    /// </summary>
-    public static IServiceCollection AddAsyncEventHandler<THandler, TEvent>(this IServiceCollection services)
-        where THandler : class, IAsyncEventHandler<TEvent>
-        where TEvent : IAsyncEvent
-    {
-        services.AddSingleton<THandler>();
-        services.AddSingleton<IAsyncEventHandler<TEvent>>(sp => sp.GetRequiredService<THandler>());
 
         return services;
     }

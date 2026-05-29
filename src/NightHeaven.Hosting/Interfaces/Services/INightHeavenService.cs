@@ -11,6 +11,4 @@ namespace NightHeaven.Hosting.Interfaces.Services;
 /// per-service start priority is supplied at registration time via
 /// <c>AddNightHeavenService</c>, not on the type itself.
 /// </remarks>
-public interface INightHeavenService : IHostedService
-{
-}
+public interface INightHeavenService : IHostedService { }

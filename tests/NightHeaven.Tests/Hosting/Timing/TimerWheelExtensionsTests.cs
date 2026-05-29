@@ -9,15 +9,31 @@ namespace NightHeaven.Tests.Hosting.Timing;
 public class TimerWheelExtensionsTests
 {
     [Fact]
-    public void AddNightHeavenTimerWheel_RegistersServiceAndConfig()
+    public void AddNightHeavenTimerWheel_AppliesCustomConfig()
+    {
+        var services = new ServiceCollection();
+        services.AddNightHeavenTimerWheel(
+            cfg =>
+            {
+                cfg.TickDuration = TimeSpan.FromMilliseconds(4);
+                cfg.WheelSize = 1024;
+            }
+        );
+
+        var cfg = services.BuildServiceProvider().GetRequiredService<TimerWheelConfig>();
+        Assert.Equal(TimeSpan.FromMilliseconds(4), cfg.TickDuration);
+        Assert.Equal(1024, cfg.WheelSize);
+    }
+
+    [Fact]
+    public void AddNightHeavenTimerWheel_DefaultConfig_HasExpectedValues()
     {
         var services = new ServiceCollection();
         services.AddNightHeavenTimerWheel();
 
-        var sp = services.BuildServiceProvider();
-
-        Assert.NotNull(sp.GetService<ITimerService>());
-        Assert.NotNull(sp.GetService<TimerWheelConfig>());
+        var cfg = services.BuildServiceProvider().GetRequiredService<TimerWheelConfig>();
+        Assert.Equal(TimeSpan.FromMilliseconds(8), cfg.TickDuration);
+        Assert.Equal(512, cfg.WheelSize);
     }
 
     [Fact]
@@ -34,28 +50,14 @@ public class TimerWheelExtensionsTests
     }
 
     [Fact]
-    public void AddNightHeavenTimerWheel_AppliesCustomConfig()
-    {
-        var services = new ServiceCollection();
-        services.AddNightHeavenTimerWheel(cfg =>
-        {
-            cfg.TickDuration = TimeSpan.FromMilliseconds(4);
-            cfg.WheelSize = 1024;
-        });
-
-        var cfg = services.BuildServiceProvider().GetRequiredService<TimerWheelConfig>();
-        Assert.Equal(TimeSpan.FromMilliseconds(4), cfg.TickDuration);
-        Assert.Equal(1024, cfg.WheelSize);
-    }
-
-    [Fact]
-    public void AddNightHeavenTimerWheel_DefaultConfig_HasExpectedValues()
+    public void AddNightHeavenTimerWheel_RegistersServiceAndConfig()
     {
         var services = new ServiceCollection();
         services.AddNightHeavenTimerWheel();
 
-        var cfg = services.BuildServiceProvider().GetRequiredService<TimerWheelConfig>();
-        Assert.Equal(TimeSpan.FromMilliseconds(8), cfg.TickDuration);
-        Assert.Equal(512, cfg.WheelSize);
+        var sp = services.BuildServiceProvider();
+
+        Assert.NotNull(sp.GetService<ITimerService>());
+        Assert.NotNull(sp.GetService<TimerWheelConfig>());
     }
 }

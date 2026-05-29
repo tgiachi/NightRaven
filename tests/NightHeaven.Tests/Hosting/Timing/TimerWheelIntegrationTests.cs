@@ -24,6 +24,7 @@ public class TimerWheelIntegrationTests
         timers.RegisterTimer("ping", TimeSpan.FromMilliseconds(50), () => Interlocked.Increment(ref fired));
 
         var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(2);
+
         while (DateTime.UtcNow < deadline && Volatile.Read(ref fired) == 0)
         {
             await Task.Delay(10);

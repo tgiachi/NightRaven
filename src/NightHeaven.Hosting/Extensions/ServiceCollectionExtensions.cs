@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Hosting.Internal;
 
@@ -27,9 +28,7 @@ public static class ServiceCollectionExtensions
         /// </summary>
         public IServiceCollection AddNightHeavenHosting()
         {
-            services.TryAddEnumerable(
-                ServiceDescriptor.Singleton<Microsoft.Extensions.Hosting.IHostedService, NightHeavenServiceOrchestrator>()
-            );
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, NightHeavenServiceOrchestrator>());
 
             return services;
         }
@@ -39,9 +38,7 @@ public static class ServiceCollectionExtensions
         /// with the given start priority.
         /// </summary>
         /// <param name="priority">Lower values start first. Default <see cref="DefaultPriority" />.</param>
-        public IServiceCollection AddNightHeavenService<TInterface, TImplementation>(
-            int priority = DefaultPriority
-        )
+        public IServiceCollection AddNightHeavenService<TInterface, TImplementation>(int priority = DefaultPriority)
             where TInterface : class
             where TImplementation : class, TInterface, INightHeavenService
         {
@@ -58,9 +55,7 @@ public static class ServiceCollectionExtensions
         /// Registers an <see cref="INightHeavenService" /> with no public interface alias.
         /// </summary>
         /// <param name="priority">Lower values start first. Default <see cref="DefaultPriority" />.</param>
-        public IServiceCollection AddNightHeavenService<TImplementation>(
-            int priority = DefaultPriority
-        )
+        public IServiceCollection AddNightHeavenService<TImplementation>(int priority = DefaultPriority)
             where TImplementation : class, INightHeavenService
         {
             services.AddSingleton<TImplementation>();

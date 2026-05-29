@@ -9,6 +9,4 @@ namespace NightHeaven.Hosting.Interfaces.Events;
 /// non-blocking; long-running work belongs in an async handler triggered by a
 /// follow-up <see cref="IAsyncEvent" />.
 /// </remarks>
-public interface ITickEvent : INightHeavenEvent
-{
-}
+public interface ITickEvent : INightHeavenEvent { }

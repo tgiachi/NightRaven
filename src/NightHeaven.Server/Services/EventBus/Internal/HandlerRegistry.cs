@@ -1,8 +1,6 @@
 using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
 using NightHeaven.Hosting.Interfaces.Events;
-using NightHeaven.Hosting.Interfaces.Services;
 
 namespace NightHeaven.Server.Services.EventBus.Internal;
 

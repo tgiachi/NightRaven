@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using NightHeaven.Hosting.Data.Timing;
 using NightHeaven.Hosting.Extensions;
 using NightHeaven.Hosting.Interfaces.Timing;

@@ -52,7 +52,7 @@ public class TextEncodingTests
     public void GetString_SafeStringFalse_DecodesAllBytes()
     {
         var bytes = Encoding.UTF8.GetBytes("hello");
-        var result = TextEncoding.GetString(bytes, Encoding.UTF8, false);
+        var result = TextEncoding.GetString(bytes, Encoding.UTF8);
 
         Assert.Equal("hello", result);
     }

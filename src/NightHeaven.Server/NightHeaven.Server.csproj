@@ -10,29 +10,29 @@
 
     <ItemGroup>
         <PackageReference Include="ConsoleAppFramework" Version="5.7.13">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8"/>
-        <PackageReference Include="Serilog" Version="4.3.1" />
-        <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+        <PackageReference Include="Serilog" Version="4.3.1"/>
+        <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj" />
-      <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj" />
-      <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj" />
+        <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj"/>
+        <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj"/>
+        <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="NightHeaven.Tests" />
+        <InternalsVisibleTo Include="NightHeaven.Tests"/>
     </ItemGroup>
 
 </Project>

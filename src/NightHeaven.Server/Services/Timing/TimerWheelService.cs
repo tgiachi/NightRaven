@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using NightHeaven.Hosting.Data.Metrics;
 using NightHeaven.Hosting.Data.Timing;
 using NightHeaven.Hosting.Interfaces.Metrics;
@@ -58,17 +59,62 @@ public sealed class TimerWheelService : ITimerService, IMetricProvider
 
         for (var i = 0; i < _wheel.Length; i++)
         {
-            _wheel[i] = new LinkedList<TimerEntry>();
+            _wheel[i] = new();
         }
     }
 
-    public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public Task StopAsync(CancellationToken cancellationToken)
+    public IReadOnlyList<MetricSample> Collect()
     {
-        UnregisterAllTimers();
+        int active;
 
-        return Task.CompletedTask;
+        lock (_syncRoot)
+        {
+            active = _timersById.Count;
+        }
+
+        var executed = Interlocked.Read(ref _totalExecuted);
+        var elapsedSwTicks = Interlocked.Read(ref _totalCallbackElapsedStopwatchTicks);
+        var avgMs = executed == 0
+                        ? 0
+                        : Stopwatch.GetElapsedTime(0, elapsedSwTicks / executed).TotalMilliseconds;
+
+        return
+        [
+            new(
+                "active",
+                active,
+                Help: "Currently registered timers"
+            ),
+            new(
+                "registered_total",
+                Interlocked.Read(ref _totalRegistered),
+                MetricType.Counter,
+                Help: "Total registrations since start"
+            ),
+            new(
+                "executed_total",
+                executed,
+                MetricType.Counter,
+                Help: "Total callback invocations"
+            ),
+            new(
+                "callback_errors_total",
+                Interlocked.Read(ref _callbackErrors),
+                MetricType.Counter,
+                Help: "Total callback exceptions"
+            ),
+            new(
+                "callback_avg_ms",
+                avgMs,
+                Help: "Average callback duration"
+            ),
+            new(
+                "processed_ticks_total",
+                Interlocked.Read(ref _totalProcessedTicks),
+                MetricType.Counter,
+                Help: "Total wheel ticks processed"
+            )
+        ];
     }
 
     public string RegisterTimer(
@@ -125,6 +171,30 @@ public sealed class TimerWheelService : ITimerService, IMetricProvider
         return entry.Id;
     }
 
+    public Task StartAsync(CancellationToken cancellationToken)
+        => Task.CompletedTask;
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        UnregisterAllTimers();
+
+        return Task.CompletedTask;
+    }
+
+    public void UnregisterAllTimers()
+    {
+        lock (_syncRoot)
+        {
+            _timersById.Clear();
+            _timerIdsByName.Clear();
+
+            foreach (var bucket in _wheel)
+            {
+                bucket.Clear();
+            }
+        }
+    }
+
     public bool UnregisterTimer(string timerId)
     {
         if (string.IsNullOrWhiteSpace(timerId))
@@ -164,20 +234,6 @@ public sealed class TimerWheelService : ITimerService, IMetricProvider
             }
 
             return removed;
-        }
-    }
-
-    public void UnregisterAllTimers()
-    {
-        lock (_syncRoot)
-        {
-            _timersById.Clear();
-            _timerIdsByName.Clear();
-
-            foreach (var bucket in _wheel)
-            {
-                bucket.Clear();
-            }
         }
     }
 
@@ -231,60 +287,45 @@ public sealed class TimerWheelService : ITimerService, IMetricProvider
         return ticksToProcess > int.MaxValue ? int.MaxValue : (int)ticksToProcess;
     }
 
-    public IReadOnlyList<MetricSample> Collect()
+    private void ExecuteEntry(TimerEntry entry)
     {
-        int active;
+        var startedAt = Stopwatch.GetTimestamp();
+
+        try
+        {
+            entry.Callback();
+        }
+        catch (Exception ex)
+        {
+            Interlocked.Increment(ref _callbackErrors);
+            _logger.Error(
+                ex,
+                "Timer callback failed for timer '{TimerName}' ({TimerId})",
+                entry.Name,
+                entry.Id
+            );
+        }
+        finally
+        {
+            Interlocked.Increment(ref _totalExecuted);
+            Interlocked.Add(
+                ref _totalCallbackElapsedStopwatchTicks,
+                Stopwatch.GetTimestamp() - startedAt
+            );
+        }
+
+        if (!entry.Repeat)
+        {
+            return;
+        }
 
         lock (_syncRoot)
         {
-            active = _timersById.Count;
+            if (!entry.Cancelled && _timersById.ContainsKey(entry.Id))
+            {
+                ScheduleEntry(entry, entry.Interval);
+            }
         }
-
-        var executed = Interlocked.Read(ref _totalExecuted);
-        var elapsedSwTicks = Interlocked.Read(ref _totalCallbackElapsedStopwatchTicks);
-        var avgMs = executed == 0
-            ? 0
-            : System.Diagnostics.Stopwatch.GetElapsedTime(0, elapsedSwTicks / executed).TotalMilliseconds;
-
-        return
-        [
-            new MetricSample(
-                "active",
-                active,
-                MetricType.Gauge,
-                Help: "Currently registered timers"
-            ),
-            new MetricSample(
-                "registered_total",
-                Interlocked.Read(ref _totalRegistered),
-                MetricType.Counter,
-                Help: "Total registrations since start"
-            ),
-            new MetricSample(
-                "executed_total",
-                executed,
-                MetricType.Counter,
-                Help: "Total callback invocations"
-            ),
-            new MetricSample(
-                "callback_errors_total",
-                Interlocked.Read(ref _callbackErrors),
-                MetricType.Counter,
-                Help: "Total callback exceptions"
-            ),
-            new MetricSample(
-                "callback_avg_ms",
-                avgMs,
-                MetricType.Gauge,
-                Help: "Average callback duration"
-            ),
-            new MetricSample(
-                "processed_ticks_total",
-                Interlocked.Read(ref _totalProcessedTicks),
-                MetricType.Counter,
-                Help: "Total wheel ticks processed"
-            )
-        ];
     }
 
     private void ProcessTick()
@@ -336,47 +377,6 @@ public sealed class TimerWheelService : ITimerService, IMetricProvider
         foreach (var entry in dueEntries)
         {
             ExecuteEntry(entry);
-        }
-    }
-
-    private void ExecuteEntry(TimerEntry entry)
-    {
-        var startedAt = System.Diagnostics.Stopwatch.GetTimestamp();
-
-        try
-        {
-            entry.Callback();
-        }
-        catch (Exception ex)
-        {
-            Interlocked.Increment(ref _callbackErrors);
-            _logger.Error(
-                ex,
-                "Timer callback failed for timer '{TimerName}' ({TimerId})",
-                entry.Name,
-                entry.Id
-            );
-        }
-        finally
-        {
-            Interlocked.Increment(ref _totalExecuted);
-            Interlocked.Add(
-                ref _totalCallbackElapsedStopwatchTicks,
-                System.Diagnostics.Stopwatch.GetTimestamp() - startedAt
-            );
-        }
-
-        if (!entry.Repeat)
-        {
-            return;
-        }
-
-        lock (_syncRoot)
-        {
-            if (!entry.Cancelled && _timersById.ContainsKey(entry.Id))
-            {
-                ScheduleEntry(entry, entry.Interval);
-            }
         }
     }
 

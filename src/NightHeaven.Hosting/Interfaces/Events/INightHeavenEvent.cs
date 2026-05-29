@@ -8,6 +8,4 @@ namespace NightHeaven.Hosting.Interfaces.Events;
 /// or <see cref="ITickEvent" /> (deterministic game-loop routing). Implementing this
 /// interface directly is not supported.
 /// </remarks>
-public interface INightHeavenEvent
-{
-}
+public interface INightHeavenEvent { }

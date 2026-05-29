@@ -5,30 +5,32 @@ namespace NightHeaven.Tests.Core.Utils;
 
 public class VersionUtilsTests
 {
-    [Fact]
-    public void GetVersion_CoreAssembly_ReturnsDeclaredVersion()
+    private sealed class FakeInformationalAssembly : Assembly
     {
-        var result = VersionUtils.GetVersion();
+        private readonly string? _informationalVersion;
+        private readonly Version? _assemblyVersion;
 
-        // Directory.Build.props declares Version = 0.1.0; informational version mirrors it.
-        Assert.False(string.IsNullOrWhiteSpace(result));
-        Assert.StartsWith("0.", result);
-    }
+        public FakeInformationalAssembly(string? informationalVersion, Version? assemblyVersion = null)
+        {
+            _informationalVersion = informationalVersion;
+            _assemblyVersion = assemblyVersion;
+        }
 
-    [Fact]
-    public void GetVersion_TargetAssembly_ReturnsInformationalVersion()
-    {
-        var assembly = typeof(VersionUtilsTests).Assembly;
+        public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+        {
+            if (attributeType == typeof(AssemblyInformationalVersionAttribute) && _informationalVersion is not null)
+            {
+                return new Attribute[] { new AssemblyInformationalVersionAttribute(_informationalVersion) };
+            }
 
-        var result = VersionUtils.GetVersion(assembly);
+            return Array.Empty<Attribute>();
+        }
 
-        Assert.False(string.IsNullOrWhiteSpace(result));
-    }
+        public override AssemblyName GetName()
+            => new("Fake") { Version = _assemblyVersion };
 
-    [Fact]
-    public void GetVersion_NullAssembly_Throws()
-    {
-        Assert.Throws<ArgumentNullException>(() => VersionUtils.GetVersion(null!));
+        public override bool IsDefined(Type attributeType, bool inherit)
+            => attributeType == typeof(AssemblyInformationalVersionAttribute) && _informationalVersion is not null;
     }
 
     [Fact]
@@ -55,7 +57,7 @@ public class VersionUtilsTests
     [Fact]
     public void GetVersion_AssemblyWithoutInformationalVersion_FallsBackToAssemblyVersion()
     {
-        var assembly = new FakeInformationalAssembly(informationalVersion: null, assemblyVersion: new Version(4, 5, 6, 7));
+        var assembly = new FakeInformationalAssembly(null, new(4, 5, 6, 7));
 
         var result = VersionUtils.GetVersion(assembly);
 
@@ -65,38 +67,34 @@ public class VersionUtilsTests
     [Fact]
     public void GetVersion_AssemblyWithWhitespaceInformationalVersion_FallsBackToAssemblyVersion()
     {
-        var assembly = new FakeInformationalAssembly(informationalVersion: "   ", assemblyVersion: new Version(2, 0));
+        var assembly = new FakeInformationalAssembly("   ", new(2, 0));
 
         var result = VersionUtils.GetVersion(assembly);
 
         Assert.Equal("2.0", result);
     }
 
-    private sealed class FakeInformationalAssembly : Assembly
+    [Fact]
+    public void GetVersion_CoreAssembly_ReturnsDeclaredVersion()
     {
-        private readonly string? _informationalVersion;
-        private readonly Version? _assemblyVersion;
+        var result = VersionUtils.GetVersion();
 
-        public FakeInformationalAssembly(string? informationalVersion, Version? assemblyVersion = null)
-        {
-            _informationalVersion = informationalVersion;
-            _assemblyVersion = assemblyVersion;
-        }
+        // Directory.Build.props declares Version = 0.1.0; informational version mirrors it.
+        Assert.False(string.IsNullOrWhiteSpace(result));
+        Assert.StartsWith("0.", result);
+    }
 
-        public override object[] GetCustomAttributes(Type attributeType, bool inherit)
-        {
-            if (attributeType == typeof(AssemblyInformationalVersionAttribute) && _informationalVersion is not null)
-            {
-                return new Attribute[] { new AssemblyInformationalVersionAttribute(_informationalVersion) };
-            }
+    [Fact]
+    public void GetVersion_NullAssembly_Throws()
+        => Assert.Throws<ArgumentNullException>(() => VersionUtils.GetVersion(null!));
 
-            return Array.Empty<Attribute>();
-        }
+    [Fact]
+    public void GetVersion_TargetAssembly_ReturnsInformationalVersion()
+    {
+        var assembly = typeof(VersionUtilsTests).Assembly;
 
-        public override bool IsDefined(Type attributeType, bool inherit)
-            => attributeType == typeof(AssemblyInformationalVersionAttribute) && _informationalVersion is not null;
+        var result = VersionUtils.GetVersion(assembly);
 
-        public override AssemblyName GetName()
-            => new("Fake") { Version = _assemblyVersion };
+        Assert.False(string.IsNullOrWhiteSpace(result));
     }
 }

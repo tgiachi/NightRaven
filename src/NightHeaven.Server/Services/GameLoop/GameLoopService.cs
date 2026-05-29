@@ -67,7 +67,8 @@ public sealed class GameLoopService : IGameLoopService, IMetricProvider, IDispos
 
     public IReadOnlyList<MetricSample> Collect()
     {
-        double avg, max;
+        double avg,
+               max;
 
         lock (_metricsSync)
         {
@@ -77,25 +78,23 @@ public sealed class GameLoopService : IGameLoopService, IMetricProvider, IDispos
 
         return
         [
-            new MetricSample(
+            new(
                 "tick_count",
                 Interlocked.Read(ref _tickCount),
                 MetricType.Counter,
                 Help: "Total game loop iterations"
             ),
-            new MetricSample(
+            new(
                 "tick_avg_ms",
                 avg,
-                MetricType.Gauge,
                 Help: "EMA tick elapsed in ms"
             ),
-            new MetricSample(
+            new(
                 "tick_max_ms",
                 max,
-                MetricType.Gauge,
                 Help: "Worst tick elapsed in ms"
             ),
-            new MetricSample(
+            new(
                 "idle_sleeps_total",
                 Interlocked.Read(ref _idleSleepCount),
                 MetricType.Counter,

@@ -7,6 +7,4 @@ namespace NightHeaven.Hosting.Interfaces.Events;
 /// Async events are processed by <see cref="IAsyncEventHandler{TEvent}" /> handlers
 /// on the .NET thread pool. Handlers run sequentially per event in registration order.
 /// </remarks>
-public interface IAsyncEvent : INightHeavenEvent
-{
-}
+public interface IAsyncEvent : INightHeavenEvent { }
