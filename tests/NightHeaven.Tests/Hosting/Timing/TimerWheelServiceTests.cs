@@ -240,6 +240,73 @@ public class TimerWheelServiceTests
         Assert.Equal(0, calls);
     }
 
+    [Fact]
+    public void LongInterval_WrapsWheelViaRounds()
+    {
+        // wheel = 8 slots × 8 ms = 64 ms wheel. Interval 200 ms → 25 ticks → 3 rounds + 1 offset.
+        var svc = NewService(tickDurationMs: 8, wheelSize: 8);
+        var calls = 0;
+        svc.RegisterTimer("long", TimeSpan.FromMilliseconds(200), () => calls++);
+
+        svc.UpdateTicksDelta(0);
+        svc.UpdateTicksDelta(192);
+        Assert.Equal(0, calls);
+
+        svc.UpdateTicksDelta(200);
+        Assert.Equal(1, calls);
+    }
+
+    [Fact]
+    public void CancelFromInsideCallback_PreventsFurtherFires()
+    {
+        var svc = NewService(tickDurationMs: 8, wheelSize: 8);
+        var calls = 0;
+        string? id = null;
+        id = svc.RegisterTimer(
+            "self-cancel",
+            TimeSpan.FromMilliseconds(8),
+            () =>
+            {
+                calls++;
+                svc.UnregisterTimer(id!);
+            },
+            repeat: true
+        );
+
+        svc.UpdateTicksDelta(0);
+        svc.UpdateTicksDelta(8);  // fires, callback cancels itself
+        svc.UpdateTicksDelta(64); // should not fire again
+
+        Assert.Equal(1, calls);
+    }
+
+    [Fact]
+    public void CallbackException_DoesNotStopOtherTimers()
+    {
+        var svc = NewService(tickDurationMs: 8, wheelSize: 8);
+        var goodCalls = 0;
+        svc.RegisterTimer("bad",  TimeSpan.FromMilliseconds(8), () => throw new InvalidOperationException("boom"));
+        svc.RegisterTimer("good", TimeSpan.FromMilliseconds(8), () => goodCalls++);
+
+        svc.UpdateTicksDelta(0);
+        svc.UpdateTicksDelta(8);
+
+        Assert.Equal(1, goodCalls);
+    }
+
+    [Fact]
+    public async Task StopAsync_ClearsState()
+    {
+        var svc = NewService();
+        svc.RegisterTimer("a", TimeSpan.FromMilliseconds(8), () => { });
+        svc.RegisterTimer("b", TimeSpan.FromMilliseconds(8), () => { });
+
+        await svc.StopAsync(CancellationToken.None);
+
+        Assert.Equal(0, svc.UnregisterTimersByName("a"));
+        Assert.Equal(0, svc.UnregisterTimersByName("b"));
+    }
+
     private static TimerWheelService NewService(int tickDurationMs = 8, int wheelSize = 16)
         => new(new TimerWheelConfig
         {
