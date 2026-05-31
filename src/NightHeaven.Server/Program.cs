@@ -9,6 +9,7 @@ using NightHeaven.Server.Extensions;
 using NightHeaven.Server.Services.Diagnostics;
 using NightHeaven.Server.Services.EventBus;
 using NightHeaven.Server.Services.GameLoop;
+using NightHeaven.Server.Services.Network;
 using NightHeaven.Server.Services.Timing;
 using Serilog;
 
@@ -57,6 +58,10 @@ await ConsoleApp.RunAsync(
         var registeredPackets = PacketTable.Register(packetRegistry);
         builder.Services.AddSingleton(packetRegistry);
         Log.Information("Registered {PacketCount} UO packets", registeredPackets);
+
+        // Network: TCP game listeners + UDP ping server + packet parser (priority 20).
+        builder.Services.AddNightHeavenNetwork();
+        builder.Services.AddMetricProvider<NetworkService>();
 
         var app = builder.Build();
 
