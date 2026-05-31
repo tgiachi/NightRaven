@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
 using Scalar.AspNetCore;
 
 namespace NightHeaven.Server.Extensions;

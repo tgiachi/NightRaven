@@ -3,6 +3,7 @@ using NightHeaven.Core.Data.Directories;
 using NightHeaven.Core.Types;
 using NightHeaven.Core.Utils;
 using NightHeaven.Hosting.Interfaces.Services;
+using NightHeaven.Network.UO.Registry;
 using NightHeaven.Server.Data.Events;
 using NightHeaven.Server.Extensions;
 using NightHeaven.Server.Services.Diagnostics;
@@ -50,6 +51,12 @@ await ConsoleApp.RunAsync(
         builder.Services.AddMetricProvider<EventBusService>();
         builder.Services.AddMetricProvider<GameLoopService>();
         builder.Services.AddMetricProvider<TimerWheelService>();
+
+        // UO packet registry: scan the Network.UO assembly for [PacketHandler] packets.
+        var packetRegistry = new PacketRegistry();
+        var registeredPackets = PacketTable.Register(packetRegistry);
+        builder.Services.AddSingleton(packetRegistry);
+        Log.Information("Registered {PacketCount} UO packets", registeredPackets);
 
         var app = builder.Build();
 

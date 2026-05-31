@@ -1,0 +1,31 @@
+using NightHeaven.Network.Spans;
+using NightHeaven.Network.UO.Attributes;
+using NightHeaven.Network.UO.Base;
+using NightHeaven.Network.UO.Types.Packets;
+
+namespace NightHeaven.Network.UO.Packets.Incoming.Interaction;
+
+[PacketHandler(0x05, PacketSizing.Fixed, Length = 5, Description = "Request Attack")]
+
+/// <summary>
+/// Represents RequestAttackPacket.
+/// </summary>
+public class RequestAttackPacket : BaseGameNetworkPacket
+{
+    public uint TargetId { get; private set; }
+
+    public RequestAttackPacket()
+        : base(0x05, 5) { }
+
+    protected override bool ParsePayload(ref SpanReader reader)
+    {
+        if (reader.Remaining != 4)
+        {
+            return false;
+        }
+
+        TargetId = reader.ReadUInt32();
+
+        return reader.Remaining == 0;
+    }
+}

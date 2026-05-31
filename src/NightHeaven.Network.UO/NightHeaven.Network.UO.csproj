@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.8" />
+      <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj"/>
+      <Folder Include="Data\" />
+      <Folder Include="Packets\" />
     </ItemGroup>
 
 </Project>
