@@ -31,11 +31,9 @@ public class NightHeavenUDPServerTests
         var payload = Encoding.ASCII.GetBytes("ping");
         await client.SendAsync(payload, payload.Length, new(IPAddress.Loopback, port));
 
-        var receive = client.ReceiveAsync();
-        var completed = await Task.WhenAny(receive, Task.Delay(TimeSpan.FromSeconds(5)));
+        var received = await client.ReceiveAsync().AsTask().WaitAsync(TimeSpan.FromSeconds(5));
 
-        Assert.Same(receive, completed);
-        Assert.Equal(payload, receive.Result.Buffer);
+        Assert.Equal(payload, received.Buffer);
 
         await server.StopAsync(CancellationToken.None);
     }
@@ -64,11 +62,9 @@ public class NightHeavenUDPServerTests
         using var client = new UdpClient();
         await client.SendAsync([1, 2, 3], 3, new(IPAddress.Loopback, port));
 
-        var receive = client.ReceiveAsync();
-        var completed = await Task.WhenAny(receive, Task.Delay(TimeSpan.FromSeconds(5)));
+        var received = await client.ReceiveAsync().AsTask().WaitAsync(TimeSpan.FromSeconds(5));
 
-        Assert.Same(receive, completed);
-        Assert.Equal(new byte[] { 2, 3, 4 }, receive.Result.Buffer);
+        Assert.Equal(new byte[] { 2, 3, 4 }, received.Buffer);
 
         await server.StopAsync(CancellationToken.None);
     }
