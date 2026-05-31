@@ -17,6 +17,7 @@ public class NetworkServiceIntegrationTests
     {
         public List<PacketReceivedEvent> Packets { get; } = [];
         public List<PlayerConnectedEvent> Connects { get; } = [];
+        public List<PlayerDisconnectedEvent> Disconnects { get; } = [];
     }
 
     private sealed class CapturePacketHandler : ITickEventHandler<PacketReceivedEvent>
@@ -51,6 +52,24 @@ public class NetworkServiceIntegrationTests
             lock (_capture)
             {
                 _capture.Connects.Add(evt);
+            }
+        }
+    }
+
+    private sealed class CaptureDisconnectHandler : ITickEventHandler<PlayerDisconnectedEvent>
+    {
+        private readonly PacketCapture _capture;
+
+        public CaptureDisconnectHandler(PacketCapture capture)
+        {
+            _capture = capture;
+        }
+
+        public void Handle(PlayerDisconnectedEvent evt)
+        {
+            lock (_capture)
+            {
+                _capture.Disconnects.Add(evt);
             }
         }
     }
@@ -116,6 +135,70 @@ public class NetworkServiceIntegrationTests
             var samples = network.Collect().ToDictionary(s => s.Name, s => s.Value);
             Assert.True(samples["active_sessions"] >= 1);
             Assert.True(samples["parsed_packets_total"] >= 1);
+        }
+        finally
+        {
+            await orchestrator.StopAsync(CancellationToken.None);
+        }
+    }
+
+    [Fact]
+    public async Task FullHost_ClientDisconnects_PublishesDisconnectAndRemovesSession()
+    {
+        var port = GetFreeTcpPort();
+        var capture = new PacketCapture();
+
+        var services = new ServiceCollection();
+        services.AddSingleton(capture);
+        services.AddNightHeavenEventBus();
+
+        var packetRegistry = new PacketRegistry();
+        PacketTable.Register(packetRegistry);
+        services.AddSingleton(packetRegistry);
+
+        services.AddNightHeavenNetwork(
+            cfg =>
+            {
+                cfg.Port = port;
+                cfg.PingServerEnabled = false;
+            }
+        );
+        services.AddTickEventHandler<CaptureDisconnectHandler, PlayerDisconnectedEvent>();
+
+        var sp = services.BuildServiceProvider();
+        var orchestrator = sp.GetRequiredService<IEnumerable<IHostedService>>().Single();
+        var network = (NetworkService)sp.GetRequiredService<INetworkService>();
+
+        await orchestrator.StartAsync(CancellationToken.None);
+
+        try
+        {
+            var client = new TcpClient();
+            await client.ConnectAsync(IPAddress.Loopback, port);
+
+            await WaitForAsync(() => network.ConnectedSessionCount >= 1, TimeSpan.FromSeconds(5));
+
+            client.Close();
+            client.Dispose();
+
+            await WaitForAsync(
+                () =>
+                {
+                    lock (capture)
+                    {
+                        return capture.Disconnects.Count >= 1;
+                    }
+                },
+                TimeSpan.FromSeconds(5)
+            );
+
+            lock (capture)
+            {
+                Assert.Single(capture.Disconnects);
+            }
+
+            await WaitForAsync(() => network.ConnectedSessionCount == 0, TimeSpan.FromSeconds(5));
+            Assert.Equal(0, network.ConnectedSessionCount);
         }
         finally
         {

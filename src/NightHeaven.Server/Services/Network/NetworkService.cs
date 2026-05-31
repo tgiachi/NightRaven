@@ -1,4 +1,3 @@
-using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using System.Net;
 using NightHeaven.Core.Utils;
@@ -9,9 +8,7 @@ using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Hosting.Types.Metrics;
 using NightHeaven.Network.Events;
 using NightHeaven.Network.Server;
-using NightHeaven.Network.UO.Data.Packets;
 using NightHeaven.Network.UO.Registry;
-using NightHeaven.Network.UO.Types.Packets;
 using NightHeaven.Server.Data.Events;
 using NightHeaven.Server.Interfaces.Network;
 using NightHeaven.Server.Services.Network.Internal;
@@ -32,8 +29,8 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
     private readonly ILogger _logger = Log.ForContext<NetworkService>();
     private readonly IEventBusService _eventBus;
     private readonly ISessionService _sessions;
-    private readonly PacketRegistry _packetRegistry;
     private readonly NetworkConfig _config;
+    private readonly PacketParser _parser;
 
     private readonly List<NightHeavenTCPServer> _tcpServers = [];
     private readonly ConcurrentQueue<PendingClientData> _pendingClientDataQueue = new();
@@ -54,8 +51,8 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
     {
         _eventBus = eventBus;
         _sessions = sessions;
-        _packetRegistry = packetRegistry;
         _config = config;
+        _parser = new(packetRegistry, config.MaxPendingBufferBytes, config.MaxDeclaredPacketLength);
     }
 
     public int ConnectedSessionCount => _sessions.Count;
@@ -294,122 +291,16 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         }
 
         var metrics = _parserMetrics.GetOrAdd(sessionId, static _ => new());
-        metrics.AddReceivedBytes(data.Length);
 
         session.WithPendingBytes(
-            pendingBytes =>
-            {
-                pendingBytes.AddRange(data);
-
-                if (pendingBytes.Count > _config.MaxPendingBufferBytes)
-                {
-                    metrics.IncrementPendingBufferOverflows();
-                    _logger.Warning(
-                        "Session {SessionId} exceeded pending buffer limit; clearing buffer",
-                        sessionId
-                    );
-                    pendingBytes.Clear();
-
-                    return;
-                }
-
-                ParseAvailablePackets(session, pendingBytes, metrics);
-            }
+            pendingBytes => _parser.Append(
+                pendingBytes,
+                data,
+                metrics,
+                (opCode, packet) =>
+                    _eventBus.Publish(new PacketReceivedEvent(session.SessionId, opCode, packet, DateTimeOffset.UtcNow))
+            )
         );
-    }
-
-    private void ParseAvailablePackets(GameSession session, List<byte> pendingBytes, NetworkParserSessionMetrics metrics)
-    {
-        while (pendingBytes.Count > 0)
-        {
-            var opCode = pendingBytes[0];
-
-            if (!_packetRegistry.TryGetDescriptor(opCode, out var descriptor))
-            {
-                // Unknown opcode: we cannot know the length, so drop the whole buffer to resync.
-                metrics.IncrementUnknownOpcodeDrops();
-                _logger.Warning(
-                    "Unknown opcode 0x{OpCode:X2} from session {SessionId}; dropping {Count} buffered bytes",
-                    opCode,
-                    session.SessionId,
-                    pendingBytes.Count
-                );
-                pendingBytes.Clear();
-
-                return;
-            }
-
-            var length = ResolvePacketLength(pendingBytes, descriptor);
-
-            if (length is null)
-            {
-                // Need more bytes to determine the length.
-                return;
-            }
-
-            if (length.Value <= 0 || length.Value > _config.MaxDeclaredPacketLength)
-            {
-                metrics.IncrementInvalidLengthDrops();
-                _logger.Warning(
-                    "Invalid declared length {Length} for opcode 0x{OpCode:X2} from session {SessionId}; dropping buffer",
-                    length.Value,
-                    opCode,
-                    session.SessionId
-                );
-                pendingBytes.Clear();
-
-                return;
-            }
-
-            if (pendingBytes.Count < length.Value)
-            {
-                // Full packet not yet available.
-                return;
-            }
-
-            var rawPacket = new byte[length.Value];
-            pendingBytes.CopyTo(0, rawPacket, 0, length.Value);
-            pendingBytes.RemoveRange(0, length.Value);
-
-            if (!_packetRegistry.TryCreatePacket(opCode, out var packet) || packet is null)
-            {
-                metrics.IncrementUnknownOpcodeDrops();
-
-                continue;
-            }
-
-            if (!packet.TryParse(rawPacket))
-            {
-                metrics.IncrementParseFailures();
-                _logger.Warning(
-                    "Failed to parse packet 0x{OpCode:X2} from session {SessionId}",
-                    opCode,
-                    session.SessionId
-                );
-
-                continue;
-            }
-
-            metrics.IncrementParsedPackets();
-            _eventBus.Publish(new PacketReceivedEvent(session.SessionId, opCode, packet, DateTimeOffset.UtcNow));
-        }
-    }
-
-    private static int? ResolvePacketLength(List<byte> pendingBytes, PacketDescriptor descriptor)
-    {
-        if (descriptor.Sizing == PacketSizing.Fixed)
-        {
-            return descriptor.Length;
-        }
-
-        if (pendingBytes.Count < 3)
-        {
-            return null;
-        }
-
-        Span<byte> lengthBuffer = [pendingBytes[1], pendingBytes[2]];
-
-        return BinaryPrimitives.ReadUInt16BigEndian(lengthBuffer);
     }
 
     private readonly record struct PendingClientData(long SessionId, byte[] Data);
