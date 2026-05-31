@@ -31,7 +31,7 @@ public class NightHeavenUDPServerTests
         var payload = Encoding.ASCII.GetBytes("ping");
         await client.SendAsync(payload, payload.Length, new(IPAddress.Loopback, port));
 
-        var received = await client.ReceiveAsync().AsTask().WaitAsync(TimeSpan.FromSeconds(5));
+        var received = await client.ReceiveAsync().WaitAsync(TimeSpan.FromSeconds(5));
 
         Assert.Equal(payload, received.Buffer);
 
@@ -62,7 +62,7 @@ public class NightHeavenUDPServerTests
         using var client = new UdpClient();
         await client.SendAsync([1, 2, 3], 3, new(IPAddress.Loopback, port));
 
-        var received = await client.ReceiveAsync().AsTask().WaitAsync(TimeSpan.FromSeconds(5));
+        var received = await client.ReceiveAsync().WaitAsync(TimeSpan.FromSeconds(5));
 
         Assert.Equal(new byte[] { 2, 3, 4 }, received.Buffer);
 
