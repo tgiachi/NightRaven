@@ -1,0 +1,102 @@
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using NightHeaven.Network.Server;
+
+namespace NightHeaven.Tests.Network.Server;
+
+public class NightHeavenUDPServerTests
+{
+    [Fact]
+    public async Task Start_BindsAndReportsRunning()
+    {
+        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, 0), bindAllInterfaces: false);
+
+        await server.StartAsync(CancellationToken.None);
+
+        Assert.True(server.IsRunning);
+        Assert.Equal(1, server.ListenerCount);
+
+        await server.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task Receive_DefaultBehaviour_EchoesPayloadBackToSender()
+    {
+        var port = GetFreeUdpPort();
+        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), bindAllInterfaces: false);
+        await server.StartAsync(CancellationToken.None);
+
+        using var client = new UdpClient();
+        var payload = Encoding.ASCII.GetBytes("ping");
+        await client.SendAsync(payload, payload.Length, new(IPAddress.Loopback, port));
+
+        var receive = client.ReceiveAsync();
+        var completed = await Task.WhenAny(receive, Task.Delay(TimeSpan.FromSeconds(5)));
+
+        Assert.Same(receive, completed);
+        Assert.Equal(payload, receive.Result.Buffer);
+
+        await server.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task Receive_WithCustomHandler_SendsHandlerResponse()
+    {
+        var port = GetFreeUdpPort();
+        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), bindAllInterfaces: false)
+        {
+            OnDatagram = (data, _) =>
+            {
+                var reply = new byte[data.Length];
+                data.Span.CopyTo(reply);
+
+                for (var i = 0; i < reply.Length; i++)
+                {
+                    reply[i] = (byte)(reply[i] + 1);
+                }
+
+                return reply;
+            }
+        };
+        await server.StartAsync(CancellationToken.None);
+
+        using var client = new UdpClient();
+        await client.SendAsync([1, 2, 3], 3, new(IPAddress.Loopback, port));
+
+        var receive = client.ReceiveAsync();
+        var completed = await Task.WhenAny(receive, Task.Delay(TimeSpan.FromSeconds(5)));
+
+        Assert.Same(receive, completed);
+        Assert.Equal(new byte[] { 2, 3, 4 }, receive.Result.Buffer);
+
+        await server.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task StopThenStart_RebindsListener()
+    {
+        var port = GetFreeUdpPort();
+        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), bindAllInterfaces: false);
+
+        await server.StartAsync(CancellationToken.None);
+        Assert.True(server.IsRunning);
+
+        await server.StopAsync(CancellationToken.None);
+        Assert.False(server.IsRunning);
+        Assert.Equal(0, server.ListenerCount);
+
+        await server.StartAsync(CancellationToken.None);
+        Assert.True(server.IsRunning);
+        Assert.Equal(1, server.ListenerCount);
+
+        await server.StopAsync(CancellationToken.None);
+    }
+
+    private static int GetFreeUdpPort()
+    {
+        using var probe = new UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+
+        return ((IPEndPoint)probe.Client.LocalEndPoint!).Port;
+    }
+}
