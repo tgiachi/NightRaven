@@ -11,6 +11,7 @@ WORKDIR /src
 # `dotnet restore` layer caches across source-only changes.
 COPY ["Directory.Build.props", "global.json", "./"]
 COPY ["src/NightHeaven.Core/NightHeaven.Core.csproj", "src/NightHeaven.Core/"]
+COPY ["src/NightHeaven.Hosting/NightHeaven.Hosting.csproj", "src/NightHeaven.Hosting/"]
 COPY ["src/NightHeaven.Network/NightHeaven.Network.csproj", "src/NightHeaven.Network/"]
 COPY ["src/NightHeaven.Server/NightHeaven.Server.csproj", "src/NightHeaven.Server/"]
 RUN dotnet restore "src/NightHeaven.Server/NightHeaven.Server.csproj"
