@@ -48,38 +48,38 @@ public sealed class PersistenceEntityDescriptor<TEntity, TKey>
     public Type EntityType => typeof(TEntity);
     public Type KeyType => typeof(TKey);
 
-    public TKey GetKey(TEntity entity)
-        => _keySelector(entity);
-
     public TEntity Clone(TEntity entity)
         => DeserializeEntity(SerializeEntity(entity));
 
-    public byte[] SerializeEntity(TEntity entity)
-        => MessagePackSerializer.Serialize(entity, SerializerOptions);
+    public IReadOnlyList<TEntity> DeserializeBucket(byte[] payload)
+        => MessagePackSerializer.Deserialize<List<TEntity>>(payload, SerializerOptions) ?? [];
 
     public TEntity DeserializeEntity(byte[] payload)
         => MessagePackSerializer.Deserialize<TEntity>(payload, SerializerOptions)!;
 
-    public byte[] SerializeKey(TKey key)
-        => MessagePackSerializer.Serialize(key, SerializerOptions);
-
     public TKey DeserializeKey(byte[] payload)
         => MessagePackSerializer.Deserialize<TKey>(payload, SerializerOptions)!;
+
+    public TKey GetKey(TEntity entity)
+        => _keySelector(entity);
 
     public byte[] SerializeBucket(IReadOnlyCollection<TEntity> entities)
         => MessagePackSerializer.Serialize(entities, SerializerOptions);
 
-    public IReadOnlyList<TEntity> DeserializeBucket(byte[] payload)
-        => MessagePackSerializer.Deserialize<List<TEntity>>(payload, SerializerOptions) ?? [];
+    public byte[] SerializeEntity(TEntity entity)
+        => MessagePackSerializer.Serialize(entity, SerializerOptions);
+
+    public byte[] SerializeKey(TKey key)
+        => MessagePackSerializer.Serialize(key, SerializerOptions);
+
+    void IInternalEntityApplier.ApplyRemove(PersistenceStateStore stateStore, byte[] payload)
+        => stateStore.GetBucket<TEntity, TKey>(TypeId).Remove(DeserializeKey(payload));
 
     void IInternalEntityApplier.ApplyUpsert(PersistenceStateStore stateStore, byte[] payload)
     {
         var entity = DeserializeEntity(payload);
         stateStore.GetBucket<TEntity, TKey>(TypeId)[GetKey(entity)] = entity;
     }
-
-    void IInternalEntityApplier.ApplyRemove(PersistenceStateStore stateStore, byte[] payload)
-        => stateStore.GetBucket<TEntity, TKey>(TypeId).Remove(DeserializeKey(payload));
 
     EntitySnapshotBucket? IInternalEntityApplier.CaptureBucket(PersistenceStateStore stateStore)
     {
@@ -99,6 +99,9 @@ public sealed class PersistenceEntityDescriptor<TEntity, TKey>
         };
     }
 
+    int IInternalEntityApplier.Count(PersistenceStateStore stateStore)
+        => stateStore.GetBucket<TEntity, TKey>(TypeId).Count;
+
     void IInternalEntityApplier.LoadBucket(PersistenceStateStore stateStore, EntitySnapshotBucket bucket)
     {
         var typed = stateStore.GetBucket<TEntity, TKey>(TypeId);
@@ -109,7 +112,4 @@ public sealed class PersistenceEntityDescriptor<TEntity, TKey>
             typed[GetKey(entity)] = entity;
         }
     }
-
-    int IInternalEntityApplier.Count(PersistenceStateStore stateStore)
-        => stateStore.GetBucket<TEntity, TKey>(TypeId).Count;
 }

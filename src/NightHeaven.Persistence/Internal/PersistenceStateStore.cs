@@ -12,6 +12,9 @@ internal sealed class PersistenceStateStore
 
     public long LastSequenceId { get; set; }
 
+    public void ClearBuckets()
+        => _entityBuckets.Clear();
+
     public Dictionary<TKey, TEntity> GetBucket<TEntity, TKey>(ushort typeId)
         where TKey : notnull
     {
@@ -25,7 +28,4 @@ internal sealed class PersistenceStateStore
 
         return created;
     }
-
-    public void ClearBuckets()
-        => _entityBuckets.Clear();
 }

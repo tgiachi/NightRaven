@@ -79,6 +79,13 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
         }
     }
 
+    public ValueTask DisposeAsync()
+    {
+        _ioLock.Dispose();
+
+        return ValueTask.CompletedTask;
+    }
+
     public async ValueTask<IReadOnlyCollection<JournalEntry>> ReadAllAsync(CancellationToken cancellationToken = default)
     {
         await _ioLock.WaitAsync(cancellationToken);
@@ -93,6 +100,20 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
             var bytes = await File.ReadAllBytesAsync(_path, cancellationToken);
 
             return ParseAll(bytes);
+        }
+        finally
+        {
+            _ioLock.Release();
+        }
+    }
+
+    public async ValueTask ResetAsync(CancellationToken cancellationToken = default)
+    {
+        await _ioLock.WaitAsync(cancellationToken);
+
+        try
+        {
+            await RewriteAsync([], cancellationToken);
         }
         finally
         {
@@ -124,53 +145,6 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
         {
             _ioLock.Release();
         }
-    }
-
-    public async ValueTask ResetAsync(CancellationToken cancellationToken = default)
-    {
-        await _ioLock.WaitAsync(cancellationToken);
-
-        try
-        {
-            await RewriteAsync([], cancellationToken);
-        }
-        finally
-        {
-            _ioLock.Release();
-        }
-    }
-
-    private static async ValueTask WriteRecordAsync(
-        FileStream stream,
-        JournalEntry entry,
-        CancellationToken cancellationToken
-    )
-    {
-        var payload = MessagePackSerializer.Serialize(entry, Options, cancellationToken);
-        var header = new byte[HeaderSize];
-        BinaryPrimitives.WriteInt32LittleEndian(header, payload.Length);
-        BinaryPrimitives.WriteUInt32LittleEndian(header.AsSpan(4), ChecksumUtils.Compute(payload));
-
-        await stream.WriteAsync(header, cancellationToken);
-        await stream.WriteAsync(payload, cancellationToken);
-        await stream.FlushAsync(cancellationToken);
-    }
-
-    private async ValueTask RewriteAsync(IReadOnlyList<JournalEntry> entries, CancellationToken cancellationToken)
-    {
-        var tempPath = _path + ".tmp";
-
-        await using (var stream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
-        {
-            for (var i = 0; i < entries.Count; i++)
-            {
-                await WriteRecordAsync(stream, entries[i], cancellationToken);
-            }
-
-            await stream.FlushAsync(cancellationToken);
-        }
-
-        File.Move(tempPath, _path, overwrite: true);
     }
 
     private List<JournalEntry> ParseAll(byte[] bytes)
@@ -206,10 +180,36 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
         return entries;
     }
 
-    public ValueTask DisposeAsync()
+    private async ValueTask RewriteAsync(IReadOnlyList<JournalEntry> entries, CancellationToken cancellationToken)
     {
-        _ioLock.Dispose();
+        var tempPath = _path + ".tmp";
 
-        return ValueTask.CompletedTask;
+        await using (var stream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            for (var i = 0; i < entries.Count; i++)
+            {
+                await WriteRecordAsync(stream, entries[i], cancellationToken);
+            }
+
+            await stream.FlushAsync(cancellationToken);
+        }
+
+        File.Move(tempPath, _path, true);
+    }
+
+    private static async ValueTask WriteRecordAsync(
+        FileStream stream,
+        JournalEntry entry,
+        CancellationToken cancellationToken
+    )
+    {
+        var payload = MessagePackSerializer.Serialize(entry, Options, cancellationToken);
+        var header = new byte[HeaderSize];
+        BinaryPrimitives.WriteInt32LittleEndian(header, payload.Length);
+        BinaryPrimitives.WriteUInt32LittleEndian(header.AsSpan(4), ChecksumUtils.Compute(payload));
+
+        await stream.WriteAsync(header, cancellationToken);
+        await stream.WriteAsync(payload, cancellationToken);
+        await stream.FlushAsync(cancellationToken);
     }
 }

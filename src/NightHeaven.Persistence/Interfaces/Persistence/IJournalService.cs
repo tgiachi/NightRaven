@@ -16,9 +16,9 @@ public interface IJournalService
     /// <summary>Reads all valid journal entries in persistence order.</summary>
     ValueTask<IReadOnlyCollection<JournalEntry>> ReadAllAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Removes journal entries up to and including the given sequence id.</summary>
-    ValueTask TrimThroughSequenceAsync(long inclusiveSequenceId, CancellationToken cancellationToken = default);
-
     /// <summary>Clears all journal content.</summary>
     ValueTask ResetAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Removes journal entries up to and including the given sequence id.</summary>
+    ValueTask TrimThroughSequenceAsync(long inclusiveSequenceId, CancellationToken cancellationToken = default);
 }

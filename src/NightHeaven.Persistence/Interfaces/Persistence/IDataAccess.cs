@@ -15,9 +15,9 @@ public interface IDataAccess<TEntity, in TKey>
     /// <summary>Gets an entity by id, or null when absent (detached clone).</summary>
     ValueTask<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default);
 
-    /// <summary>Inserts or updates an entity.</summary>
-    ValueTask UpsertAsync(TEntity entity, CancellationToken cancellationToken = default);
-
     /// <summary>Removes an entity by id; returns true when one was removed.</summary>
     ValueTask<bool> RemoveAsync(TKey id, CancellationToken cancellationToken = default);
+
+    /// <summary>Inserts or updates an entity.</summary>
+    ValueTask UpsertAsync(TEntity entity, CancellationToken cancellationToken = default);
 }

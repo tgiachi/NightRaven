@@ -13,13 +13,9 @@ public sealed class SerialMessagePackFormatter : IMessagePackFormatter<Serial>
 {
     public static readonly SerialMessagePackFormatter Instance = new();
 
-    public void Serialize(ref MessagePackWriter writer, Serial value, MessagePackSerializerOptions options)
-    {
-        writer.Write(value.Value);
-    }
-
     public Serial Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
-    {
-        return new Serial(reader.ReadUInt32());
-    }
+        => new(reader.ReadUInt32());
+
+    public void Serialize(ref MessagePackWriter writer, Serial value, MessagePackSerializerOptions options)
+        => writer.Write(value.Value);
 }

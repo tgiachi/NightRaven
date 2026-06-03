@@ -8,9 +8,9 @@ namespace NightHeaven.Persistence.Internal;
 /// </summary>
 internal interface IInternalEntityApplier
 {
-    void ApplyUpsert(PersistenceStateStore stateStore, byte[] payload);
     void ApplyRemove(PersistenceStateStore stateStore, byte[] payload);
+    void ApplyUpsert(PersistenceStateStore stateStore, byte[] payload);
     EntitySnapshotBucket? CaptureBucket(PersistenceStateStore stateStore);
-    void LoadBucket(PersistenceStateStore stateStore, EntitySnapshotBucket bucket);
     int Count(PersistenceStateStore stateStore);
+    void LoadBucket(PersistenceStateStore stateStore, EntitySnapshotBucket bucket);
 }

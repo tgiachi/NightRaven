@@ -72,19 +72,15 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
         ];
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public void Dispose()
     {
-        foreach (var registration in _registrations)
-        {
-            RegisterDescriptor(registration.Descriptor);
-        }
-
-        _registry.Freeze();
-        await InitializeAsync(cancellationToken);
+        _journal.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        _snapshot.Dispose();
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken)
-        => await SaveSnapshotAsync(cancellationToken);
+    public IDataAccess<TEntity, TKey> GetDataAccess<TEntity, TKey>()
+        where TKey : notnull
+        => new GenericDataAccess<TEntity, TKey>(_stateStore, _journal, _registry.GetDescriptor<TEntity, TKey>());
 
     public async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -164,20 +160,23 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
         }
     }
 
-    public IDataAccess<TEntity, TKey> GetDataAccess<TEntity, TKey>()
-        where TKey : notnull
-        => new GenericDataAccess<TEntity, TKey>(_stateStore, _journal, _registry.GetDescriptor<TEntity, TKey>());
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        foreach (var registration in _registrations)
+        {
+            RegisterDescriptor(registration.Descriptor);
+        }
+
+        _registry.Freeze();
+        await InitializeAsync(cancellationToken);
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken)
+        => await SaveSnapshotAsync(cancellationToken);
 
     /// <summary>Test/diagnostic hook: stops without writing a snapshot (forces journal-only recovery).</summary>
     public ValueTask StopWithoutSnapshotAsync()
         => ValueTask.CompletedTask;
-
-    private void RegisterDescriptor(IPersistenceEntityDescriptor descriptor)
-    {
-        var method = typeof(PersistenceEntityRegistry).GetMethod(nameof(PersistenceEntityRegistry.Register))!
-                                                      .MakeGenericMethod(descriptor.EntityType, descriptor.KeyType);
-        method.Invoke(_registry, [descriptor]);
-    }
 
     private IInternalEntityApplier Applier(ushort typeId)
     {
@@ -208,9 +207,10 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
         }
     }
 
-    public void Dispose()
+    private void RegisterDescriptor(IPersistenceEntityDescriptor descriptor)
     {
-        _journal.DisposeAsync().AsTask().GetAwaiter().GetResult();
-        _snapshot.Dispose();
+        var method = typeof(PersistenceEntityRegistry).GetMethod(nameof(PersistenceEntityRegistry.Register))!
+                                                      .MakeGenericMethod(descriptor.EntityType, descriptor.KeyType);
+        method.Invoke(_registry, [descriptor]);
     }
 }

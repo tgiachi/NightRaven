@@ -16,24 +16,6 @@ public sealed class PersistenceEntityRegistry : IPersistenceEntityRegistry
     public void Freeze()
         => IsFrozen = true;
 
-    public void Register<TEntity, TKey>(PersistenceEntityDescriptor<TEntity, TKey> descriptor)
-        where TKey : notnull
-    {
-        ArgumentNullException.ThrowIfNull(descriptor);
-
-        if (IsFrozen)
-        {
-            throw new InvalidOperationException("Cannot register entities after the registry is frozen.");
-        }
-
-        if (!_byTypeId.TryAdd(descriptor.TypeId, descriptor))
-        {
-            throw new InvalidOperationException($"Type id {descriptor.TypeId} is already registered.");
-        }
-
-        _byClrTypes[(typeof(TEntity), typeof(TKey))] = descriptor;
-    }
-
     public IPersistenceEntityDescriptor GetDescriptor(ushort typeId)
     {
         if (_byTypeId.TryGetValue(typeId, out var descriptor))
@@ -64,4 +46,22 @@ public sealed class PersistenceEntityRegistry : IPersistenceEntityRegistry
 
     public bool IsRegistered<TEntity, TKey>()
         => _byClrTypes.ContainsKey((typeof(TEntity), typeof(TKey)));
+
+    public void Register<TEntity, TKey>(PersistenceEntityDescriptor<TEntity, TKey> descriptor)
+        where TKey : notnull
+    {
+        ArgumentNullException.ThrowIfNull(descriptor);
+
+        if (IsFrozen)
+        {
+            throw new InvalidOperationException("Cannot register entities after the registry is frozen.");
+        }
+
+        if (!_byTypeId.TryAdd(descriptor.TypeId, descriptor))
+        {
+            throw new InvalidOperationException($"Type id {descriptor.TypeId} is already registered.");
+        }
+
+        _byClrTypes[(typeof(TEntity), typeof(TKey))] = descriptor;
+    }
 }

@@ -15,86 +15,91 @@ public static class PersistenceContainerExtensions
 {
     private const int PersistencePriority = 15;
 
-    /// <summary>
-    /// Registers a persisted entity type. Accumulates a descriptor consumed by the persistence
-    /// service at boot. Call before <see cref="AddNightHeavenPersistence" />'s service starts.
-    /// </summary>
     /// <param name="container">DryIoc container.</param>
-    /// <param name="typeId">Stable numeric identifier for the entity kind.</param>
-    /// <param name="schemaVersion">Version of the persisted entity schema.</param>
-    /// <param name="keySelector">Selects the entity key.</param>
-    public static IContainer RegisterPersistenceEntity<TEntity, TKey>(
-        this IContainer container,
-        ushort typeId,
-        int schemaVersion,
-        Func<TEntity, TKey> keySelector
-    )
-        where TKey : notnull
+    extension(IContainer container)
     {
-        var descriptor = new PersistenceEntityDescriptor<TEntity, TKey>(typeId, typeof(TEntity).Name, schemaVersion, keySelector);
-        container.AddToRegisterTypedList(new PersistenceEntityRegistration(descriptor));
-
-        return container;
-    }
-
-    /// <summary>
-    /// Registers the persistence service (snapshot + journal) with the hosting orchestrator and the
-    /// open-generic <see cref="IDataAccess{TEntity,TKey}" />.
-    /// </summary>
-    /// <param name="container">DryIoc container.</param>
-    /// <param name="saveDirectory">Directory for snapshot/journal files.</param>
-    /// <param name="configure">Optional callback to customize <see cref="PersistenceConfig" />.</param>
-    public static IContainer AddNightHeavenPersistence(
-        this IContainer container,
-        string saveDirectory,
-        Action<PersistenceConfig>? configure = null
-    )
-    {
-        container.AddNightHeavenHosting();
-
-        var config = new PersistenceConfig();
-        configure?.Invoke(config);
-        container.RegisterInstance(config);
-
-        // Ensure a (possibly empty) registration list exists even when no entity was registered.
-        if (!container.IsRegistered<List<PersistenceEntityRegistration>>())
+        /// <summary>
+        /// Registers a persisted entity type. Accumulates a descriptor consumed by the persistence
+        /// service at boot. Call before <see cref="AddNightHeavenPersistence" />'s service starts.
+        /// </summary>
+        /// <param name="typeId">Stable numeric identifier for the entity kind.</param>
+        /// <param name="schemaVersion">Version of the persisted entity schema.</param>
+        /// <param name="keySelector">Selects the entity key.</param>
+        public IContainer RegisterPersistenceEntity<TEntity, TKey>(
+            ushort typeId,
+            int schemaVersion,
+            Func<TEntity, TKey> keySelector
+        )
+            where TKey : notnull
         {
-            container.RegisterInstance(new List<PersistenceEntityRegistration>());
+            var descriptor = new PersistenceEntityDescriptor<TEntity, TKey>(
+                typeId,
+                typeof(TEntity).Name,
+                schemaVersion,
+                keySelector
+            );
+            container.AddToRegisterTypedList(new PersistenceEntityRegistration(descriptor));
+
+            return container;
         }
 
-        // The service ctor takes the save directory + config + accumulated registrations, so build it
-        // through a delegate rather than the convention helper (which assumes a resolvable ctor).
-        container.RegisterDelegate(
-            resolver => new PersistenceService(
-                saveDirectory,
-                resolver.Resolve<PersistenceConfig>(),
-                resolver.Resolve<List<PersistenceEntityRegistration>>()
-            ),
-            Reuse.Singleton
-        );
-        container.RegisterMapping<IPersistenceService, PersistenceService>();
+        /// <summary>
+        /// Registers the persistence service (snapshot + journal) with the hosting orchestrator and the
+        /// open-generic <see cref="IDataAccess{TEntity,TKey}" />.
+        /// </summary>
+        /// <param name="saveDirectory">Directory for snapshot/journal files.</param>
+        /// <param name="configure">Optional callback to customize <see cref="PersistenceConfig" />.</param>
+        public IContainer AddNightHeavenPersistence(
+            string saveDirectory,
+            Action<PersistenceConfig>? configure = null
+        )
+        {
+            container.AddNightHeavenHosting();
 
-        // Drive start/stop through the orchestrator at priority 15 (after TimerWheel=3, before Network=20).
-        container.RegisterDelegate(
-            resolver => new NightHeavenServiceDescriptor(resolver.Resolve<PersistenceService>(), PersistencePriority),
-            Reuse.Singleton,
-            ifAlreadyRegistered: IfAlreadyRegistered.AppendNewImplementation,
-            serviceKey: typeof(PersistenceService)
-        );
+            var config = new PersistenceConfig();
+            configure?.Invoke(config);
+            container.RegisterInstance(config);
 
-        // Open-generic IDataAccess<,> resolves through the service's GetDataAccess factory method.
-        container.Register(
-            typeof(IDataAccess<,>),
-            made: Made.Of(
-                request => typeof(IPersistenceService).GetMethod(nameof(IPersistenceService.GetDataAccess))!
-                    .MakeGenericMethod(request.ServiceType.GetGenericArguments()),
-                ServiceInfo.Of<IPersistenceService>()
-            ),
-            setup: Setup.With(asResolutionCall: true)
-        );
+            // Ensure a (possibly empty) registration list exists even when no entity was registered.
+            if (!container.IsRegistered<List<PersistenceEntityRegistration>>())
+            {
+                container.RegisterInstance(new List<PersistenceEntityRegistration>());
+            }
 
-        container.AddMetricProvider<PersistenceService>();
+            // The service ctor takes the save directory + config + accumulated registrations, so build it
+            // through a delegate rather than the convention helper (which assumes a resolvable ctor).
+            container.RegisterDelegate(
+                resolver => new PersistenceService(
+                    saveDirectory,
+                    resolver.Resolve<PersistenceConfig>(),
+                    resolver.Resolve<List<PersistenceEntityRegistration>>()
+                ),
+                Reuse.Singleton
+            );
+            container.RegisterMapping<IPersistenceService, PersistenceService>();
 
-        return container;
+            // Drive start/stop through the orchestrator at priority 15 (after TimerWheel=3, before Network=20).
+            container.RegisterDelegate(
+                resolver => new NightHeavenServiceDescriptor(resolver.Resolve<PersistenceService>(), PersistencePriority),
+                Reuse.Singleton,
+                ifAlreadyRegistered: IfAlreadyRegistered.AppendNewImplementation,
+                serviceKey: typeof(PersistenceService)
+            );
+
+            // Open-generic IDataAccess<,> resolves through the service's GetDataAccess factory method.
+            container.Register(
+                typeof(IDataAccess<,>),
+                made: Made.Of(
+                    request => typeof(IPersistenceService).GetMethod(nameof(IPersistenceService.GetDataAccess))!
+                                                          .MakeGenericMethod(request.ServiceType.GetGenericArguments()),
+                    ServiceInfo.Of<IPersistenceService>()
+                ),
+                setup: Setup.With(asResolutionCall: true)
+            );
+
+            container.AddMetricProvider<PersistenceService>();
+
+            return container;
+        }
     }
 }

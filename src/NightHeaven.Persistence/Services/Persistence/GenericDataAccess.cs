@@ -41,7 +41,8 @@ public sealed class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey
         lock (_stateStore.SyncRoot)
         {
             IReadOnlyCollection<TEntity> clones = Bucket()
-                                                  .Values.AsValueEnumerable()
+                                                  .Values
+                                                  .AsValueEnumerable()
                                                   .Select(_descriptor.Clone)
                                                   .ToArray();
 
@@ -55,27 +56,6 @@ public sealed class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey
         {
             return ValueTask.FromResult(Bucket().TryGetValue(id, out var entity) ? _descriptor.Clone(entity) : default);
         }
-    }
-
-    public async ValueTask UpsertAsync(TEntity entity, CancellationToken cancellationToken = default)
-    {
-        JournalEntry entry;
-
-        lock (_stateStore.SyncRoot)
-        {
-            var clone = _descriptor.Clone(entity);
-            Bucket()[_descriptor.GetKey(clone)] = clone;
-            entry = new()
-            {
-                SequenceId = ++_stateStore.LastSequenceId,
-                TimestampUnixMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                TypeId = _descriptor.TypeId,
-                Operation = JournalEntityOperationType.Upsert,
-                Payload = _descriptor.SerializeEntity(clone)
-            };
-        }
-
-        await _journalService.AppendAsync(entry, cancellationToken);
     }
 
     public async ValueTask<bool> RemoveAsync(TKey id, CancellationToken cancellationToken = default)
@@ -105,6 +85,27 @@ public sealed class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey
         await _journalService.AppendAsync(entry, cancellationToken);
 
         return true;
+    }
+
+    public async ValueTask UpsertAsync(TEntity entity, CancellationToken cancellationToken = default)
+    {
+        JournalEntry entry;
+
+        lock (_stateStore.SyncRoot)
+        {
+            var clone = _descriptor.Clone(entity);
+            Bucket()[_descriptor.GetKey(clone)] = clone;
+            entry = new()
+            {
+                SequenceId = ++_stateStore.LastSequenceId,
+                TimestampUnixMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                TypeId = _descriptor.TypeId,
+                Operation = JournalEntityOperationType.Upsert,
+                Payload = _descriptor.SerializeEntity(clone)
+            };
+        }
+
+        await _journalService.AppendAsync(entry, cancellationToken);
     }
 
     private Dictionary<TKey, TEntity> Bucket()

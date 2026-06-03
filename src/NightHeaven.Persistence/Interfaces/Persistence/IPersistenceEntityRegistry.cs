@@ -13,10 +13,6 @@ public interface IPersistenceEntityRegistry
     /// <summary>Prevents further registrations.</summary>
     void Freeze();
 
-    /// <summary>Registers a persisted entity descriptor.</summary>
-    void Register<TEntity, TKey>(PersistenceEntityDescriptor<TEntity, TKey> descriptor)
-        where TKey : notnull;
-
     /// <summary>Gets a descriptor by type id; throws when not registered.</summary>
     IPersistenceEntityDescriptor GetDescriptor(ushort typeId);
 
@@ -31,4 +27,8 @@ public interface IPersistenceEntityRegistry
 
     /// <summary>Returns true when a descriptor exists for the entity and key type pair.</summary>
     bool IsRegistered<TEntity, TKey>();
+
+    /// <summary>Registers a persisted entity descriptor.</summary>
+    void Register<TEntity, TKey>(PersistenceEntityDescriptor<TEntity, TKey> descriptor)
+        where TKey : notnull;
 }

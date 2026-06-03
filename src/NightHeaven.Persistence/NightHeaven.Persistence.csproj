@@ -7,16 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MessagePack" Version="3.1.4" />
+        <PackageReference Include="MessagePack" Version="3.1.4"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj" />
-        <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj" />
+        <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj"/>
+        <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="NightHeaven.Tests" />
+        <InternalsVisibleTo Include="NightHeaven.Tests"/>
     </ItemGroup>
 
 </Project>

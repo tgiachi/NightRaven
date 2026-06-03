@@ -29,6 +29,9 @@ public sealed class MessagePackSnapshotService : ISnapshotService, IDisposable
         }
     }
 
+    public void Dispose()
+        => _ioLock.Dispose();
+
     public async ValueTask<WorldSnapshot?> LoadAsync(CancellationToken cancellationToken = default)
     {
         await _ioLock.WaitAsync(cancellationToken);
@@ -67,14 +70,11 @@ public sealed class MessagePackSnapshotService : ISnapshotService, IDisposable
                 await stream.FlushAsync(cancellationToken);
             }
 
-            File.Move(tempPath, _path, overwrite: true);
+            File.Move(tempPath, _path, true);
         }
         finally
         {
             _ioLock.Release();
         }
     }
-
-    public void Dispose()
-        => _ioLock.Dispose();
 }
