@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Scripting.Lua.Interfaces;
 
 namespace NightRaven.Server.Services.Scripting;

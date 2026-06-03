@@ -1,5 +1,4 @@
 using NightRaven.Core.Types;
-using NightRaven.Hosting.Data.Logging;
 using NightRaven.Server.Services.Logging;
 using Serilog;
 using Serilog.Events;

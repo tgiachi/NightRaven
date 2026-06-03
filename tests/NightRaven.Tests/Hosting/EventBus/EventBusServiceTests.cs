@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightRaven.Hosting.Interfaces.EventHandlers;
-using NightRaven.Hosting.Interfaces.Events;
+using NightRaven.Abstractions.Interfaces.EventHandlers;
+using NightRaven.Abstractions.Interfaces.Events;
 using NightRaven.Server.Services.EventBus;
 using NightRaven.Tests.Hosting.EventBus.Support;
 

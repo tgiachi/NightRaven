@@ -14,6 +14,27 @@ public sealed class PluginLoaderServiceTests : IDisposable
 
     private string PluginsRoot => Path.Combine(_root, "plugins");
 
+    public void Dispose()
+    {
+        if (Directory.Exists(_root))
+        {
+            Directory.Delete(_root, true);
+        }
+
+        GC.SuppressFinalize(this);
+    }
+
+    [Fact]
+    public void LoadAndConfigure_EmptyPluginDirectory_Throws()
+    {
+        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Empty", "empty");
+        var loader = new PluginLoaderService();
+
+        var ex = Assert.Throws<InvalidOperationException>(() => loader.LoadAndConfigure(new Container(), Directories()));
+
+        Assert.Contains("does not contain a plugin", ex.Message);
+    }
+
     [Fact]
     public void LoadAndConfigure_MissingPluginsDirectory_CreatesDirectoryAndReturnsEmpty()
     {
@@ -25,6 +46,17 @@ public sealed class PluginLoaderServiceTests : IDisposable
 
         Assert.Empty(loaded);
         Assert.True(Directory.Exists(PluginsRoot));
+    }
+
+    [Fact]
+    public void LoadAndConfigure_MultiplePluginImplementations_Throws()
+    {
+        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Multiple", "multiple");
+        var loader = new PluginLoaderService();
+
+        var ex = Assert.Throws<InvalidOperationException>(() => loader.LoadAndConfigure(new Container(), Directories()));
+
+        Assert.Contains("multiple plugin implementations", ex.Message);
     }
 
     [Fact]
@@ -45,42 +77,6 @@ public sealed class PluginLoaderServiceTests : IDisposable
             modules,
             module => module.ModuleType.FullName == "NightRaven.PluginFixtures.Basic.BasicPluginScriptModule"
         );
-    }
-
-    [Fact]
-    public void LoadAndConfigure_EmptyPluginDirectory_Throws()
-    {
-        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Empty", "empty");
-        var loader = new PluginLoaderService();
-
-        var ex = Assert.Throws<InvalidOperationException>(
-            () => loader.LoadAndConfigure(new Container(), Directories())
-        );
-
-        Assert.Contains("does not contain a plugin", ex.Message);
-    }
-
-    [Fact]
-    public void LoadAndConfigure_MultiplePluginImplementations_Throws()
-    {
-        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Multiple", "multiple");
-        var loader = new PluginLoaderService();
-
-        var ex = Assert.Throws<InvalidOperationException>(
-            () => loader.LoadAndConfigure(new Container(), Directories())
-        );
-
-        Assert.Contains("multiple plugin implementations", ex.Message);
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_root))
-        {
-            Directory.Delete(_root, true);
-        }
-
-        GC.SuppressFinalize(this);
     }
 
     private DirectoriesConfig Directories()

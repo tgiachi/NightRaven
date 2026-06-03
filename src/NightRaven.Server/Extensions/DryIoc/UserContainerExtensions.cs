@@ -1,5 +1,6 @@
 using DryIoc;
 using NightRaven.Core.Ids;
+using NightRaven.Persistence.Extensions.DryIoc;
 using NightRaven.Server.Services.Users;
 using NightRaven.UO.Domain.Entities;
 using NightRaven.UO.Domain.Interfaces.Services;

@@ -88,10 +88,10 @@ src/<Project>/Interfaces/<Domain>/IFoo.cs   →   namespace <Project>.Interfaces
 - Examples:
 
 ```
-src/NightRaven.Hosting/Interfaces/Events/INightRavenEvent.cs    → namespace NightRaven.Hosting.Interfaces.Events;
-src/NightRaven.Hosting/Interfaces/Events/IAsyncEvent.cs          → namespace NightRaven.Hosting.Interfaces.Events;
-src/NightRaven.Hosting/Interfaces/EventHandlers/IAsyncEventHandler.cs → namespace NightRaven.Hosting.Interfaces.EventHandlers;
-src/NightRaven.Hosting/Interfaces/Services/IEventBusService.cs   → namespace NightRaven.Hosting.Interfaces.Services;
+src/NightRaven.Abstractions/Interfaces/Events/INightRavenEvent.cs    → namespace NightRaven.Abstractions.Interfaces.Events;
+src/NightRaven.Abstractions/Interfaces/Events/IAsyncEvent.cs          → namespace NightRaven.Abstractions.Interfaces.Events;
+src/NightRaven.Abstractions/Interfaces/EventHandlers/IAsyncEventHandler.cs → namespace NightRaven.Abstractions.Interfaces.EventHandlers;
+src/NightRaven.Abstractions/Interfaces/Services/IEventBusService.cs   → namespace NightRaven.Abstractions.Interfaces.Services;
 src/NightRaven.Network/Interfaces/Encryption/IClientEncryption.cs → namespace NightRaven.Network.Interfaces.Encryption;
 src/NightRaven.Network/Interfaces/Framing/INetFramer.cs           → namespace NightRaven.Network.Interfaces.Framing;
 ```

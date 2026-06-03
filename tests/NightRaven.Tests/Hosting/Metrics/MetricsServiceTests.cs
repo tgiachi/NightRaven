@@ -1,6 +1,6 @@
-using NightRaven.Hosting.Data.Metrics;
-using NightRaven.Hosting.Interfaces.Metrics;
-using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Abstractions.Data.Metrics;
+using NightRaven.Abstractions.Interfaces.Metrics;
+using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Server.Services.Metrics;
 using NightRaven.Server.Services.Timing;
 

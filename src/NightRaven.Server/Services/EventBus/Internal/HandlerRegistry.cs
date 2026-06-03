@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
-using NightRaven.Hosting.Interfaces.EventHandlers;
-using NightRaven.Hosting.Interfaces.Events;
+using NightRaven.Abstractions.Interfaces.EventHandlers;
+using NightRaven.Abstractions.Interfaces.Events;
 
 namespace NightRaven.Server.Services.EventBus.Internal;
 

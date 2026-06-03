@@ -39,7 +39,7 @@
     <ItemGroup>
         <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj"/>
         <ProjectReference Include="..\NightRaven.UO.Domain\NightRaven.UO.Domain.csproj"/>
-        <ProjectReference Include="..\NightRaven.Hosting\NightRaven.Hosting.csproj"/>
+        <ProjectReference Include="..\NightRaven.Abstractions\NightRaven.Abstractions.csproj"/>
         <ProjectReference Include="..\NightRaven.Network\NightRaven.Network.csproj"/>
         <ProjectReference Include="..\NightRaven.Persistence\NightRaven.Persistence.csproj"/>
         <ProjectReference Include="..\NightRaven.Plugins\NightRaven.Plugins.csproj"/>
@@ -52,8 +52,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Assets\**\*.*" />
-        <EmbeddedResource Include="Assets\**\*.*" />
+        <None Remove="Assets\**\*.*"/>
+        <EmbeddedResource Include="Assets\**\*.*"/>
     </ItemGroup>
 
 </Project>

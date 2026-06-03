@@ -1,5 +1,5 @@
+using NightRaven.Abstractions.Data.Logging;
 using NightRaven.Core.Extensions.Logger;
-using NightRaven.Hosting.Data.Logging;
 using Serilog;
 using Serilog.Core;
 

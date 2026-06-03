@@ -57,6 +57,26 @@ public sealed class PluginLoaderService
         return sorted;
     }
 
+    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+    {
+        try
+        {
+            return assembly.GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            var loaderErrors = string.Join(
+                Environment.NewLine,
+                ex.LoaderExceptions.Select(error => error?.Message).Where(message => message is not null)
+            );
+
+            throw new InvalidOperationException(
+                $"Assembly '{assembly.FullName}' contains types that could not be loaded:{Environment.NewLine}{loaderErrors}",
+                ex
+            );
+        }
+    }
+
     private LoadedPlugin LoadPluginDirectory(string pluginDirectory)
     {
         var dlls = Directory.EnumerateFiles(pluginDirectory, "*.dll", SearchOption.TopDirectoryOnly)
@@ -65,9 +85,7 @@ public sealed class PluginLoaderService
 
         if (dlls.Length == 0)
         {
-            throw new InvalidOperationException(
-                $"Plugin directory '{pluginDirectory}' does not contain a plugin assembly."
-            );
+            throw new InvalidOperationException($"Plugin directory '{pluginDirectory}' does not contain a plugin assembly.");
         }
 
         var loadContext = new PluginAssemblyLoadContext(Path.GetFullPath(dlls[0]));
@@ -87,6 +105,7 @@ public sealed class PluginLoaderService
             if (shared is not null)
             {
                 assemblies.Add(shared);
+
                 continue;
             }
 
@@ -104,9 +123,10 @@ public sealed class PluginLoaderService
         }
 
         var pluginTypes = assemblies.SelectMany(GetLoadableTypes)
-                                    .Where(type =>
-                                        type is { IsAbstract: false, IsInterface: false } &&
-                                        typeof(INightRavenPlugin).IsAssignableFrom(type)
+                                    .Where(
+                                        type =>
+                                            type is { IsAbstract: false, IsInterface: false } &&
+                                            typeof(INightRavenPlugin).IsAssignableFrom(type)
                                     )
                                     .ToArray();
 
@@ -126,10 +146,10 @@ public sealed class PluginLoaderService
 
         try
         {
-            var instance = (INightRavenPlugin?)Activator.CreateInstance(pluginTypes[0])
-                ?? throw new InvalidOperationException(
-                    $"Plugin type '{pluginTypes[0].FullName}' could not be instantiated."
-                );
+            var instance = (INightRavenPlugin?)Activator.CreateInstance(pluginTypes[0]) ??
+                           throw new InvalidOperationException(
+                               $"Plugin type '{pluginTypes[0].FullName}' could not be instantiated."
+                           );
 
             return new(pluginDirectory, instance, pluginTypes[0].Assembly);
         }
@@ -137,26 +157,6 @@ public sealed class PluginLoaderService
         {
             throw new InvalidOperationException(
                 $"Plugin type '{pluginTypes[0].FullName}' could not be instantiated.",
-                ex
-            );
-        }
-    }
-
-    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
-    {
-        try
-        {
-            return assembly.GetTypes();
-        }
-        catch (ReflectionTypeLoadException ex)
-        {
-            var loaderErrors = string.Join(
-                Environment.NewLine,
-                ex.LoaderExceptions.Select(error => error?.Message).Where(message => message is not null)
-            );
-
-            throw new InvalidOperationException(
-                $"Assembly '{assembly.FullName}' contains types that could not be loaded:{Environment.NewLine}{loaderErrors}",
                 ex
             );
         }

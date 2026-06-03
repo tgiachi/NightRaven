@@ -1,5 +1,5 @@
 using DryIoc;
-using NightRaven.Hosting.Interfaces.Timing;
+using NightRaven.Abstractions.Interfaces.Timing;
 using NightRaven.Server.Extensions.DryIoc;
 using NightRaven.Tests.Support;
 

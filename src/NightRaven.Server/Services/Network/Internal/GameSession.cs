@@ -32,20 +32,6 @@ public sealed class GameSession
     public NightRavenTCPClient Client { get; }
 
     /// <summary>
-    /// Executes <paramref name="action" /> with exclusive access to the pending byte buffer.
-    /// </summary>
-    /// <param name="action">Action receiving the locked pending byte list.</param>
-    public void WithPendingBytes(Action<List<byte>> action)
-    {
-        ArgumentNullException.ThrowIfNull(action);
-
-        lock (_pendingBytesSync)
-        {
-            action(_pendingBytes);
-        }
-    }
-
-    /// <summary>
     /// Serializes and sends a packet to the owning client.
     /// </summary>
     public Task SendPacket<TPacket>(TPacket packet, CancellationToken cancellationToken = default)
@@ -65,6 +51,27 @@ public sealed class GameSession
     public Task SendPacketAsync<TPacket>(TPacket packet, CancellationToken cancellationToken = default)
         where TPacket : IGameNetworkPacket
         => SendPacketAsync(packet, null, cancellationToken);
+
+    /// <summary>
+    /// Creates, serializes and sends a packet to the owning client.
+    /// </summary>
+    public Task SendPacketAsync<TPacket>(CancellationToken cancellationToken = default)
+        where TPacket : IGameNetworkPacket, new()
+        => SendPacketAsync(new TPacket(), cancellationToken);
+
+    /// <summary>
+    /// Executes <paramref name="action" /> with exclusive access to the pending byte buffer.
+    /// </summary>
+    /// <param name="action">Action receiving the locked pending byte list.</param>
+    public void WithPendingBytes(Action<List<byte>> action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        lock (_pendingBytesSync)
+        {
+            action(_pendingBytes);
+        }
+    }
 
     internal Task SendPacket<TPacket>(
         TPacket packet,
@@ -98,13 +105,6 @@ public sealed class GameSession
             }
         }
     }
-
-    /// <summary>
-    /// Creates, serializes and sends a packet to the owning client.
-    /// </summary>
-    public Task SendPacketAsync<TPacket>(CancellationToken cancellationToken = default)
-        where TPacket : IGameNetworkPacket, new()
-        => SendPacketAsync(new TPacket(), cancellationToken);
 
     private static byte[] SerializePacket(IGameNetworkPacket packet)
     {

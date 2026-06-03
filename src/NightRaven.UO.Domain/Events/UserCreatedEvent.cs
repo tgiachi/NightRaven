@@ -1,5 +1,5 @@
+using NightRaven.Abstractions.Interfaces.Events;
 using NightRaven.Core.Ids;
-using NightRaven.Hosting.Interfaces.Events;
 using NightRaven.UO.Domain.Types;
 
 namespace NightRaven.UO.Domain.Events;

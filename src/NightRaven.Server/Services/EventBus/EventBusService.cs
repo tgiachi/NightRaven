@@ -1,9 +1,9 @@
 using System.Threading.Channels;
-using NightRaven.Hosting.Data.Metrics;
-using NightRaven.Hosting.Interfaces.Events;
-using NightRaven.Hosting.Interfaces.Metrics;
-using NightRaven.Hosting.Interfaces.Services;
-using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Abstractions.Data.Metrics;
+using NightRaven.Abstractions.Interfaces.Events;
+using NightRaven.Abstractions.Interfaces.Metrics;
+using NightRaven.Abstractions.Interfaces.Services;
+using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Server.Services.EventBus.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;

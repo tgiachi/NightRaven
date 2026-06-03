@@ -6,19 +6,6 @@ namespace NightRaven.Tests.Network.Packets;
 public sealed class LoginSeedPacketTests
 {
     [Fact]
-    public void TryParse_ReadsSeedAndClientVersion()
-    {
-        var packet = new LoginSeedPacket();
-        var raw = BuildLoginSeedPacket(0x12345678, 7, 0, 114, 0);
-
-        var parsed = packet.TryParse(raw);
-
-        Assert.True(parsed);
-        Assert.Equal(0x12345678, packet.Seed);
-        Assert.Equal(new ClientVersion(7, 0, 114, 0), packet.ClientVersion);
-    }
-
-    [Fact]
     public void PacketTable_Register_IncludesLoginSeedPacket()
     {
         var registry = new PacketRegistry();
@@ -31,6 +18,19 @@ public sealed class LoginSeedPacketTests
         Assert.Equal(typeof(LoginSeedPacket), descriptor.HandlerType);
         Assert.True(registry.TryCreatePacket(0xEF, out var packet));
         Assert.IsType<LoginSeedPacket>(packet);
+    }
+
+    [Fact]
+    public void TryParse_ReadsSeedAndClientVersion()
+    {
+        var packet = new LoginSeedPacket();
+        var raw = BuildLoginSeedPacket(0x12345678, 7, 0, 114, 0);
+
+        var parsed = packet.TryParse(raw);
+
+        Assert.True(parsed);
+        Assert.Equal(0x12345678, packet.Seed);
+        Assert.Equal(new(7, 0, 114, 0), packet.ClientVersion);
     }
 
     private static byte[] BuildLoginSeedPacket(int seed, int major, int minor, int revision, int patch)

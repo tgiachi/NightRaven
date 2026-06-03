@@ -25,7 +25,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\NightRaven.Core\NightRaven.Core.csproj"/>
         <ProjectReference Include="..\..\src\NightRaven.UO.Domain\NightRaven.UO.Domain.csproj"/>
-        <ProjectReference Include="..\..\src\NightRaven.Hosting\NightRaven.Hosting.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Abstractions\NightRaven.Abstractions.csproj"/>
         <ProjectReference Include="..\..\src\NightRaven.Network\NightRaven.Network.csproj"/>
         <ProjectReference Include="..\..\src\NightRaven.Persistence\NightRaven.Persistence.csproj"/>
         <ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj"/>

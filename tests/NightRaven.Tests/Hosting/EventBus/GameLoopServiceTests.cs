@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightRaven.Hosting.Data;
-using NightRaven.Hosting.Data.Timing;
-using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Abstractions.Data;
+using NightRaven.Abstractions.Data.Timing;
+using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Server.Services.EventBus;
 using NightRaven.Server.Services.GameLoop;
 using NightRaven.Server.Services.Timing;

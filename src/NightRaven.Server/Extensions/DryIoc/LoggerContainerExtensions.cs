@@ -1,5 +1,6 @@
 using DryIoc;
-using NightRaven.Hosting.Data.Logging;
+using NightRaven.Abstractions.Data.Logging;
+using NightRaven.Abstractions.Extensions.DryIoc;
 
 namespace NightRaven.Server.Extensions.DryIoc;
 

@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Interfaces.Events;
+using NightRaven.Abstractions.Interfaces.Events;
 
 namespace NightRaven.Server.Services.EventBus.Internal;
 

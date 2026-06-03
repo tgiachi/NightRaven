@@ -7,11 +7,27 @@ namespace NightRaven.Tests.UO.Domain.Entities;
 public class UserEntityTests
 {
     [Fact]
+    public void Constructor_AdminLevel_LevelIsAdministrator()
+    {
+        var user = new UserEntity(new(3), "admin", "pw", UserLevelType.Administrator, true);
+
+        Assert.Equal(UserLevelType.Administrator, user.Level);
+    }
+
+    [Fact]
+    public void Constructor_InactiveUser_IsActiveIsFalse()
+    {
+        var user = new UserEntity(new(2), "banned", "pw", UserLevelType.Player, false);
+
+        Assert.False(user.IsActive);
+    }
+
+    [Fact]
     public void Constructor_ValidArgs_SetsAllProperties()
     {
         var id = new Serial(1);
 
-        var user = new UserEntity(id, "arthorius", "hashed_pw", UserLevelType.Player, isActive: true);
+        var user = new UserEntity(id, "arthorius", "hashed_pw", UserLevelType.Player, true);
 
         Assert.Equal(id, user.Id);
         Assert.Equal("arthorius", user.Username);
@@ -21,25 +37,18 @@ public class UserEntityTests
     }
 
     [Fact]
-    public void Constructor_InactiveUser_IsActiveIsFalse()
+    public void Id_DifferentSerials_AreNotEqual()
     {
-        var user = new UserEntity(new Serial(2), "banned", "pw", UserLevelType.Player, isActive: false);
+        var a = new UserEntity(new(10), "a", "pw", UserLevelType.Player, true);
+        var b = new UserEntity(new(11), "b", "pw", UserLevelType.Player, true);
 
-        Assert.False(user.IsActive);
-    }
-
-    [Fact]
-    public void Constructor_AdminLevel_LevelIsAdministrator()
-    {
-        var user = new UserEntity(new Serial(3), "admin", "pw", UserLevelType.Administrator, isActive: true);
-
-        Assert.Equal(UserLevelType.Administrator, user.Level);
+        Assert.NotEqual(a.Id, b.Id);
     }
 
     [Fact]
     public void IsActive_SetToFalse_ReflectsChange()
     {
-        var user = new UserEntity(new Serial(4), "user", "pw", UserLevelType.Player, isActive: true);
+        var user = new UserEntity(new(4), "user", "pw", UserLevelType.Player, true);
 
         user.IsActive = false;
 
@@ -49,7 +58,7 @@ public class UserEntityTests
     [Fact]
     public void Level_Promoted_ReflectsChange()
     {
-        var user = new UserEntity(new Serial(5), "user", "pw", UserLevelType.Player, isActive: true);
+        var user = new UserEntity(new(5), "user", "pw", UserLevelType.Player, true);
 
         user.Level = UserLevelType.GameMaster;
 
@@ -59,19 +68,10 @@ public class UserEntityTests
     [Fact]
     public void Password_Updated_ReflectsChange()
     {
-        var user = new UserEntity(new Serial(6), "user", "old_hash", UserLevelType.Player, isActive: true);
+        var user = new UserEntity(new(6), "user", "old_hash", UserLevelType.Player, true);
 
         user.Password = "new_hash";
 
         Assert.Equal("new_hash", user.Password);
-    }
-
-    [Fact]
-    public void Id_DifferentSerials_AreNotEqual()
-    {
-        var a = new UserEntity(new Serial(10), "a", "pw", UserLevelType.Player, isActive: true);
-        var b = new UserEntity(new Serial(11), "b", "pw", UserLevelType.Player, isActive: true);
-
-        Assert.NotEqual(a.Id, b.Id);
     }
 }

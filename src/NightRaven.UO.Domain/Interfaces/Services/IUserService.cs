@@ -9,6 +9,9 @@ namespace NightRaven.UO.Domain.Interfaces.Services;
 /// </summary>
 public interface IUserService
 {
+    /// <summary>Returns the current number of persisted users.</summary>
+    ValueTask<int> CountAsync(CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Creates a user with an auto-allocated serial and a hashed password.
     /// </summary>
@@ -19,9 +22,6 @@ public interface IUserService
         bool isActive = true,
         CancellationToken cancellationToken = default
     );
-
-    /// <summary>Returns the current number of persisted users.</summary>
-    ValueTask<int> CountAsync(CancellationToken cancellationToken = default);
 
     /// <summary>Gets a user by serial, or null when absent.</summary>
     ValueTask<UserEntity?> GetByIdAsync(Serial id, CancellationToken cancellationToken = default);

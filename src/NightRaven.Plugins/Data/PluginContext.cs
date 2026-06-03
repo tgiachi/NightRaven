@@ -1,5 +1,5 @@
+using NightRaven.Abstractions.Configuration;
 using NightRaven.Core.Data.Directories;
-using NightRaven.Hosting.Configuration;
 using Serilog;
 using Tomlyn;
 
@@ -42,10 +42,10 @@ public sealed class PluginContext
 
         if (!File.Exists(PluginConfigPath))
         {
-            var defaults = defaultFactory()
-                ?? throw new InvalidOperationException(
-                    $"Default factory returned null for plugin config {typeof(TConfig).FullName}."
-                );
+            var defaults = defaultFactory() ??
+                           throw new InvalidOperationException(
+                               $"Default factory returned null for plugin config {typeof(TConfig).FullName}."
+                           );
 
             File.WriteAllText(
                 PluginConfigPath,
@@ -61,10 +61,10 @@ public sealed class PluginContext
             var text = File.ReadAllText(PluginConfigPath);
             var config = TomlSerializer.Deserialize<TConfig>(text, ConfigTomlOptions.Instance);
 
-            return config
-                ?? throw new InvalidOperationException(
-                    $"Plugin config '{PluginConfigPath}' could not be parsed as {typeof(TConfig).FullName}."
-                );
+            return config ??
+                   throw new InvalidOperationException(
+                       $"Plugin config '{PluginConfigPath}' could not be parsed as {typeof(TConfig).FullName}."
+                   );
         }
         catch (Exception ex) when (ex is not InvalidOperationException)
         {

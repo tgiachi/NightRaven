@@ -1,6 +1,6 @@
-using NightRaven.Hosting.Data.Metrics;
-using NightRaven.Hosting.Interfaces.Metrics;
-using NightRaven.Hosting.Interfaces.Timing;
+using NightRaven.Abstractions.Data.Metrics;
+using NightRaven.Abstractions.Interfaces.Metrics;
+using NightRaven.Abstractions.Interfaces.Timing;
 using Serilog;
 using ILogger = Serilog.ILogger;
 

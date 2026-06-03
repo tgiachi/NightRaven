@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Server.Services.Timing;
 
 namespace NightRaven.Tests.Hosting.Timing;

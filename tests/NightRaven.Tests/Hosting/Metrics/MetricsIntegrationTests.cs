@@ -1,5 +1,6 @@
 using DryIoc;
-using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Abstractions.Extensions.DryIoc;
+using NightRaven.Abstractions.Interfaces.Metrics;
 using NightRaven.Server.Extensions.DryIoc;
 using NightRaven.Server.Services.EventBus;
 using NightRaven.Server.Services.GameLoop;

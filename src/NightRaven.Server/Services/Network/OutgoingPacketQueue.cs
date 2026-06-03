@@ -14,12 +14,17 @@ public sealed class OutgoingPacketQueue : IOutgoingPacketQueue
 
     public int Count => _packets.Count;
 
-    public void Enqueue<TPacket>(long sessionId, TPacket packet)
-        where TPacket : IGameNetworkPacket
+    public int Clear(Action<OutgoingPacketEnvelope>? handler = null)
     {
-        ArgumentNullException.ThrowIfNull(packet);
+        var cleared = 0;
 
-        _packets.Enqueue(new(sessionId, packet, DateTimeOffset.UtcNow));
+        while (_packets.TryDequeue(out var envelope))
+        {
+            cleared++;
+            handler?.Invoke(envelope);
+        }
+
+        return cleared;
     }
 
     public int Drain(int maxItems, Func<OutgoingPacketEnvelope, bool> handler)
@@ -42,16 +47,11 @@ public sealed class OutgoingPacketQueue : IOutgoingPacketQueue
         return drained;
     }
 
-    public int Clear(Action<OutgoingPacketEnvelope>? handler = null)
+    public void Enqueue<TPacket>(long sessionId, TPacket packet)
+        where TPacket : IGameNetworkPacket
     {
-        var cleared = 0;
+        ArgumentNullException.ThrowIfNull(packet);
 
-        while (_packets.TryDequeue(out var envelope))
-        {
-            cleared++;
-            handler?.Invoke(envelope);
-        }
-
-        return cleared;
+        _packets.Enqueue(new(sessionId, packet, DateTimeOffset.UtcNow));
     }
 }

@@ -1,6 +1,7 @@
 using DryIoc;
-using NightRaven.Hosting.Data.Metrics;
-using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Abstractions.Data.Metrics;
+using NightRaven.Abstractions.Extensions.DryIoc;
+using NightRaven.Abstractions.Interfaces.Metrics;
 using NightRaven.Server.Extensions.DryIoc;
 
 namespace NightRaven.Tests.Hosting.Metrics;

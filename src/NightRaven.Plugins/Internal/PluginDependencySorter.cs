@@ -53,37 +53,8 @@ internal static partial class PluginDependencySorter
         return ordered;
     }
 
-    private static void Visit(
-        string id,
-        IReadOnlyDictionary<string, LoadedPlugin> byId,
-        List<LoadedPlugin> ordered,
-        HashSet<string> visited,
-        Stack<string> visiting
-    )
-    {
-        if (visited.Contains(id))
-        {
-            return;
-        }
-
-        if (visiting.Contains(id, StringComparer.OrdinalIgnoreCase))
-        {
-            var path = string.Join(" -> ", visiting.Reverse().Append(id));
-            throw new InvalidOperationException($"Plugin dependency cycle detected: {path}.");
-        }
-
-        visiting.Push(id);
-        var plugin = byId[id];
-
-        foreach (var dependencyId in plugin.Metadata.Dependencies)
-        {
-            Visit(dependencyId, byId, ordered, visited, visiting);
-        }
-
-        visiting.Pop();
-        visited.Add(id);
-        ordered.Add(plugin);
-    }
+    [GeneratedRegex("^[a-z0-9]+(\\.[a-z0-9]+)*$", RegexOptions.CultureInvariant)]
+    private static partial Regex PluginIdRegex();
 
     private static void ValidateMetadata(LoadedPlugin plugin)
     {
@@ -112,6 +83,36 @@ internal static partial class PluginDependencySorter
         }
     }
 
-    [GeneratedRegex("^[a-z0-9]+(\\.[a-z0-9]+)*$", RegexOptions.CultureInvariant)]
-    private static partial Regex PluginIdRegex();
+    private static void Visit(
+        string id,
+        IReadOnlyDictionary<string, LoadedPlugin> byId,
+        List<LoadedPlugin> ordered,
+        HashSet<string> visited,
+        Stack<string> visiting
+    )
+    {
+        if (visited.Contains(id))
+        {
+            return;
+        }
+
+        if (visiting.Contains(id, StringComparer.OrdinalIgnoreCase))
+        {
+            var path = string.Join(" -> ", visiting.Reverse().Append(id));
+
+            throw new InvalidOperationException($"Plugin dependency cycle detected: {path}.");
+        }
+
+        visiting.Push(id);
+        var plugin = byId[id];
+
+        foreach (var dependencyId in plugin.Metadata.Dependencies)
+        {
+            Visit(dependencyId, byId, ordered, visited, visiting);
+        }
+
+        visiting.Pop();
+        visited.Add(id);
+        ordered.Add(plugin);
+    }
 }

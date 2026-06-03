@@ -14,23 +14,33 @@ public readonly struct AutoInt64 : IAutoIncrementKey<AutoInt64>, IEquatable<Auto
 
     public ulong Sequence => (ulong)Value;
 
-    public static AutoInt64 FromSequence(ulong value) => new((long)value);
+    public int CompareTo(AutoInt64 other)
+        => Value.CompareTo(other.Value);
 
-    public int CompareTo(AutoInt64 other) => Value.CompareTo(other.Value);
+    public bool Equals(AutoInt64 other)
+        => Value == other.Value;
 
-    public bool Equals(AutoInt64 other) => Value == other.Value;
+    public override bool Equals(object? obj)
+        => obj is AutoInt64 other && Equals(other);
 
-    public override bool Equals(object? obj) => obj is AutoInt64 other && Equals(other);
+    public static AutoInt64 FromSequence(ulong value)
+        => new((long)value);
 
-    public override int GetHashCode() => Value.GetHashCode();
+    public override int GetHashCode()
+        => Value.GetHashCode();
 
-    public override string ToString() => Value.ToString();
+    public static bool operator ==(AutoInt64 left, AutoInt64 right)
+        => left.Value == right.Value;
 
-    public static bool operator ==(AutoInt64 left, AutoInt64 right) => left.Value == right.Value;
+    public static explicit operator long(AutoInt64 value)
+        => value.Value;
 
-    public static bool operator !=(AutoInt64 left, AutoInt64 right) => left.Value != right.Value;
+    public static explicit operator AutoInt64(long value)
+        => new(value);
 
-    public static explicit operator long(AutoInt64 value) => value.Value;
+    public static bool operator !=(AutoInt64 left, AutoInt64 right)
+        => left.Value != right.Value;
 
-    public static explicit operator AutoInt64(long value) => new(value);
+    public override string ToString()
+        => Value.ToString();
 }

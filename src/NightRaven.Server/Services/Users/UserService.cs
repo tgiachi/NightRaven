@@ -1,6 +1,6 @@
+using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Core.Ids;
 using NightRaven.Core.Utils;
-using NightRaven.Hosting.Interfaces.Services;
 using NightRaven.Persistence.Interfaces.Persistence;
 using NightRaven.UO.Domain.Entities;
 using NightRaven.UO.Domain.Events;
@@ -22,6 +22,9 @@ public sealed class UserService : IUserService
         _users = users;
         _eventBus = eventBus;
     }
+
+    public ValueTask<int> CountAsync(CancellationToken cancellationToken = default)
+        => _users.CountAsync(cancellationToken);
 
     public async ValueTask<UserEntity> CreateAsync(
         string username,
@@ -49,9 +52,6 @@ public sealed class UserService : IUserService
 
         return user;
     }
-
-    public ValueTask<int> CountAsync(CancellationToken cancellationToken = default)
-        => _users.CountAsync(cancellationToken);
 
     public ValueTask<UserEntity?> GetByIdAsync(Serial id, CancellationToken cancellationToken = default)
         => _users.GetByIdAsync(id, cancellationToken);

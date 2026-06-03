@@ -1,6 +1,6 @@
 using DryIoc;
-using NightRaven.Hosting.Interfaces.Services;
-using NightRaven.Hosting.Internal;
+using NightRaven.Abstractions.Interfaces.Services;
+using NightRaven.Abstractions.Internal;
 
 namespace NightRaven.Server.Extensions.DryIoc;
 

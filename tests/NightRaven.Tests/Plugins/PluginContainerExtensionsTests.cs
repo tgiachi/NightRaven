@@ -1,7 +1,7 @@
 using DryIoc;
+using NightRaven.Abstractions.Data.Internal;
 using NightRaven.Core.Data.Directories;
 using NightRaven.Core.Types;
-using NightRaven.Hosting.Data.Internal;
 using NightRaven.Scripting.Lua.Data.Internal;
 using NightRaven.Server.Extensions.DryIoc;
 using NightRaven.Tests.Plugins.Support;

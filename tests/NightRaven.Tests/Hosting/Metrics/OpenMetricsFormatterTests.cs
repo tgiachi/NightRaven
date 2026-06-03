@@ -1,5 +1,5 @@
-using NightRaven.Hosting.Data.Metrics;
-using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Abstractions.Data.Metrics;
+using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Server.Services.Metrics;
 
 namespace NightRaven.Tests.Hosting.Metrics;

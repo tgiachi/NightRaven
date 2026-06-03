@@ -136,18 +136,6 @@ public class LuaScriptEngineServiceTests
     }
 
     [Fact]
-    public async Task StartAsync_RegistersRuntimeMetadataConstants()
-    {
-        using var fixture = new LuaEngineFixture();
-
-        await fixture.Engine.StartAsync();
-
-        Assert.Equal(VersionUtils.GetVersion(), fixture.Engine.ExecuteFunction("VERSION").Data);
-        Assert.Equal("NightRaven", fixture.Engine.ExecuteFunction("ENGINE").Data);
-        Assert.Equal(PlatformUtils.GetCurrentPlatform().ToString(), fixture.Engine.ExecuteFunction("PLATFORM").Data);
-    }
-
-    [Fact]
     public void RegisterGlobalFunction_CallableFromLua()
     {
         using var fixture = new LuaEngineFixture();
@@ -157,6 +145,18 @@ public class LuaScriptEngineServiceTests
 
         Assert.True(result.Success);
         Assert.Equal(42d, Assert.IsType<double>(result.Data));
+    }
+
+    [Fact]
+    public async Task StartAsync_RegistersRuntimeMetadataConstants()
+    {
+        using var fixture = new LuaEngineFixture();
+
+        await fixture.Engine.StartAsync();
+
+        Assert.Equal(VersionUtils.GetVersion(), fixture.Engine.ExecuteFunction("VERSION").Data);
+        Assert.Equal("NightRaven", fixture.Engine.ExecuteFunction("ENGINE").Data);
+        Assert.Equal(PlatformUtils.GetCurrentPlatform().ToString(), fixture.Engine.ExecuteFunction("PLATFORM").Data);
     }
 
     [Theory, InlineData("MyFunction", "my_function"), InlineData("DoThing", "do_thing")]

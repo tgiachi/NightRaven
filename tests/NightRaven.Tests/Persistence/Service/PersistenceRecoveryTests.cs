@@ -1,7 +1,7 @@
+using NightRaven.Abstractions.Data.Persistence;
+using NightRaven.Abstractions.Interfaces.Events;
+using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Core.Ids;
-using NightRaven.Hosting.Interfaces.Events;
-using NightRaven.Hosting.Interfaces.Services;
-using NightRaven.Hosting.Data.Persistence;
 using NightRaven.Persistence.Data;
 using NightRaven.Persistence.Data.Events;
 using NightRaven.Persistence.Services.Persistence;
@@ -12,6 +12,33 @@ namespace NightRaven.Tests.Persistence.Service;
 public class PersistenceRecoveryTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-persist-{Guid.NewGuid():N}");
+
+    private sealed class CapturingEventBusService : IEventBusService
+    {
+        public List<IAsyncEvent> AsyncEvents { get; } = [];
+        public Action<Type, Exception, INightRavenEvent>? OnEventError { get; set; }
+        public int CurrentTickQueueDepth => 0;
+
+        public int DrainTickEvents(int maxItems)
+            => 0;
+
+        public void Publish<TEvent>(TEvent evt)
+            where TEvent : ITickEvent { }
+
+        public Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
+            where TEvent : IAsyncEvent
+        {
+            AsyncEvents.Add(evt);
+
+            return Task.CompletedTask;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+            => Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken)
+            => Task.CompletedTask;
+    }
 
     public void Dispose()
     {
@@ -108,31 +135,5 @@ public class PersistenceRecoveryTests : IDisposable
         };
 
         return new(_dir, config, registrations, eventBus: eventBus);
-    }
-
-    private sealed class CapturingEventBusService : IEventBusService
-    {
-        public List<IAsyncEvent> AsyncEvents { get; } = [];
-        public Action<Type, Exception, INightRavenEvent>? OnEventError { get; set; }
-        public int CurrentTickQueueDepth => 0;
-
-        public int DrainTickEvents(int maxItems) => 0;
-
-        public void Publish<TEvent>(TEvent evt)
-            where TEvent : ITickEvent
-        {
-        }
-
-        public Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
-            where TEvent : IAsyncEvent
-        {
-            AsyncEvents.Add(evt);
-
-            return Task.CompletedTask;
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

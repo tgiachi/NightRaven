@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Abstractions.Interfaces.EventHandlers;
 
 namespace NightRaven.Tests.Hosting.EventBus.Support;
 

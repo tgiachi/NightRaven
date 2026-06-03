@@ -8,7 +8,7 @@ internal sealed class PluginAssemblyLoadContext : AssemblyLoadContext
     private readonly AssemblyDependencyResolver _resolver;
 
     public PluginAssemblyLoadContext(string pluginAssemblyPath)
-        : base($"NightRaven.Plugin:{Path.GetFileNameWithoutExtension(pluginAssemblyPath)}", isCollectible: false)
+        : base($"NightRaven.Plugin:{Path.GetFileNameWithoutExtension(pluginAssemblyPath)}", false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginAssemblyPath);
         _resolver = new(pluginAssemblyPath);
@@ -16,7 +16,7 @@ internal sealed class PluginAssemblyLoadContext : AssemblyLoadContext
 
     protected override Assembly? Load(AssemblyName assemblyName)
     {
-        var shared = AssemblyLoadContext.Default.Assemblies.FirstOrDefault(
+        var shared = Default.Assemblies.FirstOrDefault(
             assembly => string.Equals(
                 assembly.GetName().Name,
                 assemblyName.Name,

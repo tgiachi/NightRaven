@@ -1,9 +1,8 @@
 using System.Collections.Concurrent;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
-using NightRaven.Hosting.Data.Network;
-using NightRaven.Hosting.Interfaces.EventHandlers;
-using NightRaven.Hosting.Interfaces.Network;
+using NightRaven.Abstractions.Data.Network;
+using NightRaven.Abstractions.Interfaces.EventHandlers;
+using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Network.UO.Interfaces;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Interfaces.Network;

@@ -10,43 +10,26 @@ public sealed class RuntimePathsTests : IDisposable
     private readonly string? _oldLegacy = Environment.GetEnvironmentVariable("NIGHTHEAVEN_ROOT");
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"nr-runtime-paths-{Guid.NewGuid():N}");
 
-    [Fact]
-    public void ResolveRootDirectory_CommandLineRoot_WinsOverEnvironment()
+    public void Dispose()
     {
-        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", Path.Combine(_root, "env"));
-        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", Path.Combine(_root, "legacy"));
+        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", _oldPrimary);
+        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", _oldLegacy);
 
-        var root = RuntimePaths.ResolveRootDirectory(Path.Combine(_root, "cli"));
+        if (Directory.Exists(_root))
+        {
+            Directory.Delete(_root, true);
+        }
 
-        Assert.Equal(Path.Combine(_root, "cli"), root);
+        GC.SuppressFinalize(this);
     }
 
     [Fact]
-    public void ResolveRootDirectory_PrimaryEnvironment_WinsOverLegacy()
-    {
-        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", Path.Combine(_root, "new"));
-        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", Path.Combine(_root, "old"));
-
-        var root = RuntimePaths.ResolveRootDirectory(null);
-
-        Assert.Equal(Path.Combine(_root, "new"), root);
-    }
-
-    [Fact]
-    public void ResolveRootDirectory_LegacyEnvironment_RemainsFallback()
-    {
-        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", null);
-        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", Path.Combine(_root, "old"));
-
-        var root = RuntimePaths.ResolveRootDirectory(null);
-
-        Assert.Equal(Path.Combine(_root, "old"), root);
-    }
-
-    [Fact]
-    public void ResolveConfigPath_UsesNewConfigNameByDefault()
+    public void ResolveConfigPath_NewConfigWinsOverLegacyConfig()
     {
         var directories = Directories();
+        Directory.CreateDirectory(directories[DirectoryType.Config]);
+        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightheaven.toml"), string.Empty);
+        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightraven.toml"), string.Empty);
 
         var configPath = RuntimePaths.ResolveConfigPath(directories);
 
@@ -66,29 +49,46 @@ public sealed class RuntimePathsTests : IDisposable
     }
 
     [Fact]
-    public void ResolveConfigPath_NewConfigWinsOverLegacyConfig()
+    public void ResolveConfigPath_UsesNewConfigNameByDefault()
     {
         var directories = Directories();
-        Directory.CreateDirectory(directories[DirectoryType.Config]);
-        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightheaven.toml"), string.Empty);
-        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightraven.toml"), string.Empty);
 
         var configPath = RuntimePaths.ResolveConfigPath(directories);
 
         Assert.Equal(Path.Combine(directories[DirectoryType.Config], "nightraven.toml"), configPath);
     }
 
-    public void Dispose()
+    [Fact]
+    public void ResolveRootDirectory_CommandLineRoot_WinsOverEnvironment()
     {
-        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", _oldPrimary);
-        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", _oldLegacy);
+        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", Path.Combine(_root, "env"));
+        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", Path.Combine(_root, "legacy"));
 
-        if (Directory.Exists(_root))
-        {
-            Directory.Delete(_root, true);
-        }
+        var root = RuntimePaths.ResolveRootDirectory(Path.Combine(_root, "cli"));
 
-        GC.SuppressFinalize(this);
+        Assert.Equal(Path.Combine(_root, "cli"), root);
+    }
+
+    [Fact]
+    public void ResolveRootDirectory_LegacyEnvironment_RemainsFallback()
+    {
+        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", null);
+        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", Path.Combine(_root, "old"));
+
+        var root = RuntimePaths.ResolveRootDirectory(null);
+
+        Assert.Equal(Path.Combine(_root, "old"), root);
+    }
+
+    [Fact]
+    public void ResolveRootDirectory_PrimaryEnvironment_WinsOverLegacy()
+    {
+        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", Path.Combine(_root, "new"));
+        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", Path.Combine(_root, "old"));
+
+        var root = RuntimePaths.ResolveRootDirectory(null);
+
+        Assert.Equal(Path.Combine(_root, "new"), root);
     }
 
     private DirectoriesConfig Directories()

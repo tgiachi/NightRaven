@@ -6,31 +6,64 @@ using NightRaven.Tests.Persistence.Support;
 
 namespace NightRaven.Tests.Persistence;
 
-
 public class AutoDataAccessTests
 {
-    // --- Serial key ---
+    [Fact]
+    public async Task NextId_AutoInt32_AfterUpsert_ContinuesFromMaxId()
+    {
+        var access = NewInt32Access(out _);
+        await access.UpsertAsync(new() { Id = new(7), Name = "x" });
+
+        var next = await access.NextIdAsync();
+
+        Assert.Equal(new(8), next);
+    }
+
+    // --- AutoInt32 key ---
 
     [Fact]
-    public async Task NextId_Serial_FirstCall_ReturnsSerial1()
+    public async Task NextId_AutoInt32_FirstCall_Returns1()
     {
-        var access = NewSerialAccess(out _);
+        var access = NewInt32Access(out _);
 
         var id = await access.NextIdAsync();
 
-        Assert.Equal(new Serial(1), id);
+        Assert.Equal(new(1), id);
     }
 
     [Fact]
-    public async Task NextId_Serial_CalledTwice_ReturnsConsecutiveSerials()
+    public async Task NextId_AutoInt64_AfterUpsert_ContinuesFromMaxId()
+    {
+        var access = NewInt64Access(out _);
+        await access.UpsertAsync(new() { Id = new(100), Name = "y" });
+
+        var next = await access.NextIdAsync();
+
+        Assert.Equal(new(101), next);
+    }
+
+    // --- AutoInt64 key ---
+
+    [Fact]
+    public async Task NextId_AutoInt64_FirstCall_Returns1()
+    {
+        var access = NewInt64Access(out _);
+
+        var id = await access.NextIdAsync();
+
+        Assert.Equal(new(1), id);
+    }
+
+    [Fact]
+    public async Task NextId_Serial_AfterRemove_DoesNotReuseId()
     {
         var access = NewSerialAccess(out _);
+        await access.UpsertAsync(new() { Id = new(5), Name = "a" });
+        await access.RemoveAsync(new(5));
 
-        var first = await access.NextIdAsync();
-        var second = await access.NextIdAsync();
+        var next = await access.NextIdAsync();
 
-        Assert.Equal(new Serial(1), first);
-        Assert.Equal(new Serial(2), second);
+        Assert.Equal(new(6), next);
     }
 
     [Fact]
@@ -41,19 +74,31 @@ public class AutoDataAccessTests
 
         var next = await access.NextIdAsync();
 
-        Assert.Equal(new Serial(11), next);
+        Assert.Equal(new(11), next);
     }
 
     [Fact]
-    public async Task NextId_Serial_AfterRemove_DoesNotReuseId()
+    public async Task NextId_Serial_CalledTwice_ReturnsConsecutiveSerials()
     {
         var access = NewSerialAccess(out _);
-        await access.UpsertAsync(new() { Id = new(5), Name = "a" });
-        await access.RemoveAsync(new Serial(5));
 
-        var next = await access.NextIdAsync();
+        var first = await access.NextIdAsync();
+        var second = await access.NextIdAsync();
 
-        Assert.Equal(new Serial(6), next);
+        Assert.Equal(new(1), first);
+        Assert.Equal(new(2), second);
+    }
+
+    // --- Serial key ---
+
+    [Fact]
+    public async Task NextId_Serial_FirstCall_ReturnsSerial1()
+    {
+        var access = NewSerialAccess(out _);
+
+        var id = await access.NextIdAsync();
+
+        Assert.Equal(new(1), id);
     }
 
     [Fact]
@@ -67,61 +112,6 @@ public class AutoDataAccessTests
         var entity = await access.GetByIdAsync(id);
         Assert.NotNull(entity);
         Assert.Equal("auto", entity!.Name);
-    }
-
-    // --- AutoInt32 key ---
-
-    [Fact]
-    public async Task NextId_AutoInt32_FirstCall_Returns1()
-    {
-        var access = NewInt32Access(out _);
-
-        var id = await access.NextIdAsync();
-
-        Assert.Equal(new AutoInt32(1), id);
-    }
-
-    [Fact]
-    public async Task NextId_AutoInt32_AfterUpsert_ContinuesFromMaxId()
-    {
-        var access = NewInt32Access(out _);
-        await access.UpsertAsync(new() { Id = new AutoInt32(7), Name = "x" });
-
-        var next = await access.NextIdAsync();
-
-        Assert.Equal(new AutoInt32(8), next);
-    }
-
-    // --- AutoInt64 key ---
-
-    [Fact]
-    public async Task NextId_AutoInt64_FirstCall_Returns1()
-    {
-        var access = NewInt64Access(out _);
-
-        var id = await access.NextIdAsync();
-
-        Assert.Equal(new AutoInt64(1), id);
-    }
-
-    [Fact]
-    public async Task NextId_AutoInt64_AfterUpsert_ContinuesFromMaxId()
-    {
-        var access = NewInt64Access(out _);
-        await access.UpsertAsync(new() { Id = new AutoInt64(100), Name = "y" });
-
-        var next = await access.NextIdAsync();
-
-        Assert.Equal(new AutoInt64(101), next);
-    }
-
-    private static AutoDataAccess<TestPlayer, Serial> NewSerialAccess(out PersistenceStateStore store)
-    {
-        store = new();
-        var journal = new InMemoryJournalService();
-        var descriptor = new PersistenceEntityDescriptor<TestPlayer, Serial>(1, "TestPlayer", 1, p => p.Id);
-
-        return new(store, journal, descriptor);
     }
 
     private static AutoDataAccess<TestPlayerInt32, AutoInt32> NewInt32Access(out PersistenceStateStore store)
@@ -142,4 +132,12 @@ public class AutoDataAccessTests
         return new(store, journal, descriptor);
     }
 
+    private static AutoDataAccess<TestPlayer, Serial> NewSerialAccess(out PersistenceStateStore store)
+    {
+        store = new();
+        var journal = new InMemoryJournalService();
+        var descriptor = new PersistenceEntityDescriptor<TestPlayer, Serial>(1, "TestPlayer", 1, p => p.Id);
+
+        return new(store, journal, descriptor);
+    }
 }

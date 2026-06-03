@@ -1,9 +1,9 @@
 using System.Diagnostics;
-using NightRaven.Hosting.Data.Metrics;
-using NightRaven.Hosting.Data.Timing;
-using NightRaven.Hosting.Interfaces.Metrics;
-using NightRaven.Hosting.Interfaces.Timing;
-using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Abstractions.Data.Metrics;
+using NightRaven.Abstractions.Data.Timing;
+using NightRaven.Abstractions.Interfaces.Metrics;
+using NightRaven.Abstractions.Interfaces.Timing;
+using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Server.Services.Timing.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;

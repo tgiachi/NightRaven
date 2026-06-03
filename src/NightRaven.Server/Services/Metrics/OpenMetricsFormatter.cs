@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
-using NightRaven.Hosting.Data.Metrics;
-using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Abstractions.Data.Metrics;
+using NightRaven.Abstractions.Types.Metrics;
 
 namespace NightRaven.Server.Services.Metrics;
 

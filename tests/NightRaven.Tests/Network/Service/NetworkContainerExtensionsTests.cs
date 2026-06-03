@@ -9,12 +9,6 @@ public class NetworkContainerExtensionsTests : IDisposable
 {
     private readonly IContainer _container = new Container();
 
-    public void Dispose()
-    {
-        _container.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
     [Fact]
     public void AddNightRavenNetwork_RegistersOutgoingPacketQueue()
     {
@@ -23,5 +17,11 @@ public class NetworkContainerExtensionsTests : IDisposable
         _container.AddNightRavenNetwork();
 
         Assert.NotNull(_container.Resolve<IOutgoingPacketQueue>());
+    }
+
+    public void Dispose()
+    {
+        _container.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

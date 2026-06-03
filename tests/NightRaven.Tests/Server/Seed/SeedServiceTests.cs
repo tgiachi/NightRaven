@@ -1,9 +1,9 @@
 using DryIoc;
 using Microsoft.Extensions.DependencyInjection;
-using NightRaven.Core.Ids;
+using NightRaven.Abstractions.Extensions.DryIoc;
+using NightRaven.Abstractions.Interfaces.EventHandlers;
+using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Core.Utils;
-using NightRaven.Hosting.Interfaces.EventHandlers;
-using NightRaven.Hosting.Interfaces.Services;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Extensions.DryIoc;
 using NightRaven.Server.Services.Seed;
@@ -18,52 +18,7 @@ public sealed class SeedServiceTests : IDisposable
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nr-seed-{Guid.NewGuid():N}");
     private string ConfigPath => Path.Combine(_dir, "nightraven.toml");
 
-    [Fact]
-    public async Task RunAsync_ExecutesRegisteredActionsOnce()
-    {
-        var calls = 0;
-        var services = new ServiceCollection().BuildServiceProvider();
-        var service = new SeedService(
-            services,
-            [
-                (_, _) =>
-                {
-                    calls++;
-
-                    return ValueTask.CompletedTask;
-                }
-            ]
-        );
-
-        await service.RunAsync();
-        await service.RunAsync();
-
-        Assert.Equal(1, calls);
-    }
-
-    [Fact]
-    public async Task RunAsync_PassesServiceProviderToActions()
-    {
-        var services = new ServiceCollection()
-                       .AddSingleton(new SeedProbe("admin"))
-                       .BuildServiceProvider();
-        string? captured = null;
-        var service = new SeedService(
-            services,
-            [
-                (provider, _) =>
-                {
-                    captured = provider.GetRequiredService<SeedProbe>().Value;
-
-                    return ValueTask.CompletedTask;
-                }
-            ]
-        );
-
-        await service.RunAsync();
-
-        Assert.Equal("admin", captured);
-    }
+    private sealed record SeedProbe(string Value);
 
     [Fact]
     public async Task AddNightRavenSeeds_RegistersHandlerThatRunsSeedsOnServerStartedEvent()
@@ -133,7 +88,7 @@ public sealed class SeedServiceTests : IDisposable
             var admin = await service.GetByUsernameAsync("admin");
 
             Assert.NotNull(admin);
-            Assert.Equal(new Serial(1), admin!.Id);
+            Assert.Equal(new(1), admin!.Id);
             Assert.Equal(UserLevelType.Administrator, admin.Level);
             Assert.True(admin.IsActive);
             Assert.True(HashUtils.VerifyPassword("admin", admin.Password));
@@ -155,7 +110,52 @@ public sealed class SeedServiceTests : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private sealed record SeedProbe(string Value);
+    [Fact]
+    public async Task RunAsync_ExecutesRegisteredActionsOnce()
+    {
+        var calls = 0;
+        var services = new ServiceCollection().BuildServiceProvider();
+        var service = new SeedService(
+            services,
+            [
+                (_, _) =>
+                {
+                    calls++;
+
+                    return ValueTask.CompletedTask;
+                }
+            ]
+        );
+
+        await service.RunAsync();
+        await service.RunAsync();
+
+        Assert.Equal(1, calls);
+    }
+
+    [Fact]
+    public async Task RunAsync_PassesServiceProviderToActions()
+    {
+        var services = new ServiceCollection()
+                       .AddSingleton(new SeedProbe("admin"))
+                       .BuildServiceProvider();
+        string? captured = null;
+        var service = new SeedService(
+            services,
+            [
+                (provider, _) =>
+                {
+                    captured = provider.GetRequiredService<SeedProbe>().Value;
+
+                    return ValueTask.CompletedTask;
+                }
+            ]
+        );
+
+        await service.RunAsync();
+
+        Assert.Equal("admin", captured);
+    }
 
     private static async Task WaitUntilAsync(Func<bool> predicate)
     {

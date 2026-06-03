@@ -1,6 +1,6 @@
-using NightRaven.Hosting.Data.Internal;
+using NightRaven.Abstractions.Data.Internal;
 using NightRaven.Tests.Hosting.Configuration.Support;
-using ConfigService = NightRaven.Hosting.Configuration.ConfigService;
+using ConfigService = NightRaven.Abstractions.Configuration.ConfigService;
 
 namespace NightRaven.Tests.Hosting.Configuration;
 

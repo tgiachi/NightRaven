@@ -1,10 +1,10 @@
 using DryIoc;
-using NightRaven.Core.Extensions.Container;
-using NightRaven.Hosting.Data.Persistence;
-using NightRaven.Hosting.Interfaces.Metrics;
-using NightRaven.Hosting.Interfaces.Services;
-using NightRaven.Hosting.Interfaces.Timing;
-using NightRaven.Hosting.Internal;
+using NightRaven.Abstractions.Data.Persistence;
+using NightRaven.Abstractions.Extensions.DryIoc;
+using NightRaven.Abstractions.Interfaces.Metrics;
+using NightRaven.Abstractions.Interfaces.Services;
+using NightRaven.Abstractions.Interfaces.Timing;
+using NightRaven.Abstractions.Internal;
 using NightRaven.Persistence.Data;
 using NightRaven.Persistence.Interfaces.Persistence;
 using NightRaven.Persistence.Services.Persistence;
@@ -12,7 +12,7 @@ using NightRaven.Persistence.Services.Persistence;
 namespace NightRaven.Server.Extensions.DryIoc;
 
 /// <summary>
-/// DryIoc-native registration helpers for the NightRaven persistence engine.
+/// DryIoc-native bootstrap helpers for the NightRaven persistence engine.
 /// </summary>
 public static class PersistenceContainerExtensions
 {
@@ -89,31 +89,6 @@ public static class PersistenceContainerExtensions
                 ),
                 setup: Setup.With(asResolutionCall: true)
             );
-
-            return container;
-        }
-
-        /// <summary>
-        /// Registers a persisted entity type. Accumulates a descriptor consumed by the persistence
-        /// service at boot. Call before <see cref="AddNightRavenPersistence" />'s service starts.
-        /// </summary>
-        /// <param name="typeId">Stable numeric identifier for the entity kind.</param>
-        /// <param name="schemaVersion">Version of the persisted entity schema.</param>
-        /// <param name="keySelector">Selects the entity key.</param>
-        public IContainer RegisterPersistenceEntity<TEntity, TKey>(
-            ushort typeId,
-            int schemaVersion,
-            Func<TEntity, TKey> keySelector
-        )
-            where TKey : notnull
-        {
-            var descriptor = new PersistenceEntityDescriptor<TEntity, TKey>(
-                typeId,
-                typeof(TEntity).Name,
-                schemaVersion,
-                keySelector
-            );
-            container.AddToRegisterTypedList(new PersistenceEntityRegistration(descriptor));
 
             return container;
         }

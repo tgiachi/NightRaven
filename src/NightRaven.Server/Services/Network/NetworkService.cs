@@ -1,19 +1,19 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
+using NightRaven.Abstractions.Data.Logging;
+using NightRaven.Abstractions.Data.Metrics;
+using NightRaven.Abstractions.Data.Network;
+using NightRaven.Abstractions.Interfaces.Metrics;
+using NightRaven.Abstractions.Interfaces.Services;
+using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Core.Utils;
-using NightRaven.Hosting.Data.Logging;
-using NightRaven.Hosting.Data.Metrics;
-using NightRaven.Hosting.Data.Network;
-using NightRaven.Hosting.Interfaces.Metrics;
-using NightRaven.Hosting.Interfaces.Services;
-using NightRaven.Hosting.Types.Metrics;
 using NightRaven.Network.Events;
 using NightRaven.Network.Server;
 using NightRaven.Network.UO.Interfaces;
 using NightRaven.Network.UO.Registry;
-using NightRaven.Server.Data.Network;
 using NightRaven.Server.Data.Events;
+using NightRaven.Server.Data.Network;
 using NightRaven.Server.Interfaces.Network;
 using NightRaven.Server.Services.Network.Internal;
 using Serilog;
@@ -205,6 +205,76 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         _outgoingPackets.Clear(static envelope => DisposePacket(envelope.Packet));
     }
 
+    private static string BuildHexDump(ReadOnlySpan<byte> data)
+    {
+        if (data.IsEmpty)
+        {
+            return "<empty>";
+        }
+
+        var builder = new StringBuilder((data.Length / 16 + 1) * 80);
+
+        for (var i = 0; i < data.Length; i += 16)
+        {
+            var lineLength = Math.Min(16, data.Length - i);
+            builder.Append(i.ToString("X4"));
+            builder.Append("  ");
+
+            for (var j = 0; j < 16; j++)
+            {
+                if (j < lineLength)
+                {
+                    builder.Append(data[i + j].ToString("X2"));
+                }
+                else
+                {
+                    builder.Append("  ");
+                }
+
+                if (j != 15)
+                {
+                    builder.Append(' ');
+                }
+            }
+
+            builder.Append("  |");
+
+            for (var j = 0; j < lineLength; j++)
+            {
+                var value = data[i + j];
+                builder.Append(value is >= 32 and <= 126 ? (char)value : '.');
+            }
+
+            builder.Append('|');
+
+            if (i + lineLength < data.Length)
+            {
+                builder.AppendLine();
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    private static void DisposePacket(IGameNetworkPacket packet)
+    {
+        if (packet is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+    }
+
+    private void LogOutgoingPacket(OutgoingPacketEnvelope envelope, byte[] payload)
+        => _logger.Information(
+            ">> packet Session={SessionId} OpCode=0x{OpCode:X2} Name={PacketName} Length={Length}{NewLine}{Dump}",
+            envelope.SessionId,
+            envelope.Packet.OpCode,
+            envelope.Packet.GetType().Name,
+            payload.Length,
+            Environment.NewLine,
+            BuildHexDump(payload)
+        );
+
     private void OnClientConnected(object? sender, NightRavenTCPClientEventArgs e)
     {
         var session = _sessions.GetOrCreate(e.Client);
@@ -286,57 +356,6 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         );
     }
 
-    private static string BuildHexDump(ReadOnlySpan<byte> data)
-    {
-        if (data.IsEmpty)
-        {
-            return "<empty>";
-        }
-
-        var builder = new StringBuilder((data.Length / 16 + 1) * 80);
-
-        for (var i = 0; i < data.Length; i += 16)
-        {
-            var lineLength = Math.Min(16, data.Length - i);
-            builder.Append(i.ToString("X4"));
-            builder.Append("  ");
-
-            for (var j = 0; j < 16; j++)
-            {
-                if (j < lineLength)
-                {
-                    builder.Append(data[i + j].ToString("X2"));
-                }
-                else
-                {
-                    builder.Append("  ");
-                }
-
-                if (j != 15)
-                {
-                    builder.Append(' ');
-                }
-            }
-
-            builder.Append("  |");
-
-            for (var j = 0; j < lineLength; j++)
-            {
-                var value = data[i + j];
-                builder.Append(value is >= 32 and <= 126 ? (char)value : '.');
-            }
-
-            builder.Append('|');
-
-            if (i + lineLength < data.Length)
-            {
-                builder.AppendLine();
-            }
-        }
-
-        return builder.ToString();
-    }
-
     private void RunIngressLoop()
     {
         while (!_ingressStopRequested)
@@ -412,19 +431,6 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         }
 
         return true;
-    }
-
-    private void LogOutgoingPacket(OutgoingPacketEnvelope envelope, byte[] payload)
-    {
-        _logger.Information(
-            ">> packet Session={SessionId} OpCode=0x{OpCode:X2} Name={PacketName} Length={Length}{NewLine}{Dump}",
-            envelope.SessionId,
-            envelope.Packet.OpCode,
-            envelope.Packet.GetType().Name,
-            payload.Length,
-            Environment.NewLine,
-            BuildHexDump(payload)
-        );
     }
 
     private void StartIngressLoop()
@@ -509,13 +515,5 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         _outboundStopRequested = true;
         _outboundThread.Join(TimeSpan.FromSeconds(2));
         _outboundThread = null;
-    }
-
-    private static void DisposePacket(IGameNetworkPacket packet)
-    {
-        if (packet is IDisposable disposable)
-        {
-            disposable.Dispose();
-        }
     }
 }

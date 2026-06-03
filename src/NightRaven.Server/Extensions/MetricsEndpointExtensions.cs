@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Abstractions.Interfaces.Metrics;
 using NightRaven.Server.Services.Metrics;
 
 namespace NightRaven.Server.Extensions;

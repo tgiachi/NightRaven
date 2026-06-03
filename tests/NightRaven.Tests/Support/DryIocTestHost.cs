@@ -1,6 +1,6 @@
 using DryIoc;
 using Microsoft.Extensions.Hosting;
-using NightRaven.Hosting.Internal;
+using NightRaven.Abstractions.Internal;
 
 namespace NightRaven.Tests.Support;
 

@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Abstractions.Interfaces.Services;
 
 namespace NightRaven.Server.Interfaces.Network;
 

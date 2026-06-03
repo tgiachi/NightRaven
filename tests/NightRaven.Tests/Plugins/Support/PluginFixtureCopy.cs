@@ -13,7 +13,7 @@ public static class PluginFixtureCopy
 
         var pluginDirectory = Path.Combine(pluginsRoot, directoryName ?? assemblyName);
         Directory.CreateDirectory(pluginDirectory);
-        File.Copy(source, Path.Combine(pluginDirectory, assemblyName + ".dll"), overwrite: true);
+        File.Copy(source, Path.Combine(pluginDirectory, assemblyName + ".dll"), true);
 
         return pluginDirectory;
     }

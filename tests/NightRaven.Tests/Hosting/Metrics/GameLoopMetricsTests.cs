@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Server.Services.EventBus;
 using NightRaven.Server.Services.GameLoop;
 

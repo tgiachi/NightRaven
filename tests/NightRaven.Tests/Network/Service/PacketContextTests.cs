@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Data.Network;
+using NightRaven.Abstractions.Data.Network;
 using NightRaven.Network.Spans;
 using NightRaven.Network.UO.Base;
 
@@ -6,15 +6,16 @@ namespace NightRaven.Tests.Network.Service;
 
 public class PacketContextTests
 {
-    [Fact]
-    public async Task SendAsync_EnqueuesToCurrentSession()
+    private sealed class TestPacket : BaseGameNetworkPacket
     {
-        var sent = new List<long>();
-        var context = NewContext(10, [10, 20], sent);
+        public TestPacket(byte opCode)
+            : base(opCode, 1) { }
 
-        await context.SendAsync(new TestPacket(0xA1));
+        public override void Write(ref SpanWriter writer)
+            => writer.Write(OpCode);
 
-        Assert.Equal(new long[] { 10 }, sent);
+        protected override bool ParsePayload(ref SpanReader reader)
+            => true;
     }
 
     [Fact]
@@ -56,6 +57,17 @@ public class PacketContextTests
     }
 
     [Fact]
+    public async Task SendAsync_EnqueuesToCurrentSession()
+    {
+        var sent = new List<long>();
+        var context = NewContext(10, [10, 20], sent);
+
+        await context.SendAsync(new TestPacket(0xA1));
+
+        Assert.Equal(new long[] { 10 }, sent);
+    }
+
+    [Fact]
     public async Task SendAsync_NullPacket_Throws()
     {
         var context = NewContext(10, [10, 20], []);
@@ -68,7 +80,7 @@ public class PacketContextTests
     private static PacketContext<TestPacket> NewContext(long sessionId, long[] sessions, List<long> sent)
         => new(
             sessionId,
-            new TestPacket(0x01),
+            new(0x01),
             DateTimeOffset.UtcNow,
             (targetSessionId, _, _) =>
             {
@@ -78,16 +90,4 @@ public class PacketContextTests
             },
             () => sessions
         );
-
-    private sealed class TestPacket : BaseGameNetworkPacket
-    {
-        public TestPacket(byte opCode)
-            : base(opCode, 1) { }
-
-        public override void Write(ref SpanWriter writer)
-            => writer.Write(OpCode);
-
-        protected override bool ParsePayload(ref SpanReader reader)
-            => true;
-    }
 }

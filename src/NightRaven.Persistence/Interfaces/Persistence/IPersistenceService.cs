@@ -1,5 +1,5 @@
+using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Core.Ids;
-using NightRaven.Hosting.Interfaces.Services;
 
 namespace NightRaven.Persistence.Interfaces.Persistence;
 
@@ -9,13 +9,13 @@ namespace NightRaven.Persistence.Interfaces.Persistence;
 /// </summary>
 public interface IPersistenceService : INightRavenService
 {
-    /// <summary>Gets CRUD access for a registered entity type.</summary>
-    IDataAccess<TEntity, TKey> GetDataAccess<TEntity, TKey>()
-        where TKey : notnull;
-
     /// <summary>Gets CRUD access with auto-increment key allocation for a registered entity type.</summary>
     IAutoDataAccess<TEntity, TKey> GetAutoDataAccess<TEntity, TKey>()
         where TKey : struct, IAutoIncrementKey<TKey>;
+
+    /// <summary>Gets CRUD access for a registered entity type.</summary>
+    IDataAccess<TEntity, TKey> GetDataAccess<TEntity, TKey>()
+        where TKey : notnull;
 
     /// <summary>Loads the snapshot and replays the journal into memory.</summary>
     ValueTask InitializeAsync(CancellationToken cancellationToken = default);

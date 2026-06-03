@@ -1,6 +1,6 @@
 using DryIoc;
+using NightRaven.Abstractions.Data.Logging;
 using NightRaven.Core.Types;
-using NightRaven.Hosting.Data.Logging;
 using NightRaven.Server.Extensions.DryIoc;
 
 namespace NightRaven.Tests.Hosting.Logging;
@@ -9,17 +9,6 @@ public sealed class LoggerConfigTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nr-logger-config-{Guid.NewGuid():N}");
     private string ConfigPath => Path.Combine(_dir, "nightraven.toml");
-
-    [Fact]
-    public void Defaults_MatchServerStartupLogging()
-    {
-        var config = new LoggerConfig();
-
-        Assert.Equal(LogLevelType.Information, config.Level);
-        Assert.False(config.LogPackets);
-        Assert.False(config.WriteToFile);
-        Assert.Equal("nightraven.log", config.FileName);
-    }
 
     [Fact]
     public void AddNightRavenLogging_RegistersLoggerConfigSection()
@@ -39,6 +28,17 @@ public sealed class LoggerConfigTests : IDisposable
         Assert.True(config.LogPackets);
         Assert.True(config.WriteToFile);
         Assert.Equal("server.log", config.FileName);
+    }
+
+    [Fact]
+    public void Defaults_MatchServerStartupLogging()
+    {
+        var config = new LoggerConfig();
+
+        Assert.Equal(LogLevelType.Information, config.Level);
+        Assert.False(config.LogPackets);
+        Assert.False(config.WriteToFile);
+        Assert.Equal("nightraven.log", config.FileName);
     }
 
     public void Dispose()

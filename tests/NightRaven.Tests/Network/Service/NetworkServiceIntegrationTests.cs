@@ -1,7 +1,8 @@
 using System.Net;
 using System.Net.Sockets;
 using DryIoc;
-using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Abstractions.Extensions.DryIoc;
+using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Network.Spans;
 using NightRaven.Network.UO.Base;
 using NightRaven.Network.UO.Registry;
@@ -76,6 +77,22 @@ public class NetworkServiceIntegrationTests : IDisposable
                 _capture.Disconnects.Add(evt);
             }
         }
+    }
+
+    private sealed class TestOutgoingPacket : BaseGameNetworkPacket
+    {
+        public TestOutgoingPacket()
+            : base(0xAA, 3) { }
+
+        public override void Write(ref SpanWriter writer)
+        {
+            writer.Write(OpCode);
+            writer.Write((byte)0x01);
+            writer.Write((byte)0x02);
+        }
+
+        protected override bool ParsePayload(ref SpanReader reader)
+            => true;
     }
 
     public void Dispose()
@@ -334,21 +351,5 @@ public class NetworkServiceIntegrationTests : IDisposable
         File.WriteAllText(path, $"[network]\nport = {port}\nping_server_enabled = false\n");
 
         return path;
-    }
-
-    private sealed class TestOutgoingPacket : BaseGameNetworkPacket
-    {
-        public TestOutgoingPacket()
-            : base(0xAA, 3) { }
-
-        public override void Write(ref SpanWriter writer)
-        {
-            writer.Write(OpCode);
-            writer.Write((byte)0x01);
-            writer.Write((byte)0x02);
-        }
-
-        protected override bool ParsePayload(ref SpanReader reader)
-            => true;
     }
 }

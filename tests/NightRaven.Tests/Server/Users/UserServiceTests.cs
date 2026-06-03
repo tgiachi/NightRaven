@@ -1,8 +1,8 @@
 using DryIoc;
+using NightRaven.Abstractions.Interfaces.Events;
+using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Core.Ids;
 using NightRaven.Core.Utils;
-using NightRaven.Hosting.Interfaces.Events;
-using NightRaven.Hosting.Interfaces.Services;
 using NightRaven.Persistence.Interfaces.Persistence;
 using NightRaven.Server.Extensions.DryIoc;
 using NightRaven.Server.Services.Users;
@@ -19,127 +19,17 @@ public sealed class UserServiceTests : IDisposable
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nr-users-{Guid.NewGuid():N}");
     private string ConfigPath => Path.Combine(_dir, "nightraven.toml");
 
-    [Fact]
-    public async Task CreateAsync_HashesPasswordPersistsUserAndPublishesCreatedEvent()
-    {
-        var access = new FakeUserAccess();
-        var bus = new CapturingEventBusService();
-        var service = new UserService(access, bus);
-
-        var user = await service.CreateAsync("Arthorius", "secret", UserLevelType.GameMaster);
-
-        Assert.Equal(new Serial(1), user.Id);
-        Assert.Equal("Arthorius", user.Username);
-        Assert.Equal(UserLevelType.GameMaster, user.Level);
-        Assert.True(user.IsActive);
-        Assert.NotEqual("secret", user.Password);
-        Assert.True(HashUtils.VerifyPassword("secret", user.Password));
-
-        var stored = Assert.Single(access.Users);
-        Assert.Equal(user.Id, stored.Id);
-        Assert.Equal(user.Password, stored.Password);
-
-        var created = Assert.Single(bus.AsyncEvents.OfType<UserCreatedEvent>());
-        Assert.Equal(user.Id, created.UserId);
-        Assert.Equal(user.Username, created.Username);
-        Assert.Equal(user.Level, created.Level);
-        Assert.True(created.IsActive);
-    }
-
-    [Fact]
-    public async Task CreateAsync_DuplicateUsernameCaseInsensitive_ThrowsAndDoesNotPublish()
-    {
-        var access = new FakeUserAccess();
-        access.Add(new(new Serial(7), "Arthorius", HashUtils.HashPassword("old"), UserLevelType.Player, isActive: true));
-        var bus = new CapturingEventBusService();
-        var service = new UserService(access, bus);
-
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await service.CreateAsync("arthorius", "secret")
-        );
-
-        Assert.Single(access.Users);
-        Assert.Empty(bus.AsyncEvents);
-    }
-
-    [Fact]
-    public async Task GetByUsernameAsync_MatchesUsernameCaseInsensitively()
-    {
-        var access = new FakeUserAccess();
-        access.Add(new(new Serial(42), "Arthorius", HashUtils.HashPassword("secret"), UserLevelType.Player, isActive: true));
-        var service = new UserService(access, new CapturingEventBusService());
-
-        var user = await service.GetByUsernameAsync("arthorius");
-
-        Assert.NotNull(user);
-        Assert.Equal(new Serial(42), user!.Id);
-    }
-
-    [Fact]
-    public async Task CountAsync_ReturnsPersistedUserCount()
-    {
-        var access = new FakeUserAccess();
-        access.Add(new(new Serial(1), "one", HashUtils.HashPassword("secret"), UserLevelType.Player, isActive: true));
-        access.Add(new(new Serial(2), "two", HashUtils.HashPassword("secret"), UserLevelType.Player, isActive: true));
-        var service = new UserService(access, new CapturingEventBusService());
-
-        var count = await service.CountAsync();
-
-        Assert.Equal(2, count);
-    }
-
-    [Fact]
-    public async Task AddNightRavenUsers_RegistersServiceAndUserPersistence()
-    {
-        Directory.CreateDirectory(_dir);
-        File.WriteAllText(ConfigPath, "[persistence]\nenable_file_lock = false\n");
-
-        var container = new Container();
-        container.AddNightRavenEventBus();
-        container.AddNightRavenUsers();
-        container.AddNightRavenPersistence(_dir);
-        container.AddNightRavenConfig(ConfigPath);
-
-        var orchestrator = container.Orchestrator();
-        await orchestrator.StartAsync(CancellationToken.None);
-
-        try
-        {
-            var service = container.Resolve<IUserService>();
-
-            var user = await service.CreateAsync("ContainerUser", "secret");
-
-            Assert.Equal(new Serial(1), user.Id);
-            Assert.True(HashUtils.VerifyPassword("secret", user.Password));
-        }
-        finally
-        {
-            await orchestrator.StopAsync(CancellationToken.None);
-        }
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_dir))
-        {
-            Directory.Delete(_dir, true);
-        }
-
-        GC.SuppressFinalize(this);
-    }
-
     private sealed class CapturingEventBusService : IEventBusService
     {
         public List<IAsyncEvent> AsyncEvents { get; } = [];
         public Action<Type, Exception, INightRavenEvent>? OnEventError { get; set; }
         public int CurrentTickQueueDepth => 0;
 
-        public int DrainTickEvents(int maxItems) => 0;
+        public int DrainTickEvents(int maxItems)
+            => 0;
 
         public void Publish<TEvent>(TEvent evt)
-            where TEvent : ITickEvent
-        {
-        }
+            where TEvent : ITickEvent { }
 
         public Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
             where TEvent : IAsyncEvent
@@ -149,9 +39,11 @@ public sealed class UserServiceTests : IDisposable
             return Task.CompletedTask;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task StartAsync(CancellationToken cancellationToken)
+            => Task.CompletedTask;
 
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task StopAsync(CancellationToken cancellationToken)
+            => Task.CompletedTask;
     }
 
     private sealed class FakeUserAccess : IAutoDataAccess<UserEntity, Serial>
@@ -198,5 +90,112 @@ public sealed class UserServiceTests : IDisposable
 
         private static UserEntity Clone(UserEntity user)
             => new(user.Id, user.Username, user.Password, user.Level, user.IsActive);
+    }
+
+    [Fact]
+    public async Task AddNightRavenUsers_RegistersServiceAndUserPersistence()
+    {
+        Directory.CreateDirectory(_dir);
+        File.WriteAllText(ConfigPath, "[persistence]\nenable_file_lock = false\n");
+
+        var container = new Container();
+        container.AddNightRavenEventBus();
+        container.AddNightRavenUsers();
+        container.AddNightRavenPersistence(_dir);
+        container.AddNightRavenConfig(ConfigPath);
+
+        var orchestrator = container.Orchestrator();
+        await orchestrator.StartAsync(CancellationToken.None);
+
+        try
+        {
+            var service = container.Resolve<IUserService>();
+
+            var user = await service.CreateAsync("ContainerUser", "secret");
+
+            Assert.Equal(new(1), user.Id);
+            Assert.True(HashUtils.VerifyPassword("secret", user.Password));
+        }
+        finally
+        {
+            await orchestrator.StopAsync(CancellationToken.None);
+        }
+    }
+
+    [Fact]
+    public async Task CountAsync_ReturnsPersistedUserCount()
+    {
+        var access = new FakeUserAccess();
+        access.Add(new(new(1), "one", HashUtils.HashPassword("secret"), UserLevelType.Player, true));
+        access.Add(new(new(2), "two", HashUtils.HashPassword("secret"), UserLevelType.Player, true));
+        var service = new UserService(access, new CapturingEventBusService());
+
+        var count = await service.CountAsync();
+
+        Assert.Equal(2, count);
+    }
+
+    [Fact]
+    public async Task CreateAsync_DuplicateUsernameCaseInsensitive_ThrowsAndDoesNotPublish()
+    {
+        var access = new FakeUserAccess();
+        access.Add(new(new(7), "Arthorius", HashUtils.HashPassword("old"), UserLevelType.Player, true));
+        var bus = new CapturingEventBusService();
+        var service = new UserService(access, bus);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await service.CreateAsync("arthorius", "secret"));
+
+        Assert.Single(access.Users);
+        Assert.Empty(bus.AsyncEvents);
+    }
+
+    [Fact]
+    public async Task CreateAsync_HashesPasswordPersistsUserAndPublishesCreatedEvent()
+    {
+        var access = new FakeUserAccess();
+        var bus = new CapturingEventBusService();
+        var service = new UserService(access, bus);
+
+        var user = await service.CreateAsync("Arthorius", "secret", UserLevelType.GameMaster);
+
+        Assert.Equal(new(1), user.Id);
+        Assert.Equal("Arthorius", user.Username);
+        Assert.Equal(UserLevelType.GameMaster, user.Level);
+        Assert.True(user.IsActive);
+        Assert.NotEqual("secret", user.Password);
+        Assert.True(HashUtils.VerifyPassword("secret", user.Password));
+
+        var stored = Assert.Single(access.Users);
+        Assert.Equal(user.Id, stored.Id);
+        Assert.Equal(user.Password, stored.Password);
+
+        var created = Assert.Single(bus.AsyncEvents.OfType<UserCreatedEvent>());
+        Assert.Equal(user.Id, created.UserId);
+        Assert.Equal(user.Username, created.Username);
+        Assert.Equal(user.Level, created.Level);
+        Assert.True(created.IsActive);
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
+    }
+
+    [Fact]
+    public async Task GetByUsernameAsync_MatchesUsernameCaseInsensitively()
+    {
+        var access = new FakeUserAccess();
+        access.Add(new(new(42), "Arthorius", HashUtils.HashPassword("secret"), UserLevelType.Player, true));
+        var service = new UserService(access, new CapturingEventBusService());
+
+        var user = await service.GetByUsernameAsync("arthorius");
+
+        Assert.NotNull(user);
+        Assert.Equal(new(42), user!.Id);
     }
 }

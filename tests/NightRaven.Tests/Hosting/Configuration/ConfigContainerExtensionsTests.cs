@@ -1,4 +1,5 @@
 using DryIoc;
+using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Server.Extensions.DryIoc;
 using NightRaven.Tests.Hosting.Configuration.Support;
 

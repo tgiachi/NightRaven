@@ -8,6 +8,22 @@ namespace NightRaven.Core.Utils;
 public static class VersionUtils
 {
     /// <summary>
+    /// Gets the value of an <see cref="AssemblyMetadataAttribute" /> by key from the specified assembly.
+    /// </summary>
+    /// <param name="assembly">The assembly to read metadata from.</param>
+    /// <param name="key">The metadata key to look up.</param>
+    /// <returns>The metadata value, or an empty string when the key is absent.</returns>
+    public static string GetMetadata(Assembly assembly, string key)
+    {
+        ArgumentNullException.ThrowIfNull(assembly);
+
+        return assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+                       .FirstOrDefault(a => string.Equals(a.Key, key, StringComparison.Ordinal))
+                       ?.Value ??
+               "";
+    }
+
+    /// <summary>
     /// Gets the informational version for the NightRaven.Core assembly.
     /// </summary>
     /// <returns>The package version declared for NightRaven.Core.</returns>
@@ -34,20 +50,5 @@ public static class VersionUtils
         }
 
         return assembly.GetName().Version?.ToString() ?? "";
-    }
-
-    /// <summary>
-    /// Gets the value of an <see cref="AssemblyMetadataAttribute" /> by key from the specified assembly.
-    /// </summary>
-    /// <param name="assembly">The assembly to read metadata from.</param>
-    /// <param name="key">The metadata key to look up.</param>
-    /// <returns>The metadata value, or an empty string when the key is absent.</returns>
-    public static string GetMetadata(Assembly assembly, string key)
-    {
-        ArgumentNullException.ThrowIfNull(assembly);
-
-        return assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
-                       .FirstOrDefault(a => string.Equals(a.Key, key, StringComparison.Ordinal))
-                       ?.Value ?? "";
     }
 }

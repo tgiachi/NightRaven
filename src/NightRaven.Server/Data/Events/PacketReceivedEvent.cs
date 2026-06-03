@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Interfaces.Events;
+using NightRaven.Abstractions.Interfaces.Events;
 using NightRaven.Network.UO.Interfaces;
 
 namespace NightRaven.Server.Data.Events;

@@ -1,12 +1,14 @@
+using System.Reflection;
 using ConsoleAppFramework;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
-using System.Reflection;
+using NightRaven.Abstractions.Data.Logging;
+using NightRaven.Abstractions.Extensions.DryIoc;
+using NightRaven.Abstractions.Interfaces.Services;
+using NightRaven.Abstractions.Internal;
 using NightRaven.Core.Data.Directories;
 using NightRaven.Core.Types;
 using NightRaven.Core.Utils;
-using NightRaven.Hosting.Interfaces.Services;
-using NightRaven.Hosting.Internal;
 using NightRaven.Network.UO.Registry;
 using NightRaven.Scripting.Lua.Extensions.Scripts;
 using NightRaven.Scripting.Lua.Modules;
@@ -119,7 +121,7 @@ await ConsoleApp.RunAsync(
                 // all RegisterConfigSection calls (each module helper declares its section).
                 container.AddNightRavenConfig(RuntimePaths.ResolveConfigPath(directoriesConfig));
                 Log.Logger = LoggerService.CreateLogger(
-                    container.Resolve<NightRaven.Hosting.Data.Logging.LoggerConfig>(),
+                    container.Resolve<LoggerConfig>(),
                     directoriesConfig[DirectoryType.Logs]
                 );
             }

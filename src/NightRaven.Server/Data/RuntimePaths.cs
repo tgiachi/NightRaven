@@ -11,6 +11,19 @@ internal static class RuntimePaths
     public const string ConfigFileName = "nightraven.toml";
     public const string LegacyConfigFileName = "nightheaven.toml";
 
+    public static string ResolveConfigPath(DirectoriesConfig directories)
+    {
+        ArgumentNullException.ThrowIfNull(directories);
+
+        var configDirectory = directories[DirectoryType.Config];
+        var configPath = Path.Combine(configDirectory, ConfigFileName);
+        var legacyConfigPath = Path.Combine(configDirectory, LegacyConfigFileName);
+
+        return File.Exists(legacyConfigPath) && !File.Exists(configPath)
+                   ? legacyConfigPath
+                   : configPath;
+    }
+
     public static string ResolveRootDirectory(string? commandLineRootDirectory)
     {
         if (!string.IsNullOrWhiteSpace(commandLineRootDirectory))
@@ -33,18 +46,5 @@ internal static class RuntimePaths
         }
 
         return Path.Combine(Directory.GetCurrentDirectory(), DefaultRootDirectoryName);
-    }
-
-    public static string ResolveConfigPath(DirectoriesConfig directories)
-    {
-        ArgumentNullException.ThrowIfNull(directories);
-
-        var configDirectory = directories[DirectoryType.Config];
-        var configPath = Path.Combine(configDirectory, ConfigFileName);
-        var legacyConfigPath = Path.Combine(configDirectory, LegacyConfigFileName);
-
-        return File.Exists(legacyConfigPath) && !File.Exists(configPath)
-            ? legacyConfigPath
-            : configPath;
     }
 }

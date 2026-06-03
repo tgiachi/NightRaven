@@ -1,4 +1,3 @@
-using NightRaven.Core.Data.Directories;
 using NightRaven.Core.Types;
 using NightRaven.Plugins.Data;
 
@@ -13,16 +12,20 @@ public sealed class PluginContextTests : IDisposable
 
     private string PluginDirectory => Path.Combine(_root, "plugins", "nightraven.test");
 
-    [Fact]
-    public void LoadConfig_MissingFile_WritesDefaultsAndReturnsDefaults()
+    private sealed class WeatherPluginConfig
     {
-        var context = CreateContext();
+        public int WeatherIntervalSeconds { get; set; } = 2;
+        public string Region { get; set; } = "Britannia";
+    }
 
-        var config = context.LoadConfig(() => new WeatherPluginConfig());
+    public void Dispose()
+    {
+        if (Directory.Exists(_root))
+        {
+            Directory.Delete(_root, true);
+        }
 
-        Assert.Equal(2, config.WeatherIntervalSeconds);
-        Assert.True(File.Exists(context.PluginConfigPath));
-        Assert.Contains("weather_interval_seconds = 2", File.ReadAllText(context.PluginConfigPath));
+        GC.SuppressFinalize(this);
     }
 
     [Fact]
@@ -48,28 +51,22 @@ public sealed class PluginContextTests : IDisposable
         File.WriteAllText(Path.Combine(PluginDirectory, "plugin.toml"), "weather_interval_seconds = = =\n");
         var context = CreateContext();
 
-        var ex = Assert.Throws<InvalidOperationException>(
-            () => context.LoadConfig(() => new WeatherPluginConfig())
-        );
+        var ex = Assert.Throws<InvalidOperationException>(() => context.LoadConfig(() => new WeatherPluginConfig()));
         Assert.Contains("plugin.toml", ex.Message);
     }
 
-    public void Dispose()
+    [Fact]
+    public void LoadConfig_MissingFile_WritesDefaultsAndReturnsDefaults()
     {
-        if (Directory.Exists(_root))
-        {
-            Directory.Delete(_root, true);
-        }
+        var context = CreateContext();
 
-        GC.SuppressFinalize(this);
+        var config = context.LoadConfig(() => new WeatherPluginConfig());
+
+        Assert.Equal(2, config.WeatherIntervalSeconds);
+        Assert.True(File.Exists(context.PluginConfigPath));
+        Assert.Contains("weather_interval_seconds = 2", File.ReadAllText(context.PluginConfigPath));
     }
 
     private PluginContext CreateContext()
-        => new(PluginDirectory, new DirectoriesConfig(_root, Enum.GetNames<DirectoryType>()));
-
-    private sealed class WeatherPluginConfig
-    {
-        public int WeatherIntervalSeconds { get; set; } = 2;
-        public string Region { get; set; } = "Britannia";
-    }
+        => new(PluginDirectory, new(_root, Enum.GetNames<DirectoryType>()));
 }

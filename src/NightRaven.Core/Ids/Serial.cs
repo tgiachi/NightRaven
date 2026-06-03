@@ -7,7 +7,8 @@ namespace NightRaven.Core.Ids;
 /// Represents a UO entity serial identifier.
 /// </summary>
 public readonly struct Serial
-    : IAutoIncrementKey<Serial>, IComparable<Serial>, IComparable<uint>, IEquatable<Serial>, ISpanFormattable, ISpanParsable<Serial>
+    : IAutoIncrementKey<Serial>, IComparable<Serial>, IComparable<uint>, IEquatable<Serial>, ISpanFormattable,
+      ISpanParsable<Serial>
 {
     public const uint ItemOffset = 0x40000000;
     public const uint MaxItemSerial = 0x7EEEEEEE;
@@ -26,8 +27,6 @@ public readonly struct Serial
     public uint Value { get; }
 
     public ulong Sequence => Value;
-
-    public static Serial FromSequence(ulong value) => new((uint)value);
 
     public bool IsMobile
     {
@@ -67,6 +66,9 @@ public readonly struct Serial
             uint raw      => Value == raw,
             _             => false
         };
+
+    public static Serial FromSequence(ulong value)
+        => new((uint)value);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()

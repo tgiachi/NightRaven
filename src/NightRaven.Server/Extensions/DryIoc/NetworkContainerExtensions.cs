@@ -1,5 +1,6 @@
 using DryIoc;
-using NightRaven.Hosting.Data.Network;
+using NightRaven.Abstractions.Data.Network;
+using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Server.Interfaces.Network;
 using NightRaven.Server.Services.Network;
 

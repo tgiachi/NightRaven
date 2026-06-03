@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Data.Persistence;
+using NightRaven.Abstractions.Data.Persistence;
 
 namespace NightRaven.Tests.Hosting.Persistence;
 

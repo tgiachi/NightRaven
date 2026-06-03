@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Interfaces;
+using NightRaven.Abstractions.Interfaces.Config;
 
 namespace NightRaven.Tests.Hosting.Configuration.Support;
 

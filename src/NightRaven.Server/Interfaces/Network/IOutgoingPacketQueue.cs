@@ -14,13 +14,11 @@ public interface IOutgoingPacketQueue
     int Count { get; }
 
     /// <summary>
-    /// Enqueues a packet for the target session.
+    /// Clears all queued packets.
     /// </summary>
-    /// <typeparam name="TPacket">Packet type.</typeparam>
-    /// <param name="sessionId">Target session id.</param>
-    /// <param name="packet">Packet to send.</param>
-    void Enqueue<TPacket>(long sessionId, TPacket packet)
-        where TPacket : IGameNetworkPacket;
+    /// <param name="handler">Optional handler invoked for each cleared packet.</param>
+    /// <returns>Number of packets cleared.</returns>
+    int Clear(Action<OutgoingPacketEnvelope>? handler = null);
 
     /// <summary>
     /// Drains queued packets in FIFO order.
@@ -31,9 +29,11 @@ public interface IOutgoingPacketQueue
     int Drain(int maxItems, Func<OutgoingPacketEnvelope, bool> handler);
 
     /// <summary>
-    /// Clears all queued packets.
+    /// Enqueues a packet for the target session.
     /// </summary>
-    /// <param name="handler">Optional handler invoked for each cleared packet.</param>
-    /// <returns>Number of packets cleared.</returns>
-    int Clear(Action<OutgoingPacketEnvelope>? handler = null);
+    /// <typeparam name="TPacket">Packet type.</typeparam>
+    /// <param name="sessionId">Target session id.</param>
+    /// <param name="packet">Packet to send.</param>
+    void Enqueue<TPacket>(long sessionId, TPacket packet)
+        where TPacket : IGameNetworkPacket;
 }

@@ -6,12 +6,34 @@ namespace NightRaven.Tests.Network.Service;
 
 public class OutgoingPacketQueueTests
 {
+    private sealed class TestOutgoingPacket : BaseGameNetworkPacket
+    {
+        public TestOutgoingPacket(byte opCode)
+            : base(opCode, 1) { }
+
+        public override void Write(ref SpanWriter writer)
+            => writer.Write(OpCode);
+
+        protected override bool ParsePayload(ref SpanReader reader)
+            => true;
+    }
+
     [Fact]
-    public void Enqueue_NullPacket_Throws()
+    public void Drain_InvalidMaxItems_Throws()
     {
         var queue = new OutgoingPacketQueue();
 
-        var exception = Record.Exception(() => queue.Enqueue<TestOutgoingPacket>(1, null!));
+        var exception = Record.Exception(() => queue.Drain(0, _ => true));
+
+        Assert.IsType<ArgumentOutOfRangeException>(exception);
+    }
+
+    [Fact]
+    public void Drain_NullHandler_Throws()
+    {
+        var queue = new OutgoingPacketQueue();
+
+        var exception = Record.Exception(() => queue.Drain(1, null!));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -53,34 +75,12 @@ public class OutgoingPacketQueueTests
     }
 
     [Fact]
-    public void Drain_InvalidMaxItems_Throws()
+    public void Enqueue_NullPacket_Throws()
     {
         var queue = new OutgoingPacketQueue();
 
-        var exception = Record.Exception(() => queue.Drain(0, _ => true));
-
-        Assert.IsType<ArgumentOutOfRangeException>(exception);
-    }
-
-    [Fact]
-    public void Drain_NullHandler_Throws()
-    {
-        var queue = new OutgoingPacketQueue();
-
-        var exception = Record.Exception(() => queue.Drain(1, null!));
+        var exception = Record.Exception(() => queue.Enqueue<TestOutgoingPacket>(1, null!));
 
         Assert.IsType<ArgumentNullException>(exception);
-    }
-
-    private sealed class TestOutgoingPacket : BaseGameNetworkPacket
-    {
-        public TestOutgoingPacket(byte opCode)
-            : base(opCode, 1) { }
-
-        public override void Write(ref SpanWriter writer)
-            => writer.Write(OpCode);
-
-        protected override bool ParsePayload(ref SpanReader reader)
-            => true;
     }
 }

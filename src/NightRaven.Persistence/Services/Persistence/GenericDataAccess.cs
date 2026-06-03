@@ -51,6 +51,14 @@ public class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey>
         }
     }
 
+    public ValueTask<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
+    {
+        lock (_stateStore.SyncRoot)
+        {
+            return ValueTask.FromResult(Bucket().TryGetValue(id, out var entity) ? _descriptor.Clone(entity) : default);
+        }
+    }
+
     public IQueryable<TEntity> Query()
     {
         lock (_stateStore.SyncRoot)
@@ -62,14 +70,6 @@ public class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey>
                          .ToArray();
 
             return clones.AsQueryable();
-        }
-    }
-
-    public ValueTask<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
-    {
-        lock (_stateStore.SyncRoot)
-        {
-            return ValueTask.FromResult(Bucket().TryGetValue(id, out var entity) ? _descriptor.Clone(entity) : default);
         }
     }
 

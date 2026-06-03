@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Data.Network;
+using NightRaven.Abstractions.Data.Network;
 
 namespace NightRaven.Tests.Hosting.Network;
 

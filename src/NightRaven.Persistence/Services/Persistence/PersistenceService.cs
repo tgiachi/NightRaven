@@ -1,10 +1,11 @@
+using NightRaven.Abstractions.Data.Metrics;
+using NightRaven.Abstractions.Data.Persistence;
+using NightRaven.Abstractions.Interfaces.Events;
+using NightRaven.Abstractions.Interfaces.Metrics;
+using NightRaven.Abstractions.Interfaces.Services;
+using NightRaven.Abstractions.Interfaces.Timing;
+using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Core.Ids;
-using NightRaven.Hosting.Data.Metrics;
-using NightRaven.Hosting.Data.Persistence;
-using NightRaven.Hosting.Interfaces.Metrics;
-using NightRaven.Hosting.Interfaces.Services;
-using NightRaven.Hosting.Interfaces.Timing;
-using NightRaven.Hosting.Types.Metrics;
 using NightRaven.Persistence.Data;
 using NightRaven.Persistence.Data.Events;
 using NightRaven.Persistence.Interfaces.Persistence;
@@ -57,24 +58,7 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
             _config.AutosaveInterval,
             SaveSnapshotTimerCallback,
             _config.AutosaveInterval,
-            repeat: true
-        );
-    }
-
-    private void SaveSnapshotTimerCallback()
-    {
-        _ = Task.Run(
-            async () =>
-            {
-                try
-                {
-                    await SaveSnapshotAsync(CancellationToken.None);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Autosave snapshot failed");
-                }
-            }
+            true
         );
     }
 
@@ -111,13 +95,13 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
         _snapshot.Dispose();
     }
 
-    public IDataAccess<TEntity, TKey> GetDataAccess<TEntity, TKey>()
-        where TKey : notnull
-        => new GenericDataAccess<TEntity, TKey>(_stateStore, _journal, _registry.GetDescriptor<TEntity, TKey>());
-
     public IAutoDataAccess<TEntity, TKey> GetAutoDataAccess<TEntity, TKey>()
         where TKey : struct, IAutoIncrementKey<TKey>
         => new AutoDataAccess<TEntity, TKey>(_stateStore, _journal, _registry.GetDescriptor<TEntity, TKey>());
+
+    public IDataAccess<TEntity, TKey> GetDataAccess<TEntity, TKey>()
+        where TKey : notnull
+        => new GenericDataAccess<TEntity, TKey>(_stateStore, _journal, _registry.GetDescriptor<TEntity, TKey>());
 
     public async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -229,10 +213,6 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
     public ValueTask StopWithoutSnapshotAsync()
         => ValueTask.CompletedTask;
 
-    private Task PublishSnapshotEventAsync<TEvent>(TEvent evt, CancellationToken cancellationToken)
-        where TEvent : NightRaven.Hosting.Interfaces.Events.IAsyncEvent
-        => _eventBus?.PublishAsync(evt, cancellationToken) ?? Task.CompletedTask;
-
     private IInternalEntityApplier Applier(ushort typeId)
     {
         if (!_registry.IsRegistered(typeId))
@@ -262,10 +242,29 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
         }
     }
 
+    private Task PublishSnapshotEventAsync<TEvent>(TEvent evt, CancellationToken cancellationToken)
+        where TEvent : IAsyncEvent
+        => _eventBus?.PublishAsync(evt, cancellationToken) ?? Task.CompletedTask;
+
     private void RegisterDescriptor(IPersistenceEntityDescriptor descriptor)
     {
         var method = typeof(PersistenceEntityRegistry).GetMethod(nameof(PersistenceEntityRegistry.Register))!
                                                       .MakeGenericMethod(descriptor.EntityType, descriptor.KeyType);
         method.Invoke(_registry, [descriptor]);
     }
+
+    private void SaveSnapshotTimerCallback()
+        => _ = Task.Run(
+               async () =>
+               {
+                   try
+                   {
+                       await SaveSnapshotAsync(CancellationToken.None);
+                   }
+                   catch (Exception ex)
+                   {
+                       _logger.Error(ex, "Autosave snapshot failed");
+                   }
+               }
+           );
 }

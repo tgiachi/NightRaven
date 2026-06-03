@@ -17,10 +17,8 @@ public sealed class LoadedPlugin
         PluginDirectory = Path.GetFullPath(pluginDirectory);
         Instance = instance;
         Assembly = assembly;
-        Metadata = instance.Metadata
-            ?? throw new InvalidOperationException(
-                $"Plugin {instance.GetType().FullName} returned null metadata."
-            );
+        Metadata = instance.Metadata ??
+                   throw new InvalidOperationException($"Plugin {instance.GetType().FullName} returned null metadata.");
     }
 
     /// <summary>Absolute directory containing the plugin package.</summary>

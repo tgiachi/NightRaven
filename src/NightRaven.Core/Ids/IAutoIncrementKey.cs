@@ -17,5 +17,5 @@ public interface IAutoIncrementKey<TSelf> : IAutoIncrementKey
     where TSelf : struct, IAutoIncrementKey<TSelf>
 {
     /// <summary>Creates a key from the given sequence value.</summary>
-    static abstract TSelf FromSequence(ulong value);
+    abstract static TSelf FromSequence(ulong value);
 }

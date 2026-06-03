@@ -1,4 +1,4 @@
-using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Server.Data.Events;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -19,9 +19,7 @@ public sealed class SeedServerStartedHandler : ITickEventHandler<ServerStartedEv
     }
 
     public void Handle(ServerStartedEvent evt)
-    {
-        _ = Task.Run(RunSeedsAsync);
-    }
+        => _ = Task.Run(RunSeedsAsync);
 
     private async Task RunSeedsAsync()
     {
