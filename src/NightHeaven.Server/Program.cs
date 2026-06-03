@@ -68,6 +68,9 @@ await ConsoleApp.RunAsync(
         builder.Services.AddNightHeavenNetwork();
         builder.Services.AddMetricProvider<NetworkService>();
 
+        // Lua scripting engine (priority 30); runs on the DryIoc-backed host.
+        builder.Services.AddNightHeavenLuaScripting(directoriesConfig);
+
         var app = builder.Build();
 
         // Publish a tick event the moment the host is up; the handler logs the thread it runs on.

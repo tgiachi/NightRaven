@@ -589,3 +589,6 @@ definitions.lua
 
 dist/
 benchmarks/.compare
+
+# Runtime data dir created by the server on first run
+src/NightHeaven.Server/night_heaven/
