@@ -14,4 +14,8 @@
         <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="NightHeaven.Tests" />
+    </ItemGroup>
+
 </Project>
