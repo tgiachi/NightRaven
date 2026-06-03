@@ -7,24 +7,16 @@ namespace NightHeaven.Hosting.Data.Internal;
 public sealed class ConfigSectionRegistration
 {
     private readonly Func<object> _defaultFactory;
-    private readonly Func<string, object> _bind;
 
-    public ConfigSectionRegistration(
-        string name,
-        Type type,
-        Func<object> defaultFactory,
-        Func<string, object> bind
-    )
+    public ConfigSectionRegistration(string name, Type type, Func<object> defaultFactory)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(defaultFactory);
-        ArgumentNullException.ThrowIfNull(bind);
 
         Name = name;
         Type = type;
         _defaultFactory = defaultFactory;
-        _bind = bind;
     }
 
     /// <summary>TOML table name for this section (e.g. <c>persistence</c>).</summary>
@@ -36,8 +28,4 @@ public sealed class ConfigSectionRegistration
     /// <summary>Creates a fresh default instance of the config.</summary>
     public object CreateDefault()
         => _defaultFactory();
-
-    /// <summary>Binds a TOML section body to a typed config instance.</summary>
-    public object Bind(string sectionToml)
-        => _bind(sectionToml);
 }
