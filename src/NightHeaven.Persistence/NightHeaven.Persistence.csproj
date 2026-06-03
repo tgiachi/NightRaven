@@ -12,6 +12,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj" />
+        <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -3,6 +3,7 @@ using MessagePack.Formatters;
 using MessagePack.Resolvers;
 using NightHeaven.Persistence.Formatters;
 using NightHeaven.Persistence.Interfaces.Persistence;
+using NightHeaven.Persistence.Internal;
 
 namespace NightHeaven.Persistence.Data;
 
@@ -11,7 +12,8 @@ namespace NightHeaven.Persistence.Data;
 /// (<see cref="SerialMessagePackFormatter" /> first, then contractless), so plain POCO entities —
 /// including those with <c>Serial</c> fields/keys — need no attributes.
 /// </summary>
-public sealed class PersistenceEntityDescriptor<TEntity, TKey> : IPersistenceEntityDescriptor<TEntity, TKey>
+public sealed class PersistenceEntityDescriptor<TEntity, TKey>
+    : IPersistenceEntityDescriptor<TEntity, TKey>, IInternalEntityApplier
     where TKey : notnull
 {
     internal static readonly MessagePackSerializerOptions SerializerOptions =
@@ -69,4 +71,45 @@ public sealed class PersistenceEntityDescriptor<TEntity, TKey> : IPersistenceEnt
 
     public IReadOnlyList<TEntity> DeserializeBucket(byte[] payload)
         => MessagePackSerializer.Deserialize<List<TEntity>>(payload, SerializerOptions) ?? [];
+
+    void IInternalEntityApplier.ApplyUpsert(PersistenceStateStore stateStore, byte[] payload)
+    {
+        var entity = DeserializeEntity(payload);
+        stateStore.GetBucket<TEntity, TKey>(TypeId)[GetKey(entity)] = entity;
+    }
+
+    void IInternalEntityApplier.ApplyRemove(PersistenceStateStore stateStore, byte[] payload)
+        => stateStore.GetBucket<TEntity, TKey>(TypeId).Remove(DeserializeKey(payload));
+
+    EntitySnapshotBucket? IInternalEntityApplier.CaptureBucket(PersistenceStateStore stateStore)
+    {
+        var entities = stateStore.GetBucket<TEntity, TKey>(TypeId).Values.ToArray();
+
+        if (entities.Length == 0)
+        {
+            return null;
+        }
+
+        return new()
+        {
+            TypeId = TypeId,
+            TypeName = TypeName,
+            SchemaVersion = SchemaVersion,
+            Payload = SerializeBucket(entities)
+        };
+    }
+
+    void IInternalEntityApplier.LoadBucket(PersistenceStateStore stateStore, EntitySnapshotBucket bucket)
+    {
+        var typed = stateStore.GetBucket<TEntity, TKey>(TypeId);
+        typed.Clear();
+
+        foreach (var entity in DeserializeBucket(bucket.Payload))
+        {
+            typed[GetKey(entity)] = entity;
+        }
+    }
+
+    int IInternalEntityApplier.Count(PersistenceStateStore stateStore)
+        => stateStore.GetBucket<TEntity, TKey>(TypeId).Count;
 }
