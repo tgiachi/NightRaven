@@ -18,17 +18,11 @@ public static class NetworkContainerExtensions
     /// to have been registered earlier.
     /// </summary>
     /// <param name="container">DryIoc container.</param>
-    /// <param name="configure">Optional callback to customize <see cref="NetworkConfig" />.</param>
-    public static IContainer AddNightHeavenNetwork(
-        this IContainer container,
-        Action<NetworkConfig>? configure = null
-    )
+    public static IContainer AddNightHeavenNetwork(this IContainer container)
     {
         container.AddNightHeavenHosting();
 
-        var config = new NetworkConfig();
-        configure?.Invoke(config);
-        container.RegisterInstance(config);
+        container.RegisterConfigSection<NetworkConfig>("network", () => new NetworkConfig());
 
         container.Register<ISessionService, SessionService>(Reuse.Singleton);
         container.AddNightHeavenService<INetworkService, NetworkService>(NetworkServicePriority);

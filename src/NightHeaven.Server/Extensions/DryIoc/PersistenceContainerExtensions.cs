@@ -49,17 +49,11 @@ public static class PersistenceContainerExtensions
         /// open-generic <see cref="IDataAccess{TEntity,TKey}" />.
         /// </summary>
         /// <param name="saveDirectory">Directory for snapshot/journal files.</param>
-        /// <param name="configure">Optional callback to customize <see cref="PersistenceConfig" />.</param>
-        public IContainer AddNightHeavenPersistence(
-            string saveDirectory,
-            Action<PersistenceConfig>? configure = null
-        )
+        public IContainer AddNightHeavenPersistence(string saveDirectory)
         {
             container.AddNightHeavenHosting();
 
-            var config = new PersistenceConfig();
-            configure?.Invoke(config);
-            container.RegisterInstance(config);
+            container.RegisterConfigSection<PersistenceConfig>("persistence", () => new PersistenceConfig());
 
             // Ensure a (possibly empty) registration list exists even when no entity was registered.
             if (!container.IsRegistered<List<PersistenceEntityRegistration>>())

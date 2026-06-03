@@ -16,17 +16,11 @@ public static class TimerContainerExtensions
     /// Registers <see cref="TimerWheelService" /> with the NightHeaven hosting orchestrator.
     /// </summary>
     /// <param name="container">DryIoc container.</param>
-    /// <param name="configure">Optional callback to customize <see cref="TimerWheelConfig" />.</param>
-    public static IContainer AddNightHeavenTimerWheel(
-        this IContainer container,
-        Action<TimerWheelConfig>? configure = null
-    )
+    public static IContainer AddNightHeavenTimerWheel(this IContainer container)
     {
         container.AddNightHeavenHosting();
 
-        var config = new TimerWheelConfig();
-        configure?.Invoke(config);
-        container.RegisterInstance(config);
+        container.RegisterConfigSection<TimerWheelConfig>("timing", () => new TimerWheelConfig());
 
         container.AddNightHeavenService<ITimerService, TimerWheelService>(TimerWheelPriority);
 

@@ -34,17 +34,11 @@ public static class EventBusContainerExtensions
     /// NightHeaven hosting orchestrator.
     /// </summary>
     /// <param name="container">DryIoc container.</param>
-    /// <param name="configure">Optional callback to customize <see cref="GameLoopConfig" />.</param>
-    public static IContainer AddNightHeavenEventBus(
-        this IContainer container,
-        Action<GameLoopConfig>? configure = null
-    )
+    public static IContainer AddNightHeavenEventBus(this IContainer container)
     {
         container.AddNightHeavenHosting();
 
-        var config = new GameLoopConfig();
-        configure?.Invoke(config);
-        container.RegisterInstance(config);
+        container.RegisterConfigSection<GameLoopConfig>("game_loop", () => new GameLoopConfig());
 
         container.AddNightHeavenService<IEventBusService, EventBusService>(EventBusPriority);
         container.AddNightHeavenService<IGameLoopService, GameLoopService>(GameLoopPriority);

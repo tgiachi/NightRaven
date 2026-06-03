@@ -30,17 +30,11 @@ public static class MetricsContainerExtensions
     /// <see cref="Hosting.Interfaces.Timing.ITimerService" /> is resolvable.
     /// </summary>
     /// <param name="container">DryIoc container.</param>
-    /// <param name="configure">Optional callback to customize <see cref="MetricsConfig" />.</param>
-    public static IContainer AddNightHeavenMetrics(
-        this IContainer container,
-        Action<MetricsConfig>? configure = null
-    )
+    public static IContainer AddNightHeavenMetrics(this IContainer container)
     {
         container.AddNightHeavenHosting();
 
-        var config = new MetricsConfig();
-        configure?.Invoke(config);
-        container.RegisterInstance(config);
+        container.RegisterConfigSection<MetricsConfig>("metrics", () => new MetricsConfig());
 
         container.AddNightHeavenService<IMetricsService, MetricsService>(MetricsServicePriority);
 
