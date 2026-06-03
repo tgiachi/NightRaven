@@ -1,0 +1,23 @@
+using DryIoc;
+using NightRaven.Hosting.Data.Logging;
+
+namespace NightRaven.Server.Extensions.DryIoc;
+
+/// <summary>
+/// DryIoc-native registration helpers for logging configuration.
+/// </summary>
+public static class LoggerContainerExtensions
+{
+    extension(IContainer container)
+    {
+        /// <summary>
+        /// Registers the logger TOML config section.
+        /// </summary>
+        public IContainer AddNightRavenLogging()
+        {
+            container.RegisterConfigSection("logger", () => new LoggerConfig());
+
+            return container;
+        }
+    }
+}

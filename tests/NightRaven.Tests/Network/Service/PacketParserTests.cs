@@ -76,6 +76,27 @@ public class PacketParserTests
     }
 
     [Fact]
+    public void Append_SingleFixedPacket_PassesRawPacketToCallback()
+    {
+        var (parser, metrics, captured, pending) = Setup();
+        byte[]? raw = null;
+
+        parser.Append(
+            pending,
+            [0x06, 0, 0, 0, 0x2A],
+            metrics,
+            (_, packet, rawPacket) =>
+            {
+                captured.Add(packet);
+                raw = rawPacket;
+            }
+        );
+
+        Assert.Single(captured);
+        Assert.Equal(new byte[] { 0x06, 0, 0, 0, 0x2A }, raw);
+    }
+
+    [Fact]
     public void Append_TwoFixedPacketsInOneBuffer_InvokesCallbackTwice()
     {
         var (parser, metrics, captured, pending) = Setup();
@@ -150,8 +171,8 @@ public class PacketParserTests
         Assert.Equal(2, pending.Count);
     }
 
-    private static Action<byte, IGameNetworkPacket> Capture(List<IGameNetworkPacket> sink)
-        => (_, packet) => sink.Add(packet);
+    private static Action<byte, IGameNetworkPacket, byte[]> Capture(List<IGameNetworkPacket> sink)
+        => (_, packet, _) => sink.Add(packet);
 
     private static (PacketParser parser, NetworkParserSessionMetrics metrics, List<IGameNetworkPacket> captured, List<byte>
         pending) Setup(

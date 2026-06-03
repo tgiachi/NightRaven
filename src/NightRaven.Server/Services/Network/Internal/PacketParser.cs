@@ -37,7 +37,7 @@ internal sealed class PacketParser
         List<byte> pendingBytes,
         byte[] incoming,
         NetworkParserSessionMetrics metrics,
-        Action<byte, IGameNetworkPacket> onPacket
+        Action<byte, IGameNetworkPacket, byte[]> onPacket
     )
     {
         metrics.AddReceivedBytes(incoming.Length);
@@ -58,7 +58,7 @@ internal sealed class PacketParser
     private void ParseAvailable(
         List<byte> pendingBytes,
         NetworkParserSessionMetrics metrics,
-        Action<byte, IGameNetworkPacket> onPacket
+        Action<byte, IGameNetworkPacket, byte[]> onPacket
     )
     {
         while (pendingBytes.Count > 0)
@@ -126,7 +126,7 @@ internal sealed class PacketParser
             }
 
             metrics.IncrementParsedPackets();
-            onPacket(opCode, packet);
+            onPacket(opCode, packet, rawPacket);
         }
     }
 

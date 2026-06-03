@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
 using System.Net;
+using System.Text;
 using NightRaven.Core.Utils;
+using NightRaven.Hosting.Data.Logging;
 using NightRaven.Hosting.Data.Metrics;
 using NightRaven.Hosting.Data.Network;
 using NightRaven.Hosting.Interfaces.Metrics;
@@ -30,6 +32,7 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
     private readonly IEventBusService _eventBus;
     private readonly ISessionService _sessions;
     private readonly NetworkConfig _config;
+    private readonly LoggerConfig _loggerConfig;
     private readonly PacketParser _parser;
 
     private readonly List<NightRavenTCPServer> _tcpServers = [];
@@ -46,12 +49,14 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         IEventBusService eventBus,
         ISessionService sessions,
         PacketRegistry packetRegistry,
-        NetworkConfig config
+        NetworkConfig config,
+        LoggerConfig? loggerConfig = null
     )
     {
         _eventBus = eventBus;
         _sessions = sessions;
         _config = config;
+        _loggerConfig = loggerConfig ?? new();
         _parser = new(packetRegistry, config.MaxPendingBufferBytes, config.MaxDeclaredPacketLength);
     }
 
@@ -221,10 +226,76 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
                 pendingBytes,
                 data,
                 metrics,
-                (opCode, packet) =>
-                    _eventBus.Publish(new PacketReceivedEvent(session.SessionId, opCode, packet, DateTimeOffset.UtcNow))
+                (opCode, packet, rawPacket) =>
+                {
+                    if (_loggerConfig.LogPackets)
+                    {
+                        _logger.Information(
+                            "<< packet Session={SessionId} OpCode=0x{OpCode:X2} Name={PacketName} Length={Length}{NewLine}{Dump}",
+                            session.SessionId,
+                            opCode,
+                            packet.GetType().Name,
+                            rawPacket.Length,
+                            Environment.NewLine,
+                            BuildHexDump(rawPacket)
+                        );
+                    }
+
+                    _eventBus.Publish(new PacketReceivedEvent(session.SessionId, opCode, packet, DateTimeOffset.UtcNow));
+                }
             )
         );
+    }
+
+    private static string BuildHexDump(ReadOnlySpan<byte> data)
+    {
+        if (data.IsEmpty)
+        {
+            return "<empty>";
+        }
+
+        var builder = new StringBuilder((data.Length / 16 + 1) * 80);
+
+        for (var i = 0; i < data.Length; i += 16)
+        {
+            var lineLength = Math.Min(16, data.Length - i);
+            builder.Append(i.ToString("X4"));
+            builder.Append("  ");
+
+            for (var j = 0; j < 16; j++)
+            {
+                if (j < lineLength)
+                {
+                    builder.Append(data[i + j].ToString("X2"));
+                }
+                else
+                {
+                    builder.Append("  ");
+                }
+
+                if (j != 15)
+                {
+                    builder.Append(' ');
+                }
+            }
+
+            builder.Append("  |");
+
+            for (var j = 0; j < lineLength; j++)
+            {
+                var value = data[i + j];
+                builder.Append(value is >= 32 and <= 126 ? (char)value : '.');
+            }
+
+            builder.Append('|');
+
+            if (i + lineLength < data.Length)
+            {
+                builder.AppendLine();
+            }
+        }
+
+        return builder.ToString();
     }
 
     private void RunIngressLoop()

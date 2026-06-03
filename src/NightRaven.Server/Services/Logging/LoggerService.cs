@@ -1,0 +1,35 @@
+using NightRaven.Core.Extensions.Logger;
+using NightRaven.Hosting.Data.Logging;
+using Serilog;
+using Serilog.Core;
+
+namespace NightRaven.Server.Services.Logging;
+
+/// <summary>
+/// Builds the server logger from TOML configuration.
+/// </summary>
+public static class LoggerService
+{
+    /// <summary>
+    /// Creates a Serilog logger using the configured level and sinks.
+    /// </summary>
+    public static Logger CreateLogger(LoggerConfig config, string logsDirectory)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+        ArgumentException.ThrowIfNullOrWhiteSpace(logsDirectory);
+
+        var builder = new LoggerConfiguration()
+                      .MinimumLevel
+                      .Is(config.Level.ToSerilogLogLevel())
+                      .WriteTo
+                      .Console();
+
+        if (config.WriteToFile)
+        {
+            Directory.CreateDirectory(logsDirectory);
+            builder.WriteTo.File(Path.Combine(logsDirectory, config.FileName));
+        }
+
+        return builder.CreateLogger();
+    }
+}

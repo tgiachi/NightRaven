@@ -17,6 +17,7 @@ using NightRaven.Server.Extensions.DryIoc;
 using NightRaven.Server.Services.Diagnostics;
 using NightRaven.Server.Services.EventBus;
 using NightRaven.Server.Services.GameLoop;
+using NightRaven.Server.Services.Logging;
 using NightRaven.Server.Services.Network;
 using NightRaven.Server.Services.Timing;
 using Serilog;
@@ -78,6 +79,9 @@ await ConsoleApp.RunAsync(
             {
                 container.RegisterInstance(packetRegistry);
 
+                // Logger config is loaded with the rest of the TOML sections, then applied immediately.
+                container.AddNightRavenLogging();
+
                 // Event bus + game loop (priority 0 / 10) and the diagnostic handler.
                 container.AddNightRavenEventBus();
                 container.AddTickEventHandler<ServerStartedHandler, ServerStartedEvent>();
@@ -113,6 +117,10 @@ await ConsoleApp.RunAsync(
                 // Load the root TOML config once and register every section as a DI instance. Must run after
                 // all RegisterConfigSection calls (each module helper declares its section).
                 container.AddNightRavenConfig(RuntimePaths.ResolveConfigPath(directoriesConfig));
+                Log.Logger = LoggerService.CreateLogger(
+                    container.Resolve<NightRaven.Hosting.Data.Logging.LoggerConfig>(),
+                    directoriesConfig[DirectoryType.Logs]
+                );
             }
         );
 
