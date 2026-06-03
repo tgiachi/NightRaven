@@ -22,6 +22,10 @@ mono_crash.*
 imgui.ini
 *.db
 
+# Local agent/tooling state
+.codegraph/
+docs/superpowers/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
