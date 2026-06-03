@@ -4,9 +4,11 @@ using DryIoc.Microsoft.DependencyInjection;
 using NightHeaven.Core.Data.Directories;
 using NightHeaven.Core.Types;
 using NightHeaven.Core.Utils;
+using NightHeaven.Hosting.Data.Persistence;
 using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Hosting.Internal;
 using NightHeaven.Network.UO.Registry;
+using NightHeaven.Persistence.Services.Persistence;
 using NightHeaven.Scripting.Lua.Extensions.Scripts;
 using NightHeaven.Scripting.Lua.Modules;
 using NightHeaven.Server.Data.Events;
@@ -81,6 +83,11 @@ await ConsoleApp.RunAsync(
                 container.AddMetricProvider<GameLoopService>();
                 container.AddMetricProvider<TimerWheelService>();
 
+
+                // Persistence (priority 15): snapshot + journal. No entities registered yet;
+                // modules will call RegisterPersistenceEntity<TEntity,TKey>(...) before this runs.
+                container.AddNightHeavenPersistence(directoriesConfig[DirectoryType.Save]);
+
                 // Network: TCP game listeners + UDP ping server + packet parser (priority 20).
                 container.AddNightHeavenNetwork();
                 container.AddMetricProvider<NetworkService>();
@@ -89,10 +96,6 @@ await ConsoleApp.RunAsync(
                 container.AddNightHeavenLuaScripting(directoriesConfig);
 
                 container.RegisterScriptModule<LogModule>();
-
-                // Persistence (priority 15): snapshot + journal. No entities registered yet;
-                // modules will call RegisterPersistenceEntity<TEntity,TKey>(...) before this runs.
-                container.AddNightHeavenPersistence(directoriesConfig[DirectoryType.Save]);
 
             }
         );

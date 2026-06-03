@@ -1,6 +1,7 @@
 using DryIoc;
 using NightHeaven.Core.Extensions.Container;
 using NightHeaven.Hosting.Data.Persistence;
+using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Hosting.Internal;
 using NightHeaven.Persistence.Data;
 using NightHeaven.Persistence.Interfaces.Persistence;
@@ -67,8 +68,10 @@ public static class PersistenceContainerExtensions
             }
 
             // The service ctor takes the save directory + config + accumulated registrations, so build it
-            // through a delegate rather than the convention helper (which assumes a resolvable ctor).
-            container.RegisterDelegate(
+            // through a delegate. Register it behind its interface only: the host container (MS DI rules)
+            // produces duplicate factories for RegisterDelegate, and the strict RegisterMapping rejects
+            // multiple factories — resolving through the interface uses last-registered and stays safe.
+            container.RegisterDelegate<IPersistenceService>(
                 resolver => new PersistenceService(
                     saveDirectory,
                     resolver.Resolve<PersistenceConfig>(),
@@ -76,14 +79,20 @@ public static class PersistenceContainerExtensions
                 ),
                 Reuse.Singleton
             );
-            container.RegisterMapping<IPersistenceService, PersistenceService>();
 
             // Drive start/stop through the orchestrator at priority 15 (after TimerWheel=3, before Network=20).
             container.RegisterDelegate(
-                resolver => new NightHeavenServiceDescriptor(resolver.Resolve<PersistenceService>(), PersistencePriority),
+                resolver => new NightHeavenServiceDescriptor(resolver.Resolve<IPersistenceService>(), PersistencePriority),
                 Reuse.Singleton,
                 ifAlreadyRegistered: IfAlreadyRegistered.AppendNewImplementation,
                 serviceKey: typeof(PersistenceService)
+            );
+
+            // Surface persistence metrics alongside the other providers (the singleton is an IMetricProvider).
+            container.RegisterDelegate<IMetricProvider>(
+                resolver => (IMetricProvider)resolver.Resolve<IPersistenceService>(),
+                Reuse.Singleton,
+                ifAlreadyRegistered: IfAlreadyRegistered.AppendNewImplementation
             );
 
             // Open-generic IDataAccess<,> resolves through the service's GetDataAccess factory method.
@@ -96,8 +105,6 @@ public static class PersistenceContainerExtensions
                 ),
                 setup: Setup.With(asResolutionCall: true)
             );
-
-            container.AddMetricProvider<PersistenceService>();
 
             return container;
         }
