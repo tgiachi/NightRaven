@@ -125,10 +125,12 @@ await ConsoleApp.RunAsync(
 
         app.UseHttpsRedirection();
 
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+
         app.MapNightHeavenMetrics();
+        app.MapFallbackToFile("index.html");
 
         app.Run();
     }
 );
-
-

@@ -1,6 +1,18 @@
 # syntax=docker/dockerfile:1.7
 
 # ---------------------------------------------------------------------------
+# Web build stage
+# ---------------------------------------------------------------------------
+FROM node:22-alpine AS web-build
+WORKDIR /web
+
+COPY ["web/package.json", "web/package-lock.json", "./"]
+RUN npm ci
+
+COPY web/ ./
+RUN npm run build
+
+# ---------------------------------------------------------------------------
 # Build stage
 # ---------------------------------------------------------------------------
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
@@ -13,6 +25,9 @@ COPY ["Directory.Build.props", "global.json", "./"]
 COPY ["src/NightHeaven.Core/NightHeaven.Core.csproj", "src/NightHeaven.Core/"]
 COPY ["src/NightHeaven.Hosting/NightHeaven.Hosting.csproj", "src/NightHeaven.Hosting/"]
 COPY ["src/NightHeaven.Network/NightHeaven.Network.csproj", "src/NightHeaven.Network/"]
+COPY ["src/NightHeaven.Network.UO/NightHeaven.Network.UO.csproj", "src/NightHeaven.Network.UO/"]
+COPY ["src/NightHeaven.Persistence/NightHeaven.Persistence.csproj", "src/NightHeaven.Persistence/"]
+COPY ["src/NightHeaven.Scripting.Lua/NightHeaven.Scripting.Lua.csproj", "src/NightHeaven.Scripting.Lua/"]
 COPY ["src/NightHeaven.Server/NightHeaven.Server.csproj", "src/NightHeaven.Server/"]
 RUN dotnet restore "src/NightHeaven.Server/NightHeaven.Server.csproj"
 
@@ -39,6 +54,7 @@ ENV NIGHTHEAVEN_ROOT=/data \
 
 WORKDIR /app
 COPY --from=build /app/publish .
+COPY --from=web-build /web/dist ./wwwroot
 
 # Pre-create the data dir owned by the non-root APP_UID baked into the
 # aspnet base image, then mark it as a persistent volume.
@@ -47,5 +63,7 @@ VOLUME ["/data"]
 
 USER $APP_UID
 EXPOSE 8080
+EXPOSE 2593/tcp
+EXPOSE 12000/udp
 
 ENTRYPOINT ["dotnet", "NightHeaven.Server.dll"]

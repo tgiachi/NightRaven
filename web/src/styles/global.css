@@ -1,4 +1,5 @@
 :root {
+  --font-uo: "UOFont", Cinzel, Georgia, serif;
   color-scheme: dark;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -9,6 +10,14 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: "UOFont";
+  src: url("../assets/fonts/UOFont.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 * {
@@ -411,5 +420,1231 @@ p {
 
   .main-nav a {
     padding: 9px;
+  }
+}
+
+/* NightHeaven player portal */
+
+.player-portal-shell {
+  --nh-bg: #0b0d0e;
+  --nh-panel: rgba(23, 24, 23, 0.92);
+  --nh-panel-2: rgba(31, 29, 25, 0.9);
+  --nh-border: rgba(195, 166, 102, 0.28);
+  --nh-border-soft: rgba(216, 210, 191, 0.12);
+  --nh-gold: #c7a76a;
+  --nh-gold-bright: #e4cc8b;
+  --nh-green: #6fd36a;
+  --nh-text: #eee8db;
+  --nh-muted: #a79f90;
+  --nh-quiet: #6f6b62;
+  --nh-uo-outline:
+    0 -1px #050505,
+    0 1px #050505,
+    -1px 0 #050505,
+    1px 0 #050505,
+    -1px 1px #050505,
+    1px -1px #050505,
+    -1px -1px #050505,
+    1px 1px #050505;
+  --nh-cursor: url("../assets/cursors/uo-cursor.png") 0 0, auto;
+  --nh-cursor-pointer: url("../assets/cursors/uo-cursor-pointer.png") 0 0, pointer;
+  display: grid;
+  grid-template-columns: 288px minmax(0, 1fr);
+  min-height: 100vh;
+  color: var(--nh-text);
+  background:
+    radial-gradient(circle at 52% -16%, rgba(199, 167, 106, 0.12), transparent 30rem),
+    linear-gradient(140deg, rgba(22, 21, 19, 0.78), rgba(4, 6, 7, 0.96)),
+    #080a0b;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  cursor: var(--nh-cursor);
+}
+
+.player-portal-shell a,
+.player-portal-shell button,
+.player-portal-shell summary,
+.player-portal-shell [role="button"] {
+  cursor: var(--nh-cursor-pointer);
+}
+
+.player-portal-shell input,
+.player-portal-shell textarea {
+  cursor: text;
+}
+
+.player-portal-shell h1,
+.player-portal-shell h2,
+.player-portal-shell h3,
+.player-brand-title {
+  font-family: Cinzel, Georgia, serif;
+  letter-spacing: 0;
+}
+
+.uo-text-outline {
+  text-shadow: var(--nh-uo-outline);
+}
+
+.player-sidebar {
+  position: sticky;
+  top: 0;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  min-height: 100vh;
+  border-right: 1px solid rgba(199, 167, 106, 0.22);
+  background:
+    linear-gradient(180deg, rgba(9, 12, 13, 0.94), rgba(9, 11, 12, 0.84)),
+    #0b0d0e;
+  box-shadow: inset -1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.player-brand {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 30px 22px 26px;
+  text-align: center;
+}
+
+.nh-crest {
+  width: 96px;
+  height: 96px;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.65));
+}
+
+.nh-crest-compact {
+  width: 48px;
+  height: 48px;
+}
+
+.nh-crest svg {
+  width: 100%;
+  height: 100%;
+}
+
+.nh-crest-wing,
+.nh-crest-shield {
+  fill: #161514;
+  stroke: #c8ab6e;
+  stroke-width: 2.6;
+}
+
+.nh-crest-shield {
+  fill: url("#nh-crest-fill");
+}
+
+.nh-crest-line,
+.nh-crest-sword {
+  fill: none;
+  stroke: #e2c985;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.player-brand-title {
+  color: var(--nh-text);
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow: 0 2px 16px rgba(199, 167, 106, 0.24);
+}
+
+.player-brand-subtitle {
+  color: var(--nh-gold);
+  font-family: var(--font-uo);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow: var(--nh-uo-outline);
+}
+
+.player-nav {
+  display: grid;
+  border-top: 1px solid rgba(199, 167, 106, 0.18);
+  border-bottom: 1px solid rgba(199, 167, 106, 0.18);
+}
+
+.player-nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 58px;
+  padding: 0 28px;
+  color: #bbb4a6;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  font-family: var(--font-uo);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow: var(--nh-uo-outline);
+}
+
+.player-nav a svg {
+  width: 21px;
+  height: 21px;
+}
+
+.player-nav a.active,
+.player-nav a:hover {
+  color: var(--nh-text);
+  border-left-color: var(--nh-gold);
+  background:
+    linear-gradient(90deg, rgba(199, 167, 106, 0.24), rgba(199, 167, 106, 0.02)),
+    rgba(199, 167, 106, 0.07);
+}
+
+.player-sidebar-art {
+  min-height: 270px;
+  margin-top: 26px;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(8, 10, 11, 0.18) 48%, rgba(8, 10, 11, 0.9) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.7), transparent 35%, rgba(0, 0, 0, 0.6)),
+    radial-gradient(circle at 52% 38%, rgba(199, 167, 106, 0.18), transparent 9rem),
+    linear-gradient(135deg, #15191b, #080a0b);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 95%);
+}
+
+.player-sidebar-art::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(to top, #070808 0 18%, transparent 18%),
+    linear-gradient(to top, transparent 0 42%, rgba(42, 45, 44, 0.85) 42% 48%, transparent 48%),
+    linear-gradient(90deg, transparent 0 14%, #15191b 14% 21%, transparent 21% 31%, #171a1b 31% 39%, transparent 39% 50%, #141719 50% 59%, transparent 59% 71%, #17191a 71% 82%, transparent 82%),
+    linear-gradient(to top, transparent 0 33%, rgba(20, 22, 23, 0.9) 33% 66%, transparent 66%);
+  opacity: 0.88;
+}
+
+.player-profile-strip {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 18px 24px;
+  border-top: 1px solid rgba(216, 210, 191, 0.1);
+}
+
+.player-profile-strip strong,
+.player-profile-strip span {
+  display: block;
+}
+
+.player-profile-strip strong {
+  font-family: Cinzel, Georgia, serif;
+  font-size: 16px;
+}
+
+.player-profile-strip span {
+  margin-top: 3px;
+  color: var(--nh-muted);
+  font-size: 12px;
+}
+
+.player-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  border: 0;
+  border-top: 1px solid rgba(216, 210, 191, 0.1);
+  color: var(--nh-gold);
+  background: rgba(0, 0, 0, 0.18);
+  font-family: var(--font-uo);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow: var(--nh-uo-outline);
+  cursor: var(--nh-cursor-pointer);
+}
+
+.player-content {
+  width: min(1540px, 100%);
+  padding: 14px 20px 18px;
+}
+
+.ornate-panel {
+  position: relative;
+  border: 1px solid var(--nh-border-soft);
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 42%),
+    var(--nh-panel);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.06),
+    0 18px 44px rgba(0, 0, 0, 0.3);
+}
+
+.ornate-panel::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  pointer-events: none;
+  border: 1px solid rgba(199, 167, 106, 0.1);
+  border-radius: 3px;
+}
+
+.player-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  align-items: center;
+  min-height: 84px;
+  padding: 18px 34px;
+}
+
+.player-topbar h1 {
+  max-width: none;
+  color: var(--nh-text);
+  font-size: 23px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.player-topbar h1 span {
+  color: var(--nh-gold-bright);
+  font-weight: 700;
+}
+
+.player-topbar p {
+  margin-top: 5px;
+  color: var(--nh-muted);
+  font-size: 14px;
+}
+
+.realm-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 28px;
+}
+
+.realm-kpis div {
+  min-width: 126px;
+  padding-left: 24px;
+  border-left: 1px solid rgba(216, 210, 191, 0.16);
+}
+
+.realm-kpis span,
+.realm-kpis strong {
+  display: block;
+}
+
+.realm-kpis span {
+  color: var(--nh-muted);
+  font-size: 12px;
+}
+
+.realm-kpis strong {
+  margin-top: 7px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.status-online {
+  color: var(--nh-green) !important;
+}
+
+.status-online::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 12px rgba(111, 211, 106, 0.54);
+}
+
+.player-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.85fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.realm-status-card,
+.account-summary-card,
+.characters-panel,
+.download-card,
+.news-card,
+.community-card {
+  padding: 24px;
+}
+
+.panel-title,
+.panel-title-row,
+.panel-title-row > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-title {
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(216, 210, 191, 0.12);
+}
+
+.panel-title-row {
+  justify-content: space-between;
+}
+
+.panel-title svg {
+  width: 20px;
+  height: 20px;
+  color: var(--nh-gold);
+}
+
+.panel-title h2 {
+  color: var(--nh-text);
+  font-family: var(--font-uo);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow: var(--nh-uo-outline);
+}
+
+.realm-status-card {
+  min-height: 210px;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(23, 24, 23, 0.98), rgba(23, 24, 23, 0.74) 55%, rgba(23, 24, 23, 0.94)),
+    radial-gradient(circle at 82% 42%, rgba(199, 167, 106, 0.12), transparent 14rem),
+    var(--nh-panel);
+}
+
+.realm-status-card::after {
+  content: "";
+  position: absolute;
+  right: 36px;
+  bottom: 38px;
+  width: 250px;
+  height: 120px;
+  opacity: 0.24;
+  background:
+    linear-gradient(to top, rgba(227, 220, 204, 0.24) 0 18%, transparent 18%),
+    linear-gradient(90deg, transparent 0 13%, rgba(227, 220, 204, 0.3) 13% 21%, transparent 21% 33%, rgba(227, 220, 204, 0.28) 33% 40%, transparent 40% 54%, rgba(227, 220, 204, 0.25) 54% 63%, transparent 63% 78%, rgba(227, 220, 204, 0.24) 78% 86%, transparent 86%),
+    linear-gradient(to top, transparent 0 48%, rgba(227, 220, 204, 0.22) 48% 58%, transparent 58%);
+}
+
+.realm-copy {
+  position: relative;
+  z-index: 1;
+  margin: 26px 0 28px;
+}
+
+.realm-copy p {
+  color: var(--nh-text);
+  font-size: 16px;
+}
+
+.realm-copy p strong {
+  color: var(--nh-green);
+}
+
+.realm-copy span {
+  display: block;
+  margin-top: 8px;
+  color: var(--nh-muted);
+  font-size: 13px;
+}
+
+.realm-feature-row {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid rgba(216, 210, 191, 0.12);
+}
+
+.realm-feature-row div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 12px;
+  align-items: center;
+  padding: 17px 18px 0;
+  border-right: 1px solid rgba(216, 210, 191, 0.12);
+}
+
+.realm-feature-row div:last-child {
+  border-right: 0;
+}
+
+.realm-feature-row svg {
+  grid-row: span 2;
+  width: 23px;
+  height: 23px;
+  color: var(--nh-gold);
+}
+
+.realm-feature-row span {
+  color: var(--nh-text);
+  font-size: 13px;
+}
+
+.realm-feature-row strong {
+  color: var(--nh-green);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.account-summary-card {
+  min-height: 210px;
+}
+
+.account-summary-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 170px;
+  gap: 20px;
+  align-items: center;
+  padding: 20px 0 12px;
+}
+
+.account-fields {
+  display: grid;
+  gap: 15px;
+}
+
+.account-fields div {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.account-fields span {
+  color: var(--nh-muted);
+  font-size: 13px;
+}
+
+.account-fields strong {
+  color: var(--nh-gold-bright);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.account-fields strong svg {
+  width: 15px;
+  height: 15px;
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+
+.account-fields small {
+  grid-column: 2;
+  margin-top: -8px;
+  color: var(--nh-muted);
+  font-size: 12px;
+}
+
+.account-medallion {
+  display: grid;
+  place-items: center;
+  width: 142px;
+  height: 142px;
+  margin-inline: auto;
+  border-radius: 999px;
+  border: 1px solid rgba(199, 167, 106, 0.34);
+  background:
+    radial-gradient(circle, rgba(199, 167, 106, 0.2), transparent 68%),
+    rgba(0, 0, 0, 0.22);
+}
+
+.metal-button,
+.gold-button,
+.link-button {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 36px;
+  padding: 0 18px;
+  border-radius: 4px;
+  font-family: var(--font-uo);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow: var(--nh-uo-outline);
+  cursor: var(--nh-cursor-pointer);
+}
+
+.metal-button {
+  border: 1px solid rgba(199, 167, 106, 0.34);
+  color: var(--nh-text);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+}
+
+.gold-button {
+  border: 1px solid rgba(236, 209, 133, 0.56);
+  color: #f8eed4;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 42%),
+    linear-gradient(180deg, #755220, #3d260f);
+}
+
+.link-button {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  color: var(--nh-gold);
+  background: transparent;
+}
+
+.metal-button svg,
+.gold-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.characters-panel {
+  grid-column: 1;
+}
+
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding-top: 20px;
+}
+
+.character-card {
+  position: relative;
+  min-height: 390px;
+  padding: 14px;
+  border: 1px solid rgba(199, 167, 106, 0.18);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent),
+    rgba(28, 27, 24, 0.92);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.character-banner {
+  position: absolute;
+  top: 0;
+  left: 14px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 62px;
+  color: var(--nh-gold-bright);
+  border: 1px solid rgba(199, 167, 106, 0.42);
+  background: #272019;
+  clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%);
+  font-family: var(--font-uo);
+  font-size: 20px;
+  font-weight: 800;
+  text-shadow: var(--nh-uo-outline);
+}
+
+.character-banner-star {
+  background: #2c2340;
+}
+
+.character-banner-stag {
+  background: #203329;
+}
+
+.character-card-heading {
+  padding: 12px 0 8px 60px;
+}
+
+.character-card-heading h3 {
+  color: var(--nh-gold-bright);
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.character-card-heading p {
+  margin-top: 4px;
+  color: var(--nh-muted);
+  font-size: 12px;
+}
+
+.character-portrait {
+  position: relative;
+  height: 236px;
+  margin: 10px 12px 18px;
+}
+
+.portrait-arch {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(216, 210, 191, 0.18);
+  border-radius: 50% 50% 5px 5px / 22% 22% 5px 5px;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(216, 210, 191, 0.09), transparent 46%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.16));
+}
+
+.portrait-figure {
+  position: absolute;
+  inset: 34px 0 0;
+  margin: auto;
+  width: 88px;
+  height: 170px;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.7));
+}
+
+.portrait-figure span {
+  position: absolute;
+  display: block;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.24), rgba(115, 113, 105, 0.8) 42%, rgba(38, 38, 35, 0.94));
+  border: 1px solid rgba(216, 210, 191, 0.22);
+}
+
+.figure-head {
+  left: 31px;
+  width: 26px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.figure-body {
+  top: 30px;
+  left: 24px;
+  width: 40px;
+  height: 78px;
+  clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
+}
+
+.figure-arm {
+  top: 42px;
+  width: 18px;
+  height: 86px;
+}
+
+.figure-arm-left {
+  left: 6px;
+  transform: rotate(16deg);
+}
+
+.figure-arm-right {
+  right: 6px;
+  transform: rotate(-16deg);
+}
+
+.figure-leg {
+  top: 105px;
+  width: 23px;
+  height: 62px;
+}
+
+.figure-leg-left {
+  left: 23px;
+}
+
+.figure-leg-right {
+  right: 23px;
+}
+
+.character-level {
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  min-width: 54px;
+  padding: 5px 10px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(199, 167, 106, 0.5);
+  border-radius: 4px;
+  color: var(--nh-gold-bright);
+  background: #19140f;
+  text-align: center;
+  font-family: var(--font-uo);
+  font-size: 20px;
+  font-weight: 700;
+  text-shadow: var(--nh-uo-outline);
+}
+
+.character-meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  align-items: center;
+}
+
+.character-meta strong {
+  grid-column: 1;
+  grid-row: 1;
+  color: var(--nh-text);
+  font-size: 13px;
+}
+
+.character-meta span {
+  grid-column: 1;
+  grid-row: 2;
+  color: var(--nh-green);
+  font-size: 12px;
+}
+
+.character-meta svg {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 18px;
+  height: 18px;
+  color: var(--nh-muted);
+}
+
+.character-card-empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 18px;
+  color: var(--nh-muted);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent),
+    rgba(18, 20, 20, 0.86);
+}
+
+.empty-character-mark {
+  display: grid;
+  place-items: center;
+  width: 110px;
+  height: 150px;
+  border: 1px solid rgba(216, 210, 191, 0.08);
+  border-radius: 50% 50% 4px 4px / 18% 18% 4px 4px;
+  color: rgba(199, 167, 106, 0.2);
+  font-size: 54px;
+}
+
+.player-side-column {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.download-card,
+.news-card,
+.community-card {
+  padding: 20px;
+}
+
+.download-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(216, 210, 191, 0.08);
+}
+
+.download-row:last-child {
+  border-bottom: 0;
+}
+
+.download-row > svg {
+  width: 34px;
+  height: 34px;
+  padding: 8px;
+  border: 1px solid rgba(216, 210, 191, 0.1);
+  border-radius: 4px;
+  color: var(--nh-gold);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.download-row strong,
+.download-row span,
+.download-row small {
+  display: block;
+}
+
+.download-row strong {
+  color: var(--nh-gold-bright);
+  font-size: 13px;
+}
+
+.download-row span,
+.download-row small {
+  color: var(--nh-muted);
+  font-size: 12px;
+}
+
+.news-list {
+  display: grid;
+}
+
+.news-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 14px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(216, 210, 191, 0.08);
+}
+
+.news-row:last-child {
+  border-bottom: 0;
+}
+
+.news-row > svg {
+  width: 34px;
+  height: 34px;
+  padding: 8px;
+  border: 1px solid rgba(199, 167, 106, 0.18);
+  border-radius: 4px;
+  color: var(--nh-gold);
+  background: rgba(199, 167, 106, 0.08);
+}
+
+.news-row time {
+  display: block;
+  color: var(--nh-quiet);
+  font-size: 11px;
+}
+
+.news-row strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--nh-gold-bright);
+  font-size: 13px;
+}
+
+.news-row p {
+  margin-top: 3px;
+  color: var(--nh-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.community-links {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding-top: 16px;
+}
+
+.community-links a {
+  color: var(--nh-text);
+  text-decoration: none;
+  font-family: var(--font-uo);
+  font-size: 20px;
+  font-weight: 700;
+  text-shadow: var(--nh-uo-outline);
+}
+
+.community-links span {
+  display: block;
+  margin-top: 3px;
+  color: var(--nh-muted);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.player-footer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 18px;
+  min-height: 58px;
+  margin-top: 18px;
+  padding: 0 18px;
+  border: 1px solid rgba(216, 210, 191, 0.08);
+  border-radius: 4px;
+  color: var(--nh-quiet);
+  background: rgba(0, 0, 0, 0.22);
+  font-size: 11px;
+}
+
+.player-footer > div:first-child {
+  display: flex;
+  gap: 24px;
+}
+
+.player-footer > span:last-child {
+  text-align: right;
+}
+
+.footer-mark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--nh-gold);
+  font-family: var(--font-uo);
+  font-size: 20px;
+  font-weight: 700;
+  text-shadow: var(--nh-uo-outline);
+}
+
+.footer-mark svg {
+  width: 18px;
+  height: 18px;
+}
+
+.player-login-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
+  gap: 22px;
+  min-height: calc(100vh - 92px);
+  align-items: center;
+}
+
+.player-login-copy,
+.player-login-panel {
+  padding: 30px;
+}
+
+.player-login-copy {
+  display: grid;
+  gap: 18px;
+  overflow: hidden;
+}
+
+.player-login-copy::after {
+  content: "";
+  position: absolute;
+  right: 36px;
+  bottom: 32px;
+  width: 280px;
+  height: 150px;
+  opacity: 0.18;
+  background:
+    linear-gradient(to top, rgba(227, 220, 204, 0.28) 0 18%, transparent 18%),
+    linear-gradient(90deg, transparent 0 12%, rgba(227, 220, 204, 0.28) 12% 22%, transparent 22% 38%, rgba(227, 220, 204, 0.28) 38% 50%, transparent 50% 65%, rgba(227, 220, 204, 0.28) 65% 78%, transparent 78%);
+}
+
+.player-login-copy h1 {
+  max-width: 720px;
+  color: var(--nh-text);
+  font-size: clamp(42px, 5.5vw, 74px);
+  line-height: 0.96;
+}
+
+.player-login-copy .section-label {
+  font-family: var(--font-uo);
+  font-size: 20px;
+  letter-spacing: 0;
+  text-shadow: var(--nh-uo-outline);
+}
+
+.player-login-copy p {
+  max-width: 660px;
+  color: var(--nh-muted);
+  font-size: 16px;
+}
+
+.login-realm-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.login-realm-strip div {
+  padding: 14px;
+  border: 1px solid rgba(216, 210, 191, 0.1);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.login-realm-strip span,
+.login-realm-strip strong {
+  display: block;
+}
+
+.login-realm-strip span {
+  color: var(--nh-muted);
+  font-size: 12px;
+}
+
+.login-realm-strip strong {
+  margin-top: 8px;
+  color: var(--nh-text);
+  font-size: 15px;
+}
+
+.player-login-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.player-login-panel > p {
+  color: var(--nh-muted);
+  font-size: 14px;
+}
+
+.fantasy-field input {
+  border-color: rgba(199, 167, 106, 0.22);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
+    rgba(6, 7, 8, 0.7);
+}
+
+.login-submit {
+  width: 100%;
+  min-height: 46px;
+}
+
+@media (max-width: 1180px) {
+  .player-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-summary-card,
+  .characters-panel,
+  .player-side-column {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .character-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 920px) {
+  .player-portal-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .player-sidebar {
+    position: static;
+    min-height: auto;
+    grid-template-rows: auto auto;
+  }
+
+  .player-brand {
+    grid-template-columns: auto 1fr;
+    justify-items: start;
+    text-align: left;
+    padding: 16px;
+  }
+
+  .player-brand .nh-crest {
+    grid-row: span 2;
+    width: 54px;
+    height: 54px;
+  }
+
+  .player-brand-title {
+    align-self: end;
+    font-size: 22px;
+  }
+
+  .player-nav {
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .player-nav a {
+    flex: 0 0 auto;
+    min-height: 48px;
+    padding: 0 16px;
+  }
+
+  .player-sidebar-art,
+  .player-profile-strip,
+  .player-logout {
+    display: none;
+  }
+
+  .player-content {
+    padding: 14px;
+  }
+
+  .player-topbar,
+  .account-summary-content,
+  .player-login-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .player-topbar {
+    display: grid;
+  }
+
+  .realm-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .realm-kpis div {
+    min-width: 0;
+    padding-left: 12px;
+  }
+
+  .realm-feature-row,
+  .community-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .download-row {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .download-row button {
+    grid-column: 1 / -1;
+  }
+
+  .player-footer {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .player-footer > span:last-child {
+    text-align: left;
+  }
+}
+
+@media (max-width: 620px) {
+  .player-topbar,
+  .realm-status-card,
+  .account-summary-card,
+  .characters-panel,
+  .download-card,
+  .news-card,
+  .community-card,
+  .player-login-copy,
+  .player-login-panel {
+    padding: 18px;
+  }
+
+  .realm-kpis,
+  .realm-feature-row,
+  .character-grid,
+  .community-links,
+  .login-realm-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .player-nav a {
+    justify-content: center;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 8px;
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  .player-nav a svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .character-card {
+    min-height: 350px;
+  }
+
+  .account-fields div {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .account-fields small {
+    grid-column: auto;
+    margin-top: -4px;
   }
 }

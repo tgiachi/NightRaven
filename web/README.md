@@ -28,3 +28,11 @@ src/
 The current UI is intentionally a scaffold. It keeps player and admin routes
 separate, leaves backend auth enforcement to the server, and gives future API
 work stable places to land.
+
+## Font credits
+
+The player portal uses `UOFont.ttf` from Jackkv/UOFont as a local asset:
+https://github.com/Jackkv/UOFont
+
+UOFont is a fan project and is not affiliated with Electronic Arts or Broadsword.
+The themed cursor PNGs also come from Jackkv/UOFont's demo page assets.
