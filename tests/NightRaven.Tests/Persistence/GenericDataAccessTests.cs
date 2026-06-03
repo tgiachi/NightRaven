@@ -30,6 +30,20 @@ public class GenericDataAccessTests
     }
 
     [Fact]
+    public async Task Query_ReturnsDetachedQueryableClones()
+    {
+        var access = NewAccess(out _, out _);
+        await access.UpsertAsync(new() { Id = new(1), Name = "active", Level = 10 });
+        await access.UpsertAsync(new() { Id = new(2), Name = "inactive", Level = 1 });
+
+        var queried = access.Query().Where(player => player.Level >= 10).ToArray();
+        queried[0].Name = "mutated";
+
+        Assert.Single(queried);
+        Assert.Equal("active", (await access.GetByIdAsync(new(1)))!.Name);
+    }
+
+    [Fact]
     public async Task Remove_Existing_ReturnsTrueAndAppendsRemoveEntry()
     {
         var access = NewAccess(out var journal, out _);

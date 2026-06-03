@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj"/>
+        <ProjectReference Include="..\NightRaven.Hosting\NightRaven.Hosting.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
