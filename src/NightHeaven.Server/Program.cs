@@ -90,6 +90,10 @@ await ConsoleApp.RunAsync(
 
                 container.RegisterScriptModule<LogModule>();
 
+                // Persistence (priority 15): snapshot + journal. No entities registered yet;
+                // modules will call RegisterPersistenceEntity<TEntity,TKey>(...) before this runs.
+                container.AddNightHeavenPersistence(directoriesConfig[DirectoryType.Save]);
+
             }
         );
 
