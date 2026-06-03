@@ -7,5 +7,8 @@
     <Project Path="src/NightHeaven.Network.UO/NightHeaven.Network.UO.csproj" />
     <Project Path="src/NightHeaven.Network/NightHeaven.Network.csproj" />
     <Project Path="src/NightHeaven.Server/NightHeaven.Server.csproj" />
+    <Project Path="tests/NightHeaven.PluginFixtures.Basic/NightHeaven.PluginFixtures.Basic.csproj" />
+    <Project Path="tests/NightHeaven.PluginFixtures.Empty/NightHeaven.PluginFixtures.Empty.csproj" />
+    <Project Path="tests/NightHeaven.PluginFixtures.Multiple/NightHeaven.PluginFixtures.Multiple.csproj" />
     <Project Path="tests/NightHeaven.Tests/NightHeaven.Tests.csproj" />
 </Solution>

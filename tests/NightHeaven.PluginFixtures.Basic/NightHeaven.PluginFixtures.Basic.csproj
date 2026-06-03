@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\NightHeaven.Plugins\NightHeaven.Plugins.csproj"/>
+        <ProjectReference Include="..\..\src\NightHeaven.Server\NightHeaven.Server.csproj"/>
+        <ProjectReference Include="..\..\src\NightHeaven.Scripting.Lua\NightHeaven.Scripting.Lua.csproj"/>
+    </ItemGroup>
+
+</Project>
