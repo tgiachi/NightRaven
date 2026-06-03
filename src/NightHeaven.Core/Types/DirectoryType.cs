@@ -12,5 +12,6 @@ public enum DirectoryType
     Images,
     Logs,
     Cache,
-    Plugins
+    Plugins,
+    Config
 }
