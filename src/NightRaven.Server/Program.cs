@@ -89,8 +89,10 @@ await ConsoleApp.RunAsync(
                 container.AddMetricProvider<GameLoopService>();
                 container.AddMetricProvider<TimerWheelService>();
 
-                // Persistence (priority 15): snapshot + journal. No entities registered yet;
-                // modules will call RegisterPersistenceEntity<TEntity,TKey>(...) before this runs.
+                // UO domain services register persisted entities before persistence starts.
+                container.AddNightRavenUsers();
+
+                // Persistence (priority 15): snapshot + journal.
                 container.AddNightRavenPersistence(directoriesConfig[DirectoryType.Save]);
 
                 // Network: TCP game listeners + UDP ping server + packet parser (priority 20).

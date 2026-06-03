@@ -51,6 +51,20 @@ public class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey>
         }
     }
 
+    public IQueryable<TEntity> Query()
+    {
+        lock (_stateStore.SyncRoot)
+        {
+            var clones = Bucket()
+                         .Values
+                         .AsValueEnumerable()
+                         .Select(_descriptor.Clone)
+                         .ToArray();
+
+            return clones.AsQueryable();
+        }
+    }
+
     public ValueTask<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
     {
         lock (_stateStore.SyncRoot)
