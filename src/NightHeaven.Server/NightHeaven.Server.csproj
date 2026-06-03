@@ -31,6 +31,7 @@
         <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj" />
         <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj" />
         <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj" />
+        <ProjectReference Include="..\NightHeaven.Persistence\NightHeaven.Persistence.csproj" />
         <ProjectReference Include="..\NightHeaven.Network.UO\NightHeaven.Network.UO.csproj" />
         <ProjectReference Include="..\NightHeaven.Scripting.Lua\NightHeaven.Scripting.Lua.csproj" />
     </ItemGroup>

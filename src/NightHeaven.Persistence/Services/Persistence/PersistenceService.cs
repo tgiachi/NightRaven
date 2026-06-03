@@ -209,5 +209,8 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
     }
 
     public void Dispose()
-        => _journal.DisposeAsync().AsTask().GetAwaiter().GetResult();
+    {
+        _journal.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        _snapshot.Dispose();
+    }
 }

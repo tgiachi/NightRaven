@@ -1,0 +1,100 @@
+using DryIoc;
+using NightHeaven.Core.Extensions.Container;
+using NightHeaven.Hosting.Data.Persistence;
+using NightHeaven.Hosting.Internal;
+using NightHeaven.Persistence.Data;
+using NightHeaven.Persistence.Interfaces.Persistence;
+using NightHeaven.Persistence.Services.Persistence;
+
+namespace NightHeaven.Server.Extensions.DryIoc;
+
+/// <summary>
+/// DryIoc-native registration helpers for the NightHeaven persistence engine.
+/// </summary>
+public static class PersistenceContainerExtensions
+{
+    private const int PersistencePriority = 15;
+
+    /// <summary>
+    /// Registers a persisted entity type. Accumulates a descriptor consumed by the persistence
+    /// service at boot. Call before <see cref="AddNightHeavenPersistence" />'s service starts.
+    /// </summary>
+    /// <param name="container">DryIoc container.</param>
+    /// <param name="typeId">Stable numeric identifier for the entity kind.</param>
+    /// <param name="schemaVersion">Version of the persisted entity schema.</param>
+    /// <param name="keySelector">Selects the entity key.</param>
+    public static IContainer RegisterPersistenceEntity<TEntity, TKey>(
+        this IContainer container,
+        ushort typeId,
+        int schemaVersion,
+        Func<TEntity, TKey> keySelector
+    )
+        where TKey : notnull
+    {
+        var descriptor = new PersistenceEntityDescriptor<TEntity, TKey>(typeId, typeof(TEntity).Name, schemaVersion, keySelector);
+        container.AddToRegisterTypedList(new PersistenceEntityRegistration(descriptor));
+
+        return container;
+    }
+
+    /// <summary>
+    /// Registers the persistence service (snapshot + journal) with the hosting orchestrator and the
+    /// open-generic <see cref="IDataAccess{TEntity,TKey}" />.
+    /// </summary>
+    /// <param name="container">DryIoc container.</param>
+    /// <param name="saveDirectory">Directory for snapshot/journal files.</param>
+    /// <param name="configure">Optional callback to customize <see cref="PersistenceConfig" />.</param>
+    public static IContainer AddNightHeavenPersistence(
+        this IContainer container,
+        string saveDirectory,
+        Action<PersistenceConfig>? configure = null
+    )
+    {
+        container.AddNightHeavenHosting();
+
+        var config = new PersistenceConfig();
+        configure?.Invoke(config);
+        container.RegisterInstance(config);
+
+        // Ensure a (possibly empty) registration list exists even when no entity was registered.
+        if (!container.IsRegistered<List<PersistenceEntityRegistration>>())
+        {
+            container.RegisterInstance(new List<PersistenceEntityRegistration>());
+        }
+
+        // The service ctor takes the save directory + config + accumulated registrations, so build it
+        // through a delegate rather than the convention helper (which assumes a resolvable ctor).
+        container.RegisterDelegate(
+            resolver => new PersistenceService(
+                saveDirectory,
+                resolver.Resolve<PersistenceConfig>(),
+                resolver.Resolve<List<PersistenceEntityRegistration>>()
+            ),
+            Reuse.Singleton
+        );
+        container.RegisterMapping<IPersistenceService, PersistenceService>();
+
+        // Drive start/stop through the orchestrator at priority 15 (after TimerWheel=3, before Network=20).
+        container.RegisterDelegate(
+            resolver => new NightHeavenServiceDescriptor(resolver.Resolve<PersistenceService>(), PersistencePriority),
+            Reuse.Singleton,
+            ifAlreadyRegistered: IfAlreadyRegistered.AppendNewImplementation,
+            serviceKey: typeof(PersistenceService)
+        );
+
+        // Open-generic IDataAccess<,> resolves through the service's GetDataAccess factory method.
+        container.Register(
+            typeof(IDataAccess<,>),
+            made: Made.Of(
+                request => typeof(IPersistenceService).GetMethod(nameof(IPersistenceService.GetDataAccess))!
+                    .MakeGenericMethod(request.ServiceType.GetGenericArguments()),
+                ServiceInfo.Of<IPersistenceService>()
+            ),
+            setup: Setup.With(asResolutionCall: true)
+        );
+
+        container.AddMetricProvider<PersistenceService>();
+
+        return container;
+    }
+}

@@ -146,7 +146,7 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
         CancellationToken cancellationToken
     )
     {
-        var payload = MessagePackSerializer.Serialize(entry, Options);
+        var payload = MessagePackSerializer.Serialize(entry, Options, cancellationToken);
         var header = new byte[HeaderSize];
         BinaryPrimitives.WriteInt32LittleEndian(header, payload.Length);
         BinaryPrimitives.WriteUInt32LittleEndian(header.AsSpan(4), ChecksumUtils.Compute(payload));

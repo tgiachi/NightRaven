@@ -8,7 +8,7 @@ namespace NightHeaven.Persistence.Services.Persistence;
 /// <summary>
 /// Stores the world snapshot as a single MessagePack file, written atomically via temp + rename.
 /// </summary>
-public sealed class MessagePackSnapshotService : ISnapshotService
+public sealed class MessagePackSnapshotService : ISnapshotService, IDisposable
 {
     private static readonly MessagePackSerializerOptions Options = ContractlessStandardResolver.Options;
 
@@ -42,7 +42,7 @@ public sealed class MessagePackSnapshotService : ISnapshotService
 
             var bytes = await File.ReadAllBytesAsync(_path, cancellationToken);
 
-            return MessagePackSerializer.Deserialize<WorldSnapshot>(bytes, Options);
+            return MessagePackSerializer.Deserialize<WorldSnapshot>(bytes, Options, cancellationToken);
         }
         finally
         {
@@ -59,7 +59,7 @@ public sealed class MessagePackSnapshotService : ISnapshotService
         try
         {
             var tempPath = _path + ".tmp";
-            var bytes = MessagePackSerializer.Serialize(snapshot, Options);
+            var bytes = MessagePackSerializer.Serialize(snapshot, Options, cancellationToken);
 
             await using (var stream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
@@ -74,4 +74,7 @@ public sealed class MessagePackSnapshotService : ISnapshotService
             _ioLock.Release();
         }
     }
+
+    public void Dispose()
+        => _ioLock.Dispose();
 }
