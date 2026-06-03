@@ -72,7 +72,7 @@ Create `src/NightHeaven.Plugins/NightHeaven.Plugins.csproj`:
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DryIoc" Version="6.2.0" />
+        <PackageReference Include="DryIoc.dll" Version="5.4.3"/>
         <PackageReference Include="Serilog" Version="4.3.1" />
         <PackageReference Include="Tomlyn" Version="2.4.1" />
     </ItemGroup>

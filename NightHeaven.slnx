@@ -3,6 +3,7 @@
     <Project Path="src/NightHeaven.Core/NightHeaven.Core.csproj" />
     <Project Path="src/NightHeaven.Persistence/NightHeaven.Persistence.csproj" />
     <Project Path="src/NightHeaven.Hosting/NightHeaven.Hosting.csproj" />
+    <Project Path="src/NightHeaven.Plugins/NightHeaven.Plugins.csproj" />
     <Project Path="src/NightHeaven.Network.UO/NightHeaven.Network.UO.csproj" />
     <Project Path="src/NightHeaven.Network/NightHeaven.Network.csproj" />
     <Project Path="src/NightHeaven.Server/NightHeaven.Server.csproj" />
