@@ -1,6 +1,6 @@
-using NightHeaven.Core.Extensions.Strings;
+using NightRaven.Core.Extensions.Strings;
 
-namespace NightHeaven.Core.Data.Directories;
+namespace NightRaven.Core.Data.Directories;
 
 /// <summary>
 /// Configuration for managing directory structures with automatic creation and path resolution

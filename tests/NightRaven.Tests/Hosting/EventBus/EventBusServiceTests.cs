@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Hosting.Interfaces.Events;
-using NightHeaven.Server.Services.EventBus;
-using NightHeaven.Tests.Hosting.EventBus.Support;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Hosting.Interfaces.Events;
+using NightRaven.Server.Services.EventBus;
+using NightRaven.Tests.Hosting.EventBus.Support;
 
-namespace NightHeaven.Tests.Hosting.EventBus;
+namespace NightRaven.Tests.Hosting.EventBus;
 
 public class EventBusServiceTests
 {
@@ -145,7 +145,7 @@ public class EventBusServiceTests
 
         Type? errorHandler = null;
         Exception? errorException = null;
-        INightHeavenEvent? errorEvent = null;
+        INightRavenEvent? errorEvent = null;
         bus.OnEventError = (handlerType, ex, evt) =>
                            {
                                errorHandler = handlerType;

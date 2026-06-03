@@ -1,14 +1,14 @@
 using System.Reflection;
-using NightHeaven.Plugins.Interfaces;
+using NightRaven.Plugins.Interfaces;
 
-namespace NightHeaven.Plugins.Data;
+namespace NightRaven.Plugins.Data;
 
 /// <summary>
 /// A plugin instance loaded from a plugin package directory.
 /// </summary>
 public sealed class LoadedPlugin
 {
-    public LoadedPlugin(string pluginDirectory, INightHeavenPlugin instance, Assembly assembly)
+    public LoadedPlugin(string pluginDirectory, INightRavenPlugin instance, Assembly assembly)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginDirectory);
         ArgumentNullException.ThrowIfNull(instance);
@@ -27,7 +27,7 @@ public sealed class LoadedPlugin
     public string PluginDirectory { get; }
 
     /// <summary>The instantiated plugin.</summary>
-    public INightHeavenPlugin Instance { get; }
+    public INightRavenPlugin Instance { get; }
 
     /// <summary>The plugin metadata.</summary>
     public PluginMetadata Metadata { get; }

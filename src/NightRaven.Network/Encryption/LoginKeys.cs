@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 
-namespace NightHeaven.Network.Encryption;
+namespace NightRaven.Network.Encryption;
 
 /// <summary>
 /// Represents login encryption keys derived from the client version.

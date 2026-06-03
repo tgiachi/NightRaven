@@ -1,6 +1,6 @@
 using MoonSharp.Interpreter;
 
-namespace NightHeaven.Scripting.Lua.Extensions;
+namespace NightRaven.Scripting.Lua.Extensions;
 
 public static class LuaTableReader
 {

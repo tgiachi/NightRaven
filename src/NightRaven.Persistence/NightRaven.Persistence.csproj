@@ -11,12 +11,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj"/>
-        <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj"/>
+        <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj"/>
+        <ProjectReference Include="..\NightRaven.Hosting\NightRaven.Hosting.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="NightHeaven.Tests"/>
+        <InternalsVisibleTo Include="NightRaven.Tests"/>
     </ItemGroup>
 
 </Project>

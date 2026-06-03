@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace NightHeaven.Core.Json;
+namespace NightRaven.Core.Json;
 
 /// <summary>
 /// Utility class to retrieve registered types from JsonSerializerContext at runtime.

@@ -1,7 +1,7 @@
 using System.Reflection;
-using NightHeaven.Core.Utils;
+using NightRaven.Core.Utils;
 
-namespace NightHeaven.Tests.Core.Utils;
+namespace NightRaven.Tests.Core.Utils;
 
 public class VersionUtilsTests
 {

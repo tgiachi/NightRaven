@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace NightHeaven.Core.Ids;
+namespace NightRaven.Core.Ids;
 
 /// <summary>
 /// Represents a UO entity serial identifier.

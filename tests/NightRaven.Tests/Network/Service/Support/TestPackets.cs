@@ -1,7 +1,7 @@
-using NightHeaven.Network.Spans;
-using NightHeaven.Network.UO.Base;
+using NightRaven.Network.Spans;
+using NightRaven.Network.UO.Base;
 
-namespace NightHeaven.Tests.Network.Service.Support;
+namespace NightRaven.Tests.Network.Service.Support;
 
 /// <summary>
 /// Fixed-length (5 bytes) packet whose payload always parses. Opcode 0x06.

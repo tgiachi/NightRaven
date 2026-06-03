@@ -1,8 +1,8 @@
-using NightHeaven.Network.Client;
-using NightHeaven.Network.Interfaces.Middleware;
-using NightHeaven.Network.Pipeline;
+using NightRaven.Network.Client;
+using NightRaven.Network.Interfaces.Middleware;
+using NightRaven.Network.Pipeline;
 
-namespace NightHeaven.Tests.Network.Pipeline;
+namespace NightRaven.Tests.Network.Pipeline;
 
 public class NetMiddlewarePipelineTests
 {
@@ -18,7 +18,7 @@ public class NetMiddlewarePipelineTests
         public int CallCount { get; private set; }
 
         public ValueTask<ReadOnlyMemory<byte>> ProcessAsync(
-            NightHeavenTCPClient? client,
+            NightRavenTCPClient? client,
             ReadOnlyMemory<byte> data,
             CancellationToken cancellationToken = default
         )
@@ -35,7 +35,7 @@ public class NetMiddlewarePipelineTests
     private sealed class DropMiddleware : INetMiddleware
     {
         public ValueTask<ReadOnlyMemory<byte>> ProcessAsync(
-            NightHeavenTCPClient? client,
+            NightRavenTCPClient? client,
             ReadOnlyMemory<byte> data,
             CancellationToken cancellationToken = default
         )
@@ -48,7 +48,7 @@ public class NetMiddlewarePipelineTests
         public int SendCalls { get; private set; }
 
         public ValueTask<ReadOnlyMemory<byte>> ProcessAsync(
-            NightHeavenTCPClient? client,
+            NightRavenTCPClient? client,
             ReadOnlyMemory<byte> data,
             CancellationToken cancellationToken = default
         )
@@ -59,7 +59,7 @@ public class NetMiddlewarePipelineTests
         }
 
         public ValueTask<ReadOnlyMemory<byte>> ProcessSendAsync(
-            NightHeavenTCPClient? client,
+            NightRavenTCPClient? client,
             ReadOnlyMemory<byte> data,
             CancellationToken cancellationToken = default
         )

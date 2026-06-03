@@ -1,6 +1,6 @@
 using Tomlyn.Serialization;
 
-namespace NightHeaven.Tests.Core.Toml;
+namespace NightRaven.Tests.Core.Toml;
 
 [TomlSerializable(typeof(TomlPerson))]
 public partial class TomlTestContext : TomlSerializerContext;

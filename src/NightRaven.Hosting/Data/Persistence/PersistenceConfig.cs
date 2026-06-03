@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Data.Persistence;
+namespace NightRaven.Hosting.Data.Persistence;
 
 /// <summary>
 /// Configuration for the persistence service: autosave cadence and snapshot/journal file names.

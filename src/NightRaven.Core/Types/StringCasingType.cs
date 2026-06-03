@@ -1,4 +1,4 @@
-namespace NightHeaven.Core.Types;
+namespace NightRaven.Core.Types;
 
 internal enum StringCasingType
 {

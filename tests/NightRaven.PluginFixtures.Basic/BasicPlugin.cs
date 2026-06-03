@@ -1,20 +1,20 @@
 using DryIoc;
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Interfaces;
-using NightHeaven.Scripting.Lua.Attributes.Scripts;
-using NightHeaven.Scripting.Lua.Extensions.Scripts;
-using NightHeaven.Server.Extensions.DryIoc;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Interfaces;
+using NightRaven.Scripting.Lua.Attributes.Scripts;
+using NightRaven.Scripting.Lua.Extensions.Scripts;
+using NightRaven.Server.Extensions.DryIoc;
 
-namespace NightHeaven.PluginFixtures.Basic;
+namespace NightRaven.PluginFixtures.Basic;
 
-public sealed class BasicPlugin : INightHeavenPlugin
+public sealed class BasicPlugin : INightRavenPlugin
 {
     public PluginMetadata Metadata { get; } = new()
     {
-        Id = "nightheaven.fixture.basic",
+        Id = "nightraven.fixture.basic",
         Name = "Basic Fixture Plugin",
         Version = new(1, 0, 0),
-        Author = "NightHeaven Tests"
+        Author = "NightRaven Tests"
     };
 
     public void Configure(IContainer container, PluginContext context)

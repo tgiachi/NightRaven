@@ -1,15 +1,15 @@
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Scripting.Lua.Interfaces;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Support;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Scripting.Lua.Interfaces;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Support;
 
-namespace NightHeaven.Tests.Scripting.Lua;
+namespace NightRaven.Tests.Scripting.Lua;
 
 public class LuaScriptingIntegrationTests
 {
     [Fact]
-    public void AddNightHeavenLuaScripting_RegistersEngineAndHostedService()
+    public void AddNightRavenLuaScripting_RegistersEngineAndHostedService()
     {
         var scriptsDir = Path.Combine(Path.GetTempPath(), $"nh-lua-reg-{Guid.NewGuid():N}");
         Directory.CreateDirectory(scriptsDir);
@@ -19,7 +19,7 @@ public class LuaScriptingIntegrationTests
             var directoriesConfig = new DirectoriesConfig(scriptsDir, Array.Empty<string>());
 
             var container = new Container();
-            container.AddNightHeavenLuaScripting(directoriesConfig);
+            container.AddNightRavenLuaScripting(directoriesConfig);
 
             Assert.NotNull(container.Resolve<IScriptEngineService>());
             Assert.NotNull(container.Orchestrator());
@@ -52,7 +52,7 @@ public class LuaScriptingIntegrationTests
             var directoriesConfig = new DirectoriesConfig(scriptsDir, Array.Empty<string>());
 
             var container = new Container();
-            container.AddNightHeavenLuaScripting(directoriesConfig);
+            container.AddNightRavenLuaScripting(directoriesConfig);
 
             var orchestrator = container.Orchestrator();
             var engine = container.Resolve<IScriptEngineService>();

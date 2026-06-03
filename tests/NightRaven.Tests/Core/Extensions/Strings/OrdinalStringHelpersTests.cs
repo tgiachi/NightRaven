@@ -1,6 +1,6 @@
-using NightHeaven.Core.Extensions.Strings;
+using NightRaven.Core.Extensions.Strings;
 
-namespace NightHeaven.Tests.Core.Extensions.Strings;
+namespace NightRaven.Tests.Core.Extensions.Strings;
 
 public class OrdinalStringHelpersTests
 {

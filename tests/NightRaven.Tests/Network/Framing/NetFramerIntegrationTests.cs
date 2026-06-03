@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.Sockets;
-using NightHeaven.Network.Events;
-using NightHeaven.Network.Server;
+using NightRaven.Network.Events;
+using NightRaven.Network.Server;
 
-namespace NightHeaven.Tests.Network.Framing;
+namespace NightRaven.Tests.Network.Framing;
 
 public class NetFramerIntegrationTests
 {
@@ -11,7 +11,7 @@ public class NetFramerIntegrationTests
     public async Task ReceiveLoop_WithFramer_EmitsOneEventPerCompleteFrame()
     {
         var framer = new LengthPrefixedFramer();
-        await using var server = new NightHeavenTCPServer(new(IPAddress.Loopback, 0), framer);
+        await using var server = new NightRavenTCPServer(new(IPAddress.Loopback, 0), framer);
 
         var received = new List<byte[]>();
         var receivedSignal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -57,7 +57,7 @@ public class NetFramerIntegrationTests
     public async Task ReceiveLoop_WithFramer_HoldsPartialTailUntilCompleted()
     {
         var framer = new LengthPrefixedFramer();
-        await using var server = new NightHeavenTCPServer(new(IPAddress.Loopback, 0), framer);
+        await using var server = new NightRavenTCPServer(new(IPAddress.Loopback, 0), framer);
 
         var received = new List<byte[]>();
         var firstFrameSignal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -107,9 +107,9 @@ public class NetFramerIntegrationTests
     [Fact]
     public async Task ReceiveLoop_WithoutFramer_EmitsRawChunks()
     {
-        await using var server = new NightHeavenTCPServer(new(IPAddress.Loopback, 0));
+        await using var server = new NightRavenTCPServer(new(IPAddress.Loopback, 0));
 
-        NightHeavenTCPDataReceivedEventArgs? captured = null;
+        NightRavenTCPDataReceivedEventArgs? captured = null;
         var signal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         server.OnDataReceived += (_, args) =>

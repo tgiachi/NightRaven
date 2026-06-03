@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.UO.Types.GeneralInformation;
+namespace NightRaven.Network.UO.Types.GeneralInformation;
 
 /// <summary>
 /// Subcommand types used by General Information packet (0xBF).

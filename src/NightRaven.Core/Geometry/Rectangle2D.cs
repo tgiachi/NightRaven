@@ -14,9 +14,9 @@
  *************************************************************************/
 
 using System.Runtime.CompilerServices;
-using NightHeaven.Core.Extensions.Strings;
+using NightRaven.Core.Extensions.Strings;
 
-namespace NightHeaven.Core.Geometry;
+namespace NightRaven.Core.Geometry;
 
 /// <summary>
 /// Represents Rectangle2D.

@@ -1,8 +1,8 @@
 using MessagePack;
 using MessagePack.Formatters;
-using NightHeaven.Core.Ids;
+using NightRaven.Core.Ids;
 
-namespace NightHeaven.Persistence.Formatters;
+namespace NightRaven.Persistence.Formatters;
 
 /// <summary>
 /// MessagePack formatter for <see cref="AutoInt64" />, persisted as its underlying 64-bit signed value.

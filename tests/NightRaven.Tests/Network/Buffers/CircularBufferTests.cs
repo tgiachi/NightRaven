@@ -1,6 +1,6 @@
-using NightHeaven.Network.Buffers;
+using NightRaven.Network.Buffers;
 
-namespace NightHeaven.Tests.Network.Buffers;
+namespace NightRaven.Tests.Network.Buffers;
 
 public class CircularBufferTests
 {

@@ -1,8 +1,8 @@
-using NightHeaven.Core.Ids;
-using NightHeaven.Persistence.Interfaces.Persistence;
-using NightHeaven.Persistence.Internal;
+using NightRaven.Core.Ids;
+using NightRaven.Persistence.Interfaces.Persistence;
+using NightRaven.Persistence.Internal;
 
-namespace NightHeaven.Persistence.Services.Persistence;
+namespace NightRaven.Persistence.Services.Persistence;
 
 /// <summary>
 /// <see cref="IAutoDataAccess{TEntity,TKey}" /> implementation: extends <see cref="GenericDataAccess{TEntity,TKey}" />

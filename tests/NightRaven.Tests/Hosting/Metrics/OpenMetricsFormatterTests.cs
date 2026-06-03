@@ -1,8 +1,8 @@
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Types.Metrics;
-using NightHeaven.Server.Services.Metrics;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Server.Services.Metrics;
 
-namespace NightHeaven.Tests.Hosting.Metrics;
+namespace NightRaven.Tests.Hosting.Metrics;
 
 public class OpenMetricsFormatterTests
 {

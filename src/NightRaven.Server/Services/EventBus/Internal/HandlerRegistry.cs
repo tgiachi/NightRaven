@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Hosting.Interfaces.Events;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Hosting.Interfaces.Events;
 
-namespace NightHeaven.Server.Services.EventBus.Internal;
+namespace NightRaven.Server.Services.EventBus.Internal;
 
 /// <summary>
 /// Caches per-event-type handler arrays resolved from the DI container.

@@ -1,14 +1,14 @@
 using DryIoc;
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Server.Extensions.DryIoc;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Server.Extensions.DryIoc;
 
-namespace NightHeaven.Tests.Hosting.Metrics;
+namespace NightRaven.Tests.Hosting.Metrics;
 
 public class MetricsExtensionsTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-metrics-config-{Guid.NewGuid():N}");
-    private string Path_ => Path.Combine(_dir, "nightheaven.toml");
+    private string Path_ => Path.Combine(_dir, "nightraven.toml");
 
     private sealed class NamedProvider : IMetricProvider
     {
@@ -33,39 +33,39 @@ public class MetricsExtensionsTests : IDisposable
     }
 
     [Fact]
-    public void AddNightHeavenMetrics_AppliesCustomConfig()
+    public void AddNightRavenMetrics_AppliesCustomConfig()
     {
         Directory.CreateDirectory(_dir);
         File.WriteAllText(Path_, "[metrics]\nrefresh_interval = \"00:00:02\"\n");
 
         var container = new Container();
-        container.AddNightHeavenTimerWheel();
-        container.AddNightHeavenMetrics();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenTimerWheel();
+        container.AddNightRavenMetrics();
+        container.AddNightRavenConfig(Path_);
 
         var cfg = container.Resolve<MetricsConfig>();
         Assert.Equal(TimeSpan.FromSeconds(2), cfg.RefreshInterval);
     }
 
     [Fact]
-    public void AddNightHeavenMetrics_DefaultConfig_FiveSeconds()
+    public void AddNightRavenMetrics_DefaultConfig_FiveSeconds()
     {
         var container = new Container();
-        container.AddNightHeavenTimerWheel();
-        container.AddNightHeavenMetrics();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenTimerWheel();
+        container.AddNightRavenMetrics();
+        container.AddNightRavenConfig(Path_);
 
         var cfg = container.Resolve<MetricsConfig>();
         Assert.Equal(TimeSpan.FromSeconds(5), cfg.RefreshInterval);
     }
 
     [Fact]
-    public void AddNightHeavenMetrics_RegistersServiceAndConfig()
+    public void AddNightRavenMetrics_RegistersServiceAndConfig()
     {
         var container = new Container();
-        container.AddNightHeavenTimerWheel();
-        container.AddNightHeavenMetrics();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenTimerWheel();
+        container.AddNightRavenMetrics();
+        container.AddNightRavenConfig(Path_);
 
         Assert.NotNull(container.Resolve<IMetricsService>());
         Assert.NotNull(container.Resolve<MetricsConfig>());

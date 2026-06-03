@@ -1,6 +1,6 @@
-using NightHeaven.Core.Ids;
+using NightRaven.Core.Ids;
 
-namespace NightHeaven.Tests.Persistence.Support;
+namespace NightRaven.Tests.Persistence.Support;
 
 public sealed class TestItem
 {

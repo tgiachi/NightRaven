@@ -1,6 +1,6 @@
-using NightHeaven.Network.Interfaces.Encryption;
+using NightRaven.Network.Interfaces.Encryption;
 
-namespace NightHeaven.Network.Encryption;
+namespace NightRaven.Network.Encryption;
 
 /// <summary>
 /// Implements login packet encryption for account login traffic.

@@ -1,9 +1,9 @@
-using NightHeaven.Network.Spans;
-using NightHeaven.Network.UO.Attributes;
-using NightHeaven.Network.UO.Base;
-using NightHeaven.Network.UO.Types.Packets;
+using NightRaven.Network.Spans;
+using NightRaven.Network.UO.Attributes;
+using NightRaven.Network.UO.Base;
+using NightRaven.Network.UO.Types.Packets;
 
-namespace NightHeaven.Network.UO.Packets.Incoming.Interaction;
+namespace NightRaven.Network.UO.Packets.Incoming.Interaction;
 
 [PacketHandler(0xED, PacketSizing.Variable, Description = "Unequip Item Macro (KR)")]
 

@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Data.Network;
+using NightRaven.Hosting.Data.Network;
 
-namespace NightHeaven.Tests.Hosting.Network;
+namespace NightRaven.Tests.Hosting.Network;
 
 public class NetworkConfigTests
 {

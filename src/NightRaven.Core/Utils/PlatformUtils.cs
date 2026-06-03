@@ -1,6 +1,6 @@
-using NightHeaven.Core.Types;
+using NightRaven.Core.Types;
 
-namespace NightHeaven.Core.Utils;
+namespace NightRaven.Core.Utils;
 
 /// <summary>
 /// Provides utilities for detecting the current platform.

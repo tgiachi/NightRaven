@@ -1,7 +1,7 @@
 using System.Reflection;
 using MoonSharp.Interpreter;
 
-namespace NightHeaven.Scripting.Lua.Proxies;
+namespace NightRaven.Scripting.Lua.Proxies;
 
 /// <summary>
 /// A proxy class that implements an interface by delegating method calls to a MoonSharp Table.

@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using Tomlyn;
 using Tomlyn.Serialization;
 
-namespace NightHeaven.Core.Toml;
+namespace NightRaven.Core.Toml;
 
 /// <summary>
 /// Provides source-generation-based TOML serialization helpers.

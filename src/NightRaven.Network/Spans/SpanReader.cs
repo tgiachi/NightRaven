@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace NightHeaven.Network.Spans;
+namespace NightRaven.Network.Spans;
 
 public ref struct SpanReader : IDisposable
 {

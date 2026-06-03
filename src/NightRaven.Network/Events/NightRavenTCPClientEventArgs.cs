@@ -1,13 +1,13 @@
-using NightHeaven.Network.Client;
+using NightRaven.Network.Client;
 
-namespace NightHeaven.Network.Events;
+namespace NightRaven.Network.Events;
 
 /// <summary>
 /// Event payload containing a network client instance.
 /// </summary>
-public sealed class NightHeavenTCPClientEventArgs : EventArgs
+public sealed class NightRavenTCPClientEventArgs : EventArgs
 {
-    public NightHeavenTCPClientEventArgs(NightHeavenTCPClient client)
+    public NightRavenTCPClientEventArgs(NightRavenTCPClient client)
     {
         Client = client;
     }
@@ -15,5 +15,5 @@ public sealed class NightHeavenTCPClientEventArgs : EventArgs
     /// <summary>
     /// Connected or disconnected client.
     /// </summary>
-    public NightHeavenTCPClient Client { get; }
+    public NightRavenTCPClient Client { get; }
 }

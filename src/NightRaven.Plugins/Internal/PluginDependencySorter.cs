@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
-using NightHeaven.Plugins.Data;
+using NightRaven.Plugins.Data;
 
-namespace NightHeaven.Plugins.Internal;
+namespace NightRaven.Plugins.Internal;
 
 internal static partial class PluginDependencySorter
 {

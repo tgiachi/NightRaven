@@ -1,6 +1,6 @@
-using NightHeaven.Core.Buffers;
+using NightRaven.Core.Buffers;
 
-namespace NightHeaven.Tests.Core.Buffers;
+namespace NightRaven.Tests.Core.Buffers;
 
 public class ValueStringBuilderTests
 {

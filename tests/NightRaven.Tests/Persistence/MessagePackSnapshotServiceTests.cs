@@ -1,7 +1,7 @@
-using NightHeaven.Persistence.Data;
-using NightHeaven.Persistence.Services.Persistence;
+using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Services.Persistence;
 
-namespace NightHeaven.Tests.Persistence;
+namespace NightRaven.Tests.Persistence;
 
 public class MessagePackSnapshotServiceTests : IDisposable
 {

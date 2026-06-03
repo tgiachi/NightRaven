@@ -1,12 +1,12 @@
 using DryIoc;
-using NightHeaven.Core.Extensions.Container;
-using NightHeaven.Hosting.Configuration;
-using NightHeaven.Hosting.Data.Internal;
+using NightRaven.Core.Extensions.Container;
+using NightRaven.Hosting.Configuration;
+using NightRaven.Hosting.Data.Internal;
 
-namespace NightHeaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.DryIoc;
 
 /// <summary>
-/// DryIoc-native registration helpers for the NightHeaven TOML config system.
+/// DryIoc-native registration helpers for the NightRaven TOML config system.
 /// </summary>
 public static class ConfigContainerExtensions
 {
@@ -16,7 +16,7 @@ public static class ConfigContainerExtensions
     /// </summary>
     /// <param name="container">DryIoc container.</param>
     /// <param name="configFilePath">Full path to the TOML config file.</param>
-    public static IContainer AddNightHeavenConfig(this IContainer container, string configFilePath)
+    public static IContainer AddNightRavenConfig(this IContainer container, string configFilePath)
     {
         if (!container.IsRegistered<List<ConfigSectionRegistration>>())
         {
@@ -40,7 +40,7 @@ public static class ConfigContainerExtensions
 
     /// <summary>
     /// Declares a config section. Accumulates a descriptor consumed by
-    /// <see cref="AddNightHeavenConfig" /> at boot. Call before <see cref="AddNightHeavenConfig" />.
+    /// <see cref="AddNightRavenConfig" /> at boot. Call before <see cref="AddNightRavenConfig" />.
     /// </summary>
     /// <param name="container">DryIoc container.</param>
     /// <param name="name">TOML section name (e.g. <c>persistence</c>).</param>

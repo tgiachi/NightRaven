@@ -1,20 +1,20 @@
 using DryIoc;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Hosting.EventBus.Support;
-using NightHeaven.Tests.Support;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Hosting.EventBus.Support;
+using NightRaven.Tests.Support;
 
-namespace NightHeaven.Tests.Hosting.EventBus;
+namespace NightRaven.Tests.Hosting.EventBus;
 
 public class EventBusIntegrationTests : IDisposable
 {
     private readonly string _dir = Path.Combine(
         Path.GetTempPath(),
-        $"nightheaven-eventbus-integration-{Guid.NewGuid():N}"
+        $"nightraven-eventbus-integration-{Guid.NewGuid():N}"
     );
 
-    private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
+    private string ConfigPath => Path.Combine(_dir, "nightraven.toml");
 
     private sealed class IntegrationTickHandler : ITickEventHandler<TestTickEvent>
     {
@@ -70,8 +70,8 @@ public class EventBusIntegrationTests : IDisposable
         var timeline = new List<string>();
         var container = new Container();
         container.RegisterInstance(timeline);
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenConfig(ConfigPath);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenConfig(ConfigPath);
         container.AddAsyncEventHandler<IntegrationAsyncHandler, TestAsyncEvent>();
 
         var orchestrator = container.Orchestrator();
@@ -92,8 +92,8 @@ public class EventBusIntegrationTests : IDisposable
         var timeline = new List<string>();
         var container = new Container();
         container.RegisterInstance(timeline);
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenConfig(ConfigPath);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenConfig(ConfigPath);
         container.AddTickEventHandler<IntegrationTickHandler, TestTickEvent>();
 
         var orchestrator = container.Orchestrator();

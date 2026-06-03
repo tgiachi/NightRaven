@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using ShaiRandom.Generators;
 
-namespace NightHeaven.Core.Random;
+namespace NightRaven.Core.Random;
 
 public static class BuiltInRng
 {

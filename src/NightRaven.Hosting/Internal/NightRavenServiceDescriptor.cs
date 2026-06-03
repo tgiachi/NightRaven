@@ -1,9 +1,9 @@
-using NightHeaven.Hosting.Interfaces.Services;
+using NightRaven.Hosting.Interfaces.Services;
 
-namespace NightHeaven.Hosting.Internal;
+namespace NightRaven.Hosting.Internal;
 
 /// <summary>
-/// Pairs a registered <see cref="INightHeavenService" /> with its start priority.
+/// Pairs a registered <see cref="INightRavenService" /> with its start priority.
 /// Lower priorities start first; stop happens in reverse order.
 /// </summary>
-internal sealed record NightHeavenServiceDescriptor(INightHeavenService Service, int Priority);
+internal sealed record NightRavenServiceDescriptor(INightRavenService Service, int Priority);

@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj"/>
+        <ProjectReference Include="..\NightRaven.Network\NightRaven.Network.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

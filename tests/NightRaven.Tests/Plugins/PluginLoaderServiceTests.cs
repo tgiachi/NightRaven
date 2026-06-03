@@ -1,12 +1,12 @@
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Plugins.Services;
-using NightHeaven.Scripting.Lua.Data.Internal;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Plugins.Support;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Plugins.Services;
+using NightRaven.Scripting.Lua.Data.Internal;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Plugins.Support;
 
-namespace NightHeaven.Tests.Plugins;
+namespace NightRaven.Tests.Plugins;
 
 public sealed class PluginLoaderServiceTests : IDisposable
 {
@@ -30,27 +30,27 @@ public sealed class PluginLoaderServiceTests : IDisposable
     [Fact]
     public void LoadAndConfigure_ValidPlugin_LoadsMetadataAndConfiguresContainer()
     {
-        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightHeaven.PluginFixtures.Basic", "basic");
+        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Basic", "basic");
         var container = new Container();
-        container.AddNightHeavenLuaScripting(Directories());
+        container.AddNightRavenLuaScripting(Directories());
         var loader = new PluginLoaderService();
 
         var loaded = loader.LoadAndConfigure(container, Directories());
 
         var plugin = Assert.Single(loaded);
-        Assert.Equal("nightheaven.fixture.basic", plugin.Metadata.Id);
+        Assert.Equal("nightraven.fixture.basic", plugin.Metadata.Id);
         Assert.True(File.Exists(Path.Combine(plugin.PluginDirectory, "plugin.toml")));
         var modules = container.Resolve<List<ScriptModuleData>>();
         Assert.Contains(
             modules,
-            module => module.ModuleType.FullName == "NightHeaven.PluginFixtures.Basic.BasicPluginScriptModule"
+            module => module.ModuleType.FullName == "NightRaven.PluginFixtures.Basic.BasicPluginScriptModule"
         );
     }
 
     [Fact]
     public void LoadAndConfigure_EmptyPluginDirectory_Throws()
     {
-        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightHeaven.PluginFixtures.Empty", "empty");
+        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Empty", "empty");
         var loader = new PluginLoaderService();
 
         var ex = Assert.Throws<InvalidOperationException>(
@@ -63,7 +63,7 @@ public sealed class PluginLoaderServiceTests : IDisposable
     [Fact]
     public void LoadAndConfigure_MultiplePluginImplementations_Throws()
     {
-        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightHeaven.PluginFixtures.Multiple", "multiple");
+        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Multiple", "multiple");
         var loader = new PluginLoaderService();
 
         var ex = Assert.Throws<InvalidOperationException>(

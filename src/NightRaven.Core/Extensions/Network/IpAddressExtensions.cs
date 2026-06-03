@@ -1,7 +1,7 @@
 using System.Buffers.Binary;
 using System.Net;
 
-namespace NightHeaven.Core.Extensions.Network;
+namespace NightRaven.Core.Extensions.Network;
 
 public static class IpAddressExtensions
 {

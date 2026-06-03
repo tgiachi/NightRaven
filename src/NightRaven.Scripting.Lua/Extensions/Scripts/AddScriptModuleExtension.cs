@@ -1,9 +1,9 @@
 using DryIoc;
 using MoonSharp.Interpreter;
-using NightHeaven.Core.Extensions.Container;
-using NightHeaven.Scripting.Lua.Data.Internal;
+using NightRaven.Core.Extensions.Container;
+using NightRaven.Scripting.Lua.Data.Internal;
 
-namespace NightHeaven.Scripting.Lua.Extensions.Scripts;
+namespace NightRaven.Scripting.Lua.Extensions.Scripts;
 
 /// <summary>
 /// Extension methods for registering Lua script modules in the dependency injection container.

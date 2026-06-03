@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace NightHeaven.Core.Collections;
+namespace NightRaven.Core.Collections;
 
 public static class CollectionHelpers
 {

@@ -7,7 +7,7 @@ export function HomePage() {
     <Shell>
       <section className="home-split">
         <div className="home-copy">
-          <h1>NightHeaven web</h1>
+          <h1>NightRaven web</h1>
           <p>
             Punto di ingresso unico per area giocatori e amministrazione shard.
             La struttura e pronta per collegare account, personaggi, metriche e

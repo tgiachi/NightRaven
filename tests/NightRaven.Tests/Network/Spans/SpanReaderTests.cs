@@ -1,9 +1,9 @@
 using System.Buffers.Binary;
 using System.Text;
-using NightHeaven.Core.Text;
-using NightHeaven.Network.Spans;
+using NightRaven.Core.Text;
+using NightRaven.Network.Spans;
 
-namespace NightHeaven.Tests.Network.Spans;
+namespace NightRaven.Tests.Network.Spans;
 
 public class SpanReaderTests
 {
@@ -276,10 +276,10 @@ public class SpanReaderTests
     }
 
     [Fact]
-    public void ReadString_WithCustomNightHeavenUnicodeEncoding_StillUsesTwoByteTerminator()
+    public void ReadString_WithCustomNightRavenUnicodeEncoding_StillUsesTwoByteTerminator()
     {
         // Regression: GetTerminatorWidth used ReferenceEquals against Encoding.Unicode,
-        // so NightHeaven's TextEncoding.Unicode (a different UnicodeEncoding instance)
+        // so NightRaven's TextEncoding.Unicode (a different UnicodeEncoding instance)
         // was treated as 1-byte terminator and corrupted reads.
         var bytes = new List<byte>();
         bytes.AddRange(TextEncoding.Unicode.GetBytes("ab"));

@@ -1,8 +1,8 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using NightHeaven.Core.Random;
+using NightRaven.Core.Random;
 
-namespace NightHeaven.Core.Utils;
+namespace NightRaven.Core.Utils;
 
 public static class RandomUtils
 {

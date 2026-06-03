@@ -1,6 +1,6 @@
-# NightHeaven Web
+# NightRaven Web
 
-React + Vite frontend for NightHeaven player and admin surfaces.
+React + Vite frontend for NightRaven player and admin surfaces.
 
 ## Commands
 

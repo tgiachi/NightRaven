@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Server.Services.EventBus.Internal;
-using NightHeaven.Tests.Hosting.EventBus.Support;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Server.Services.EventBus.Internal;
+using NightRaven.Tests.Hosting.EventBus.Support;
 
-namespace NightHeaven.Tests.Hosting.EventBus;
+namespace NightRaven.Tests.Hosting.EventBus;
 
 public class HandlerRegistryTests
 {

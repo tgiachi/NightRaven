@@ -1,19 +1,19 @@
-using NightHeaven.Hosting.Interfaces.Events;
+using NightRaven.Hosting.Interfaces.Events;
 
-namespace NightHeaven.Hosting.Interfaces.Services;
+namespace NightRaven.Hosting.Interfaces.Services;
 
 /// <summary>
-/// Routes <see cref="INightHeavenEvent" /> instances to registered handlers.
+/// Routes <see cref="INightRavenEvent" /> instances to registered handlers.
 /// Async events go to the thread pool; tick events are queued and drained by
 /// <see cref="IGameLoopService" /> on the game-loop thread.
 /// </summary>
-public interface IEventBusService : INightHeavenService
+public interface IEventBusService : INightRavenService
 {
     /// <summary>
     /// Optional callback invoked after every handler exception, in addition to the structured log entry.
     /// Arguments: handler type that threw, the exception, the event instance.
     /// </summary>
-    Action<Type, Exception, INightHeavenEvent>? OnEventError { get; set; }
+    Action<Type, Exception, INightRavenEvent>? OnEventError { get; set; }
 
     /// <summary>Current number of tick events queued for the next drain.</summary>
     int CurrentTickQueueDepth { get; }

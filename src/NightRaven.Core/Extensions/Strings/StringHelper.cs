@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using NightHeaven.Core.Buffers;
+using NightRaven.Core.Buffers;
 
-namespace NightHeaven.Core.Extensions.Strings;
+namespace NightRaven.Core.Extensions.Strings;
 
 /*************************************************************************
  * ModernUO                                                              *

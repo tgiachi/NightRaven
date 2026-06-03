@@ -1,4 +1,4 @@
-namespace NightHeaven.Core.Types;
+namespace NightRaven.Core.Types;
 
 /// <summary>
 /// public enum LogLevelType : byte.

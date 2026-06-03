@@ -1,10 +1,10 @@
 using DryIoc;
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Interfaces;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Interfaces;
 
-namespace NightHeaven.Tests.Plugins.Support;
+namespace NightRaven.Tests.Plugins.Support;
 
-public sealed class FakePlugin : INightHeavenPlugin
+public sealed class FakePlugin : INightRavenPlugin
 {
     public FakePlugin(string id, params string[] dependencies)
     {
@@ -13,7 +13,7 @@ public sealed class FakePlugin : INightHeavenPlugin
             Id = id,
             Name = id,
             Version = new(1, 0, 0),
-            Author = "NightHeaven Tests",
+            Author = "NightRaven Tests",
             Dependencies = dependencies
         };
     }

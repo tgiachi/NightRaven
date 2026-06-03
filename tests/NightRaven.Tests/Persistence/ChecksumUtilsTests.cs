@@ -1,6 +1,6 @@
-using NightHeaven.Persistence.Internal;
+using NightRaven.Persistence.Internal;
 
-namespace NightHeaven.Tests.Persistence;
+namespace NightRaven.Tests.Persistence;
 
 public class ChecksumUtilsTests
 {

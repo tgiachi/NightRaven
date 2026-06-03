@@ -1,6 +1,6 @@
-using NightHeaven.Persistence.Types;
+using NightRaven.Persistence.Types;
 
-namespace NightHeaven.Persistence.Data;
+namespace NightRaven.Persistence.Data;
 
 /// <summary>
 /// Journal record appended for every persisted mutation.

@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.Exceptions.Buffers;
+namespace NightRaven.Network.Exceptions.Buffers;
 
 /// <summary>
 /// Exception thrown when an index is outside the valid circular buffer bounds.

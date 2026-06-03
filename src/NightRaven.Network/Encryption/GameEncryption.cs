@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Intrinsics;
 using System.Security.Cryptography;
-using NightHeaven.Network.Interfaces.Encryption;
+using NightRaven.Network.Interfaces.Encryption;
 
-namespace NightHeaven.Network.Encryption;
+namespace NightRaven.Network.Encryption;
 
 /// <summary>
 /// Implements game transport encryption using Twofish and MD5-derived XOR state.

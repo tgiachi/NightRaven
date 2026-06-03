@@ -1,6 +1,6 @@
-using NightHeaven.Network.UO.Types.Packets;
+using NightRaven.Network.UO.Types.Packets;
 
-namespace NightHeaven.Network.UO.Data.Packets;
+namespace NightRaven.Network.UO.Data.Packets;
 
 /// <summary>
 /// Represents struct.

@@ -1,7 +1,7 @@
 using System.Text;
-using NightHeaven.Core.Text;
+using NightRaven.Core.Text;
 
-namespace NightHeaven.Tests.Core.Text;
+namespace NightRaven.Tests.Core.Text;
 
 public class TextEncodingTests
 {

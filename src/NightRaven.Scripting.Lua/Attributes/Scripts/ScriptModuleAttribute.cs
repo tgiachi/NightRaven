@@ -1,4 +1,4 @@
-namespace NightHeaven.Scripting.Lua.Attributes.Scripts;
+namespace NightRaven.Scripting.Lua.Attributes.Scripts;
 
 /// <summary>
 /// Attribute to mark a class as a script module that will be exposed to JavaScript.

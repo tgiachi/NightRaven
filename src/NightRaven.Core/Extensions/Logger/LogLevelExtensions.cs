@@ -1,7 +1,7 @@
-using NightHeaven.Core.Types;
+using NightRaven.Core.Types;
 using Serilog.Events;
 
-namespace NightHeaven.Core.Extensions.Logger;
+namespace NightRaven.Core.Extensions.Logger;
 
 /// <summary>
 /// Extension methods for converting log levels between different logging frameworks.

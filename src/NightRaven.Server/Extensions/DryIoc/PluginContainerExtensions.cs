@@ -1,8 +1,8 @@
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Plugins.Services;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Plugins.Services;
 
-namespace NightHeaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.DryIoc;
 
 /// <summary>
 /// DryIoc-native registration helper for boot-time .NET plugins.
@@ -11,9 +11,9 @@ public static class PluginContainerExtensions
 {
     /// <summary>
     /// Loads trusted .NET plugins from the configured plugins directory and lets them register into the container.
-    /// Must run before <see cref="ConfigContainerExtensions.AddNightHeavenConfig" />.
+    /// Must run before <see cref="ConfigContainerExtensions.AddNightRavenConfig" />.
     /// </summary>
-    public static IContainer AddNightHeavenPlugins(this IContainer container, DirectoriesConfig directoriesConfig)
+    public static IContainer AddNightRavenPlugins(this IContainer container, DirectoriesConfig directoriesConfig)
     {
         ArgumentNullException.ThrowIfNull(container);
         ArgumentNullException.ThrowIfNull(directoriesConfig);

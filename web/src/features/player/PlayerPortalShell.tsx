@@ -9,15 +9,15 @@ import {
   Shield,
   UserRound,
 } from 'lucide-react'
-import { NightHeavenCrest } from './NightHeavenCrest'
+import { NightRavenCrest } from './NightRavenCrest'
 
 export function PlayerPortalShell({ children }: PropsWithChildren) {
   return (
     <div className="player-portal-shell">
       <aside className="player-sidebar">
         <div className="player-brand">
-          <NightHeavenCrest />
-          <div className="player-brand-title">NightHeaven</div>
+          <NightRavenCrest />
+          <div className="player-brand-title">NightRaven</div>
           <div className="player-brand-subtitle">Ultima Online Shard</div>
         </div>
 
@@ -47,10 +47,10 @@ export function PlayerPortalShell({ children }: PropsWithChildren) {
         <div className="player-sidebar-art" />
 
         <div className="player-profile-strip">
-          <NightHeavenCrest compact />
+          <NightRavenCrest compact />
           <div>
             <strong>Arthorius</strong>
-            <span>arthorius@nightheaven.net</span>
+            <span>arthorius@nightraven.net</span>
           </div>
         </div>
 
@@ -77,7 +77,7 @@ export function PlayerFooter() {
         <BookOpen aria-hidden="true" />
         <span>NH</span>
       </div>
-      <span>&copy; 2026 NightHeaven. All rights reserved.</span>
+      <span>&copy; 2026 NightRaven. All rights reserved.</span>
     </footer>
   )
 }

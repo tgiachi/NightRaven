@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.Types.Encryption;
+namespace NightRaven.Network.Types.Encryption;
 
 /// <summary>
 /// Specifies which transport encryption modes the server accepts.

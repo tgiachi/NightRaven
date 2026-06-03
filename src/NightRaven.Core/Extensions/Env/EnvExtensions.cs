@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace NightHeaven.Core.Extensions.Env;
+namespace NightRaven.Core.Extensions.Env;
 
 /// <summary>
 /// Provides extension methods for expanding environment variables in strings

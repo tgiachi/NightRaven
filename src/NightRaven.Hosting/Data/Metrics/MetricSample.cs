@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Types.Metrics;
+using NightRaven.Hosting.Types.Metrics;
 
-namespace NightHeaven.Hosting.Data.Metrics;
+namespace NightRaven.Hosting.Data.Metrics;
 
 /// <summary>
 /// One collected metric datapoint returned by an <see cref="Interfaces.Metrics.IMetricProvider" />.

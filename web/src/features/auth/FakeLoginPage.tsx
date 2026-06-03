@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { KeyRound, Shield, UserRound } from 'lucide-react'
 import { Shell } from '../../shared/layouts/Shell'
-import { NightHeavenCrest } from '../player/NightHeavenCrest'
+import { NightRavenCrest } from '../player/NightRavenCrest'
 import { PlayerFooter, PlayerPortalShell } from '../player/PlayerPortalShell'
 
 type FakeLoginPageProps = {
@@ -23,7 +23,7 @@ export function FakeLoginPage({
 }: FakeLoginPageProps) {
   const navigate = useNavigate()
   const [username, setUsername] = useState(section === 'admin' ? 'staff' : 'player')
-  const [password, setPassword] = useState('nightheaven')
+  const [password, setPassword] = useState('nightraven')
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -37,8 +37,8 @@ export function FakeLoginPage({
       <PlayerPortalShell>
         <section className="player-login-layout">
           <div className="player-login-copy ornate-panel">
-            <NightHeavenCrest />
-            <p className="section-label">NightHeaven Account</p>
+            <NightRavenCrest />
+            <p className="section-label">NightRaven Account</p>
             <h1>{title}</h1>
             <p>{description}</p>
             <div className="login-realm-strip">

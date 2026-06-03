@@ -1,6 +1,6 @@
-using NightHeaven.Core.Ids;
+using NightRaven.Core.Ids;
 
-namespace NightHeaven.Persistence.Internal;
+namespace NightRaven.Persistence.Internal;
 
 /// <summary>
 /// In-memory mutable world state shared by persistence data-access instances. Not thread-safe by

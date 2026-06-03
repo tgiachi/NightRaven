@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Types.Metrics;
+namespace NightRaven.Hosting.Types.Metrics;
 
 /// <summary>
 /// Subset of Prometheus / OpenMetrics metric kinds supported in v1.

@@ -3,12 +3,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
-using NightHeaven.Core.Extensions.Strings;
-using NightHeaven.Scripting.Lua.Attributes;
-using NightHeaven.Scripting.Lua.Attributes.Scripts;
-using NightHeaven.Scripting.Lua.Data.Internal;
+using NightRaven.Core.Extensions.Strings;
+using NightRaven.Scripting.Lua.Attributes;
+using NightRaven.Scripting.Lua.Attributes.Scripts;
+using NightRaven.Scripting.Lua.Data.Internal;
 
-namespace NightHeaven.Scripting.Lua.Utils;
+namespace NightRaven.Scripting.Lua.Utils;
 
 /// <summary>
 /// Utility class for generating Lua meta files with EmmyLua/LuaLS annotations

@@ -1,4 +1,4 @@
-namespace NightHeaven.Server.Data;
+namespace NightRaven.Server.Data;
 
 /// <summary>
 /// Version information returned by the <c>GET /api/version</c> endpoint.

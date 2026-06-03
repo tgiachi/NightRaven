@@ -1,24 +1,24 @@
 using DryIoc;
-using NightHeaven.Hosting.Data.Timing;
-using NightHeaven.Hosting.Interfaces.Timing;
-using NightHeaven.Server.Extensions.DryIoc;
+using NightRaven.Hosting.Data.Timing;
+using NightRaven.Hosting.Interfaces.Timing;
+using NightRaven.Server.Extensions.DryIoc;
 
-namespace NightHeaven.Tests.Hosting.Timing;
+namespace NightRaven.Tests.Hosting.Timing;
 
 public class TimerWheelExtensionsTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-timing-config-{Guid.NewGuid():N}");
-    private string Path_ => Path.Combine(_dir, "nightheaven.toml");
+    private string Path_ => Path.Combine(_dir, "nightraven.toml");
 
     [Fact]
-    public void AddNightHeavenTimerWheel_AppliesCustomConfig()
+    public void AddNightRavenTimerWheel_AppliesCustomConfig()
     {
         Directory.CreateDirectory(_dir);
         File.WriteAllText(Path_, "[timing]\ntick_duration = \"00:00:00.0040000\"\nwheel_size = 1024\n");
 
         var container = new Container();
-        container.AddNightHeavenTimerWheel();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenTimerWheel();
+        container.AddNightRavenConfig(Path_);
 
         var cfg = container.Resolve<TimerWheelConfig>();
         Assert.Equal(TimeSpan.FromMilliseconds(4), cfg.TickDuration);
@@ -26,11 +26,11 @@ public class TimerWheelExtensionsTests : IDisposable
     }
 
     [Fact]
-    public void AddNightHeavenTimerWheel_DefaultConfig_HasExpectedValues()
+    public void AddNightRavenTimerWheel_DefaultConfig_HasExpectedValues()
     {
         var container = new Container();
-        container.AddNightHeavenTimerWheel();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenTimerWheel();
+        container.AddNightRavenConfig(Path_);
 
         var cfg = container.Resolve<TimerWheelConfig>();
         Assert.Equal(TimeSpan.FromMilliseconds(8), cfg.TickDuration);
@@ -38,11 +38,11 @@ public class TimerWheelExtensionsTests : IDisposable
     }
 
     [Fact]
-    public void AddNightHeavenTimerWheel_RegistersServiceAndConfig()
+    public void AddNightRavenTimerWheel_RegistersServiceAndConfig()
     {
         var container = new Container();
-        container.AddNightHeavenTimerWheel();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenTimerWheel();
+        container.AddNightRavenConfig(Path_);
 
         Assert.NotNull(container.Resolve<ITimerService>());
         Assert.NotNull(container.Resolve<TimerWheelConfig>());

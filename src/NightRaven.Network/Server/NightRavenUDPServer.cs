@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Sockets;
-using NightHeaven.Core.Utils;
-using NightHeaven.Network.Events;
+using NightRaven.Core.Utils;
+using NightRaven.Network.Events;
 using Serilog;
 
-namespace NightHeaven.Network.Server;
+namespace NightRaven.Network.Server;
 
 /// <summary>
 /// Connectionless UDP server that binds one socket per local interface address and processes
@@ -12,9 +12,9 @@ namespace NightHeaven.Network.Server;
 /// UO launcher expects from a shard ping server); supply <see cref="OnDatagram" /> to customise the
 /// response. Supports Start/Stop/Start cycles by recreating the sockets on each Start.
 /// </summary>
-public sealed class NightHeavenUDPServer : IAsyncDisposable, IDisposable
+public sealed class NightRavenUDPServer : IAsyncDisposable, IDisposable
 {
-    private readonly ILogger _logger = Log.ForContext<NightHeavenUDPServer>();
+    private readonly ILogger _logger = Log.ForContext<NightRavenUDPServer>();
     private readonly Lock _sync = new();
     private readonly List<UdpClient> _listeners = [];
     private readonly List<Task> _receiveLoops = [];
@@ -32,7 +32,7 @@ public sealed class NightHeavenUDPServer : IAsyncDisposable, IDisposable
     /// When <c>true</c> (default), binds one socket per local unicast address matching the endpoint's
     /// address family. When <c>false</c>, binds only <paramref name="endPoint" />.
     /// </param>
-    public NightHeavenUDPServer(IPEndPoint endPoint, bool bindAllInterfaces = true)
+    public NightRavenUDPServer(IPEndPoint endPoint, bool bindAllInterfaces = true)
     {
         ArgumentNullException.ThrowIfNull(endPoint);
 
@@ -43,7 +43,7 @@ public sealed class NightHeavenUDPServer : IAsyncDisposable, IDisposable
     /// <summary>
     /// Raised when receive loops throw an unexpected exception.
     /// </summary>
-    public event EventHandler<NightHeavenTCPExceptionEventArgs>? OnException;
+    public event EventHandler<NightRavenTCPExceptionEventArgs>? OnException;
 
     /// <summary>
     /// Optional response factory. Receives the datagram payload and the sender endpoint and returns

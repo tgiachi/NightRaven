@@ -1,4 +1,4 @@
-namespace NightHeaven.Scripting.Lua.Attributes.Scripts;
+namespace NightRaven.Scripting.Lua.Attributes.Scripts;
 
 /// <summary>
 /// Attribute to mark a method as a script function that will be exposed to JavaScript.

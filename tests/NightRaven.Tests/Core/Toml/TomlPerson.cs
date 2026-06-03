@@ -1,4 +1,4 @@
-namespace NightHeaven.Tests.Core.Toml;
+namespace NightRaven.Tests.Core.Toml;
 
 public class TomlPerson
 {

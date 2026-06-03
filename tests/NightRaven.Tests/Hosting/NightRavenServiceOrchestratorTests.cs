@@ -1,13 +1,13 @@
 using DryIoc;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Support;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Support;
 
-namespace NightHeaven.Tests.Hosting;
+namespace NightRaven.Tests.Hosting;
 
-public class NightHeavenServiceOrchestratorTests
+public class NightRavenServiceOrchestratorTests
 {
-    internal sealed class ThrowingStopService : INightHeavenService
+    internal sealed class ThrowingStopService : INightRavenService
     {
         public Task StartAsync(CancellationToken cancellationToken)
             => Task.CompletedTask;
@@ -36,7 +36,7 @@ public class NightHeavenServiceOrchestratorTests
     public async Task Start_NoServicesRegistered_DoesNotThrow()
     {
         var container = new Container();
-        container.AddNightHeavenHosting();
+        container.AddNightRavenHosting();
 
         await container.Orchestrator().StartAsync(CancellationToken.None);
         await container.Orchestrator().StopAsync(CancellationToken.None);
@@ -64,9 +64,9 @@ public class NightHeavenServiceOrchestratorTests
         var timeline = new List<string>();
         var container = new Container();
         container.RegisterInstance(timeline);
-        container.AddNightHeavenHosting();
-        container.AddNightHeavenService<TestHostingServices.NamedServiceA>(10);
-        container.AddNightHeavenService<ThrowingStopService>(20);
+        container.AddNightRavenHosting();
+        container.AddNightRavenService<TestHostingServices.NamedServiceA>(10);
+        container.AddNightRavenService<ThrowingStopService>(20);
 
         var orchestrator = container.Orchestrator();
         await orchestrator.StartAsync(CancellationToken.None);
@@ -100,22 +100,22 @@ public class NightHeavenServiceOrchestratorTests
     {
         var container = new Container();
         container.RegisterInstance(timeline);
-        container.AddNightHeavenHosting();
+        container.AddNightRavenHosting();
 
         foreach (var (name, priority) in services)
         {
             switch (name)
             {
                 case "A":
-                    container.AddNightHeavenService<TestHostingServices.NamedServiceA>(priority);
+                    container.AddNightRavenService<TestHostingServices.NamedServiceA>(priority);
 
                     break;
                 case "B":
-                    container.AddNightHeavenService<TestHostingServices.NamedServiceB>(priority);
+                    container.AddNightRavenService<TestHostingServices.NamedServiceB>(priority);
 
                     break;
                 case "C":
-                    container.AddNightHeavenService<TestHostingServices.NamedServiceC>(priority);
+                    container.AddNightRavenService<TestHostingServices.NamedServiceC>(priority);
 
                     break;
                 default:
@@ -129,7 +129,7 @@ public class NightHeavenServiceOrchestratorTests
 
 internal static class TestHostingServices
 {
-    internal sealed class NamedServiceA : INightHeavenService
+    internal sealed class NamedServiceA : INightRavenService
     {
         private readonly List<string> _timeline;
 
@@ -159,7 +159,7 @@ internal static class TestHostingServices
         }
     }
 
-    internal sealed class NamedServiceB : INightHeavenService
+    internal sealed class NamedServiceB : INightRavenService
     {
         private readonly List<string> _timeline;
 
@@ -189,7 +189,7 @@ internal static class TestHostingServices
         }
     }
 
-    internal sealed class NamedServiceC : INightHeavenService
+    internal sealed class NamedServiceC : INightRavenService
     {
         private readonly List<string> _timeline;
 

@@ -28,12 +28,12 @@
         <FileVersion>0.1.0.0</FileVersion>
         <InformationalVersion>0.1.0</InformationalVersion>
         <Authors>Squid Development</Authors>
-        <Product>NightHeaven</Product>
+        <Product>NightRaven</Product>
         <Company>Squid Development</Company>
         <Copyright>© $(Company) $([System.DateTime]::Now.Year)</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryType>git</RepositoryType>
-        <PackageProjectUrl>https://github.com/tgiachi/NightHeaven</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/tgiachi/NightRaven</PackageProjectUrl>
         <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

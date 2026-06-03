@@ -1,4 +1,4 @@
-namespace NightHeaven.Core.Interfaces.Geometry;
+namespace NightRaven.Core.Interfaces.Geometry;
 
 /// <summary>
 /// Represents a two-dimensional point.

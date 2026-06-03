@@ -1,4 +1,4 @@
-namespace NightHeaven.Core.Utils;
+namespace NightRaven.Core.Utils;
 
 /// <summary>
 /// Utility methods for working with directories and file system operations

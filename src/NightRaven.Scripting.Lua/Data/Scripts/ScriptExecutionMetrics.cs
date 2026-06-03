@@ -1,4 +1,4 @@
-namespace NightHeaven.Scripting.Lua.Data.Scripts;
+namespace NightRaven.Scripting.Lua.Data.Scripts;
 
 /// <summary>
 /// Metrics about script execution performance.

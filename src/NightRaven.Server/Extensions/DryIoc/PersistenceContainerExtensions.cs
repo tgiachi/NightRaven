@@ -1,16 +1,16 @@
 using DryIoc;
-using NightHeaven.Core.Extensions.Container;
-using NightHeaven.Hosting.Data.Persistence;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Hosting.Internal;
-using NightHeaven.Persistence.Data;
-using NightHeaven.Persistence.Interfaces.Persistence;
-using NightHeaven.Persistence.Services.Persistence;
+using NightRaven.Core.Extensions.Container;
+using NightRaven.Hosting.Data.Persistence;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Hosting.Internal;
+using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Interfaces.Persistence;
+using NightRaven.Persistence.Services.Persistence;
 
-namespace NightHeaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.DryIoc;
 
 /// <summary>
-/// DryIoc-native registration helpers for the NightHeaven persistence engine.
+/// DryIoc-native registration helpers for the NightRaven persistence engine.
 /// </summary>
 public static class PersistenceContainerExtensions
 {
@@ -24,9 +24,9 @@ public static class PersistenceContainerExtensions
         /// open-generic <see cref="IDataAccess{TEntity,TKey}" />.
         /// </summary>
         /// <param name="saveDirectory">Directory for snapshot/journal files.</param>
-        public IContainer AddNightHeavenPersistence(string saveDirectory)
+        public IContainer AddNightRavenPersistence(string saveDirectory)
         {
-            container.AddNightHeavenHosting();
+            container.AddNightRavenHosting();
 
             container.RegisterConfigSection("persistence", () => new PersistenceConfig());
 
@@ -51,7 +51,7 @@ public static class PersistenceContainerExtensions
 
             // Drive start/stop through the orchestrator at priority 15 (after TimerWheel=3, before Network=20).
             container.RegisterDelegate(
-                resolver => new NightHeavenServiceDescriptor(resolver.Resolve<IPersistenceService>(), PersistencePriority),
+                resolver => new NightRavenServiceDescriptor(resolver.Resolve<IPersistenceService>(), PersistencePriority),
                 Reuse.Singleton,
                 ifAlreadyRegistered: IfAlreadyRegistered.AppendNewImplementation,
                 serviceKey: typeof(PersistenceService)
@@ -91,7 +91,7 @@ public static class PersistenceContainerExtensions
 
         /// <summary>
         /// Registers a persisted entity type. Accumulates a descriptor consumed by the persistence
-        /// service at boot. Call before <see cref="AddNightHeavenPersistence" />'s service starts.
+        /// service at boot. Call before <see cref="AddNightRavenPersistence" />'s service starts.
         /// </summary>
         /// <param name="typeId">Stable numeric identifier for the entity kind.</param>
         /// <param name="schemaVersion">Version of the persisted entity schema.</param>

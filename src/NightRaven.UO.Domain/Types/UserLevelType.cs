@@ -1,4 +1,4 @@
-namespace NightHeaven.UO.Domain.Types;
+namespace NightRaven.UO.Domain.Types;
 
 public enum UserLevelType
 {

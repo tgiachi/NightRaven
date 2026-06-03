@@ -1,27 +1,27 @@
 using System.Net;
 using System.Net.Sockets;
-using NightHeaven.Core.Buffers;
-using NightHeaven.Network.Buffers;
-using NightHeaven.Network.Events;
-using NightHeaven.Network.Interfaces.Framing;
-using NightHeaven.Network.Interfaces.Middleware;
-using NightHeaven.Network.Pipeline;
+using NightRaven.Core.Buffers;
+using NightRaven.Network.Buffers;
+using NightRaven.Network.Events;
+using NightRaven.Network.Interfaces.Framing;
+using NightRaven.Network.Interfaces.Middleware;
+using NightRaven.Network.Pipeline;
 using Serilog;
 
-namespace NightHeaven.Network.Client;
+namespace NightRaven.Network.Client;
 
 /// <summary>
 /// Represents a connected TCP client with async send/receive loops,
 /// middleware processing, lifecycle events, and recent byte history.
 /// </summary>
-public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
+public sealed class NightRavenTCPClient : IAsyncDisposable, IDisposable
 {
     private const int DefaultReceiveBufferSize = 8192;
     private const int DefaultHistoryBufferCapacity = 65536;
 
     private static long _sessionIdSequence;
 
-    private readonly ILogger _logger = Log.ForContext<NightHeavenTCPClient>();
+    private readonly ILogger _logger = Log.ForContext<NightRavenTCPClient>();
     private readonly NetMiddlewarePipeline _middlewarePipeline;
     private readonly INetFramer? _framer;
     private readonly Socket _socket;
@@ -48,7 +48,7 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
     /// </param>
     /// <param name="receiveBufferSize">Receive chunk size in bytes.</param>
     /// <param name="historyBufferCapacity">Max number of received bytes to keep in history.</param>
-    public NightHeavenTCPClient(
+    public NightRavenTCPClient(
         Socket socket,
         IEnumerable<INetMiddleware>? middlewares = null,
         INetFramer? framer = null,
@@ -67,22 +67,22 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
     /// <summary>
     /// Raised when the client is fully connected and receive loop starts.
     /// </summary>
-    public event EventHandler<NightHeavenTCPClientEventArgs>? OnConnected;
+    public event EventHandler<NightRavenTCPClientEventArgs>? OnConnected;
 
     /// <summary>
     /// Raised when the client is disconnected.
     /// </summary>
-    public event EventHandler<NightHeavenTCPClientEventArgs>? OnDisconnected;
+    public event EventHandler<NightRavenTCPClientEventArgs>? OnDisconnected;
 
     /// <summary>
     /// Raised when data is received (after middleware pipeline).
     /// </summary>
-    public event EventHandler<NightHeavenTCPDataReceivedEventArgs>? OnDataReceived;
+    public event EventHandler<NightRavenTCPDataReceivedEventArgs>? OnDataReceived;
 
     /// <summary>
     /// Raised when receive/send loops throw an exception.
     /// </summary>
-    public event EventHandler<NightHeavenTCPExceptionEventArgs>? OnException;
+    public event EventHandler<NightRavenTCPExceptionEventArgs>? OnException;
 
     /// <summary>
     /// Unique session identifier for this client connection.
@@ -166,7 +166,7 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
     /// <summary>
     /// Adds a middleware component to this client pipeline.
     /// </summary>
-    public NightHeavenTCPClient AddMiddleware(INetMiddleware middleware)
+    public NightRavenTCPClient AddMiddleware(INetMiddleware middleware)
     {
         _middlewarePipeline.AddMiddleware(middleware);
 
@@ -210,7 +210,7 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
     /// <summary>
     /// Creates an outbound client and connects to the specified endpoint.
     /// </summary>
-    public static async Task<NightHeavenTCPClient> ConnectAsync(
+    public static async Task<NightRavenTCPClient> ConnectAsync(
         IPEndPoint endPoint,
         IEnumerable<INetMiddleware>? middlewares = null,
         INetFramer? framer = null,
@@ -220,7 +220,7 @@ public sealed class NightHeavenTCPClient : IAsyncDisposable, IDisposable
         var socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         await socket.ConnectAsync(endPoint, cancellationToken);
 
-        var client = new NightHeavenTCPClient(socket, middlewares, framer);
+        var client = new NightRavenTCPClient(socket, middlewares, framer);
         await client.StartAsync(cancellationToken);
 
         return client;

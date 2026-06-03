@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.UO.Types.Targeting;
+namespace NightRaven.Network.UO.Types.Targeting;
 
 /// <summary>
 /// Indicates whether the target cursor expects an object or a world position.

@@ -1,6 +1,6 @@
-using NightHeaven.Persistence.Data;
+using NightRaven.Persistence.Data;
 
-namespace NightHeaven.Persistence.Interfaces.Persistence;
+namespace NightRaven.Persistence.Interfaces.Persistence;
 
 /// <summary>
 /// Registry of persisted entity descriptors used by snapshot and journal infrastructure.

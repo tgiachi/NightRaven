@@ -1,18 +1,18 @@
 using DryIoc;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Server.Services.EventBus;
-using NightHeaven.Server.Services.GameLoop;
-using NightHeaven.Server.Services.Metrics;
-using NightHeaven.Server.Services.Timing;
-using NightHeaven.Tests.Support;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Services.EventBus;
+using NightRaven.Server.Services.GameLoop;
+using NightRaven.Server.Services.Metrics;
+using NightRaven.Server.Services.Timing;
+using NightRaven.Tests.Support;
 
-namespace NightHeaven.Tests.Hosting.Metrics;
+namespace NightRaven.Tests.Hosting.Metrics;
 
 public class MetricsIntegrationTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-metrics-integration-config-{Guid.NewGuid():N}");
-    private string Path_ => Path.Combine(_dir, "nightheaven.toml");
+    private string Path_ => Path.Combine(_dir, "nightraven.toml");
 
     public void Dispose()
     {
@@ -31,10 +31,10 @@ public class MetricsIntegrationTests : IDisposable
         File.WriteAllText(Path_, "[metrics]\nrefresh_interval = \"00:00:00.0500000\"\n");
 
         var container = new Container();
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenTimerWheel();
-        container.AddNightHeavenMetrics();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenTimerWheel();
+        container.AddNightRavenMetrics();
+        container.AddNightRavenConfig(Path_);
 
         container.AddMetricProvider<EventBusService>();
         container.AddMetricProvider<GameLoopService>();

@@ -1,7 +1,7 @@
-using NightHeaven.Core.Ids;
-using NightHeaven.UO.Domain.Types;
+using NightRaven.Core.Ids;
+using NightRaven.UO.Domain.Types;
 
-namespace NightHeaven.UO.Domain.Entities;
+namespace NightRaven.UO.Domain.Entities;
 
 public sealed class UserEntity
 {

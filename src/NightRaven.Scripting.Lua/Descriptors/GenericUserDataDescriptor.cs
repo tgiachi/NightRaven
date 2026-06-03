@@ -1,7 +1,7 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Interop;
 
-namespace NightHeaven.Scripting.Lua.Descriptors;
+namespace NightRaven.Scripting.Lua.Descriptors;
 
 /// <summary>
 /// Generic UserData descriptor that adds support for string concatenation and conversion.

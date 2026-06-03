@@ -1,4 +1,4 @@
-namespace NightHeaven.Tests.Plugins.Support;
+namespace NightRaven.Tests.Plugins.Support;
 
 public static class PluginFixtureCopy
 {

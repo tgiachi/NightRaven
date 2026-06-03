@@ -1,10 +1,10 @@
 using Scalar.AspNetCore;
 
-namespace NightHeaven.Server.Extensions;
+namespace NightRaven.Server.Extensions;
 
 public static class ApiDocsEndpointExtensions
 {
-    public static IEndpointConventionBuilder MapNightHeavenApiDocs(
+    public static IEndpointConventionBuilder MapNightRavenApiDocs(
         this IEndpointRouteBuilder endpoints,
         string pattern = "/api/docs"
     )
@@ -15,7 +15,7 @@ public static class ApiDocsEndpointExtensions
             pattern,
             options =>
             {
-                options.Title = "NightHeaven API";
+                options.Title = "NightRaven API";
                 options.Theme = ScalarTheme.DeepSpace;
             }
         );

@@ -1,4 +1,4 @@
-namespace NightHeaven.Server.Services.Timing.Internal;
+namespace NightRaven.Server.Services.Timing.Internal;
 
 /// <summary>
 /// Internal record stored in the timer wheel. Mutable so the wheel can update

@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Data.Timing;
+namespace NightRaven.Hosting.Data.Timing;
 
 /// <summary>
 /// Configuration for the hashed timer wheel.

@@ -1,14 +1,14 @@
 using System.Diagnostics;
-using NightHeaven.Hosting.Data;
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Hosting.Interfaces.Timing;
-using NightHeaven.Hosting.Types.Metrics;
+using NightRaven.Hosting.Data;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Hosting.Interfaces.Timing;
+using NightRaven.Hosting.Types.Metrics;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace NightHeaven.Server.Services.GameLoop;
+namespace NightRaven.Server.Services.GameLoop;
 
 /// <summary>
 /// Owns the dedicated game-loop thread. Drains tick events from <see cref="IEventBusService" />,
@@ -114,7 +114,7 @@ public sealed class GameLoopService : IGameLoopService, IMetricProvider, IDispos
         _thread = new(RunLoop)
         {
             IsBackground = true,
-            Name = "NightHeaven-GameLoop"
+            Name = "NightRaven-GameLoop"
         };
         _thread.Start();
 

@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.Exceptions.Buffers;
+namespace NightRaven.Network.Exceptions.Buffers;
 
 /// <summary>
 /// Exception thrown when an operation requires at least one element in the circular buffer.

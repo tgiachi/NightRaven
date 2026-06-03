@@ -6,9 +6,9 @@ export function Shell({ children }: PropsWithChildren) {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <NavLink to="/" className="brand" aria-label="NightHeaven home">
+        <NavLink to="/" className="brand" aria-label="NightRaven home">
           <span className="brand-mark">NH</span>
-          <span>NightHeaven</span>
+          <span>NightRaven</span>
         </NavLink>
 
         <nav className="main-nav" aria-label="Navigazione principale">

@@ -1,13 +1,13 @@
-using NightHeaven.Hosting.Data.Internal;
-using NightHeaven.Tests.Hosting.Configuration.Support;
-using ConfigService = NightHeaven.Hosting.Configuration.ConfigService;
+using NightRaven.Hosting.Data.Internal;
+using NightRaven.Tests.Hosting.Configuration.Support;
+using ConfigService = NightRaven.Hosting.Configuration.ConfigService;
 
-namespace NightHeaven.Tests.Hosting.Configuration;
+namespace NightRaven.Tests.Hosting.Configuration;
 
 public class ConfigServiceTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-config-{Guid.NewGuid():N}");
-    private string Path_ => Path.Combine(_dir, "nightheaven.toml");
+    private string Path_ => Path.Combine(_dir, "nightraven.toml");
 
     public void Dispose()
     {

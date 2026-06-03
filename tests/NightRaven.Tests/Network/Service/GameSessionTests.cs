@@ -1,8 +1,8 @@
 using System.Net.Sockets;
-using NightHeaven.Network.Client;
-using NightHeaven.Server.Services.Network.Internal;
+using NightRaven.Network.Client;
+using NightRaven.Server.Services.Network.Internal;
 
-namespace NightHeaven.Tests.Network.Service;
+namespace NightRaven.Tests.Network.Service;
 
 public class GameSessionTests
 {
@@ -44,6 +44,6 @@ public class GameSessionTests
         Assert.Equal(new byte[] { 1, 2, 3 }, observed);
     }
 
-    private static NightHeavenTCPClient NewClient()
+    private static NightRavenTCPClient NewClient()
         => new(new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp));
 }

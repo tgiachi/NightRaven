@@ -1,11 +1,11 @@
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Server.Services.Metrics;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Server.Services.Metrics;
 
-namespace NightHeaven.Server.Extensions;
+namespace NightRaven.Server.Extensions;
 
 public static class MetricsEndpointExtensions
 {
-    public static IEndpointConventionBuilder MapNightHeavenMetrics(
+    public static IEndpointConventionBuilder MapNightRavenMetrics(
         this IEndpointRouteBuilder endpoints,
         string pattern = "/metrics"
     )

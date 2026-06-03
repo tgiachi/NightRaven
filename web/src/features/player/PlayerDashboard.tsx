@@ -8,7 +8,7 @@ import {
   Swords,
   UserRound,
 } from 'lucide-react'
-import { NightHeavenCrest } from './NightHeavenCrest'
+import { NightRavenCrest } from './NightRavenCrest'
 import { PlayerDashboardCard } from './PlayerDashboardCard'
 import { PlayerFooter, PlayerPortalShell } from './PlayerPortalShell'
 import { patchNotes, playerCharacters } from './playerPortalData'
@@ -45,7 +45,7 @@ export function PlayerDashboard() {
           </div>
           <div className="realm-copy">
             <p>
-              NightHeaven is <strong>online</strong> and accepting connections.
+              NightRaven is <strong>online</strong> and accepting connections.
             </p>
             <span>All systems operational.</span>
           </div>
@@ -95,7 +95,7 @@ export function PlayerDashboard() {
               </div>
             </div>
             <div className="account-medallion">
-              <NightHeavenCrest compact />
+              <NightRavenCrest compact />
             </div>
           </div>
           <button className="metal-button" type="button">
@@ -134,7 +134,7 @@ export function PlayerDashboard() {
               <Download aria-hidden="true" />
               <div>
                 <strong>Full Client (Recommended)</strong>
-                <span>UO Classic 7.0.98.13 + NightHeaven</span>
+                <span>UO Classic 7.0.98.13 + NightRaven</span>
                 <small>1.2 GB</small>
               </div>
               <button className="gold-button" type="button">Download Full Client</button>

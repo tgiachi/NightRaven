@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.UO.Types.Packets;
+namespace NightRaven.Network.UO.Types.Packets;
 
 /// <summary>
 /// Represents PacketSizing.

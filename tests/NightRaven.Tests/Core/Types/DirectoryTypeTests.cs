@@ -1,6 +1,6 @@
-using NightHeaven.Core.Types;
+using NightRaven.Core.Types;
 
-namespace NightHeaven.Tests.Core.Types;
+namespace NightRaven.Tests.Core.Types;
 
 public class DirectoryTypeTests
 {

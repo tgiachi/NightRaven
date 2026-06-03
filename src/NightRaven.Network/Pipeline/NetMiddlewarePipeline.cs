@@ -1,7 +1,7 @@
-using NightHeaven.Network.Client;
-using NightHeaven.Network.Interfaces.Middleware;
+using NightRaven.Network.Client;
+using NightRaven.Network.Interfaces.Middleware;
 
-namespace NightHeaven.Network.Pipeline;
+namespace NightRaven.Network.Pipeline;
 
 /// <summary>
 /// Executes <see cref="INetMiddleware" /> components in registration order over a byte payload.
@@ -61,7 +61,7 @@ public sealed class NetMiddlewarePipeline
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The processed payload, or empty when dropped by middleware.</returns>
     public async ValueTask<ReadOnlyMemory<byte>> ExecuteAsync(
-        NightHeavenTCPClient? client,
+        NightRavenTCPClient? client,
         ReadOnlyMemory<byte> data,
         CancellationToken cancellationToken
     )
@@ -97,7 +97,7 @@ public sealed class NetMiddlewarePipeline
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The processed payload, or empty when dropped by middleware.</returns>
     public async ValueTask<ReadOnlyMemory<byte>> ExecuteSendAsync(
-        NightHeavenTCPClient? client,
+        NightRavenTCPClient? client,
         ReadOnlyMemory<byte> data,
         CancellationToken cancellationToken
     )

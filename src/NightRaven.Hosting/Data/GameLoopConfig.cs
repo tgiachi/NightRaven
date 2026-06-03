@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Data;
+namespace NightRaven.Hosting.Data;
 
 /// <summary>
 /// Configuration for the game loop thread.

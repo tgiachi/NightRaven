@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace NightHeaven.Network.Encryption;
+namespace NightRaven.Network.Encryption;
 
 /// <summary>
 /// Implements the 128-bit Twofish block cipher used by the UO game transport.

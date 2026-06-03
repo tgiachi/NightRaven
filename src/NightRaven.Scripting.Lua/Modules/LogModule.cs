@@ -1,7 +1,7 @@
-using NightHeaven.Scripting.Lua.Attributes.Scripts;
+using NightRaven.Scripting.Lua.Attributes.Scripts;
 using Serilog;
 
-namespace NightHeaven.Scripting.Lua.Modules;
+namespace NightRaven.Scripting.Lua.Modules;
 
 [ScriptModule("log", "Provides logging functionalities to scripts.")]
 public class LogModule

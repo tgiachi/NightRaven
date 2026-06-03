@@ -1,4 +1,4 @@
-namespace NightHeaven.Server.Services.EventBus.Internal;
+namespace NightRaven.Server.Services.EventBus.Internal;
 
 /// <summary>
 /// Abstract base of the polymorphic envelope used to type-erase tick events in the queue.

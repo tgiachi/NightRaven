@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Data.Internal;
+namespace NightRaven.Hosting.Data.Internal;
 
 /// <summary>
 /// Boot-time declaration of a config section: how to name it, default it, and bind it from TOML.

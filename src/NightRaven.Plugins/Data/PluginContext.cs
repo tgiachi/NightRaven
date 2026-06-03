@@ -1,12 +1,12 @@
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Hosting.Configuration;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Hosting.Configuration;
 using Serilog;
 using Tomlyn;
 
-namespace NightHeaven.Plugins.Data;
+namespace NightRaven.Plugins.Data;
 
 /// <summary>
-/// Per-plugin startup context passed to <see cref="NightHeaven.Plugins.Interfaces.INightHeavenPlugin" />.
+/// Per-plugin startup context passed to <see cref="NightRaven.Plugins.Interfaces.INightRavenPlugin" />.
 /// </summary>
 public sealed class PluginContext
 {
@@ -28,7 +28,7 @@ public sealed class PluginContext
     /// <summary>Absolute path to the optional plugin runtime TOML config.</summary>
     public string PluginConfigPath { get; }
 
-    /// <summary>Global NightHeaven directory configuration.</summary>
+    /// <summary>Global NightRaven directory configuration.</summary>
     public DirectoriesConfig Directories { get; }
 
     /// <summary>

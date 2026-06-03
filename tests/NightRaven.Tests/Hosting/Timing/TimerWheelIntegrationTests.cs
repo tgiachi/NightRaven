@@ -1,18 +1,18 @@
 using DryIoc;
-using NightHeaven.Hosting.Interfaces.Timing;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Support;
+using NightRaven.Hosting.Interfaces.Timing;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Support;
 
-namespace NightHeaven.Tests.Hosting.Timing;
+namespace NightRaven.Tests.Hosting.Timing;
 
 public class TimerWheelIntegrationTests : IDisposable
 {
     private readonly string _dir = Path.Combine(
         Path.GetTempPath(),
-        $"nightheaven-timerwheel-integration-{Guid.NewGuid():N}"
+        $"nightraven-timerwheel-integration-{Guid.NewGuid():N}"
     );
 
-    private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
+    private string ConfigPath => Path.Combine(_dir, "nightraven.toml");
 
     public void Dispose()
     {
@@ -28,9 +28,9 @@ public class TimerWheelIntegrationTests : IDisposable
     public async Task FullHost_TimerRegisteredAfterStart_FiresThroughGameLoop()
     {
         var container = new Container();
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenTimerWheel();
-        container.AddNightHeavenConfig(ConfigPath);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenTimerWheel();
+        container.AddNightRavenConfig(ConfigPath);
 
         var orchestrator = container.Orchestrator();
         var timers = container.Resolve<ITimerService>();

@@ -1,6 +1,6 @@
-using NightHeaven.Persistence.Data;
+using NightRaven.Persistence.Data;
 
-namespace NightHeaven.Persistence.Internal;
+namespace NightRaven.Persistence.Internal;
 
 /// <summary>
 /// Type-erased hook implemented by the typed descriptor so the persistence service can apply journal

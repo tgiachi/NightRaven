@@ -1,10 +1,10 @@
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Hosting.Types.Metrics;
-using NightHeaven.Server.Services.Metrics;
-using NightHeaven.Server.Services.Timing;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Server.Services.Metrics;
+using NightRaven.Server.Services.Timing;
 
-namespace NightHeaven.Tests.Hosting.Metrics;
+namespace NightRaven.Tests.Hosting.Metrics;
 
 public class MetricsServiceTests
 {

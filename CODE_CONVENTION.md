@@ -1,6 +1,6 @@
-# Code Convention — NightHeaven
+# Code Convention — NightRaven
 
-This document defines coding conventions for the NightHeaven project. It is intentionally strict to keep the codebase consistent and readable.
+This document defines coding conventions for the NightRaven project. It is intentionally strict to keep the codebase consistent and readable.
 
 ## 1. General Principles
 
@@ -17,9 +17,9 @@ This document defines coding conventions for the NightHeaven project. It is inte
 Namespace must match folder path exactly.
 
 ```
-src/NightHeaven.Core/Services/ConfigService.cs        → namespace NightHeaven.Core.Services;
-src/NightHeaven.Service/Subscribers/SocketBroadcastSubscriber.cs → namespace NightHeaven.Service.Subscribers;
-tests/NightHeaven.Tests/Core/EventBusServiceTests.cs  → namespace NightHeaven.Tests.Core;
+src/NightRaven.Core/Services/ConfigService.cs        → namespace NightRaven.Core.Services;
+src/NightRaven.Service/Subscribers/SocketBroadcastSubscriber.cs → namespace NightRaven.Service.Subscribers;
+tests/NightRaven.Tests/Core/EventBusServiceTests.cs  → namespace NightRaven.Tests.Core;
 ```
 
 ### 2.2 Domain-First Organization
@@ -88,12 +88,12 @@ src/<Project>/Interfaces/<Domain>/IFoo.cs   →   namespace <Project>.Interfaces
 - Examples:
 
 ```
-src/NightHeaven.Hosting/Interfaces/Events/INightHeavenEvent.cs    → namespace NightHeaven.Hosting.Interfaces.Events;
-src/NightHeaven.Hosting/Interfaces/Events/IAsyncEvent.cs          → namespace NightHeaven.Hosting.Interfaces.Events;
-src/NightHeaven.Hosting/Interfaces/EventHandlers/IAsyncEventHandler.cs → namespace NightHeaven.Hosting.Interfaces.EventHandlers;
-src/NightHeaven.Hosting/Interfaces/Services/IEventBusService.cs   → namespace NightHeaven.Hosting.Interfaces.Services;
-src/NightHeaven.Network/Interfaces/Encryption/IClientEncryption.cs → namespace NightHeaven.Network.Interfaces.Encryption;
-src/NightHeaven.Network/Interfaces/Framing/INetFramer.cs           → namespace NightHeaven.Network.Interfaces.Framing;
+src/NightRaven.Hosting/Interfaces/Events/INightRavenEvent.cs    → namespace NightRaven.Hosting.Interfaces.Events;
+src/NightRaven.Hosting/Interfaces/Events/IAsyncEvent.cs          → namespace NightRaven.Hosting.Interfaces.Events;
+src/NightRaven.Hosting/Interfaces/EventHandlers/IAsyncEventHandler.cs → namespace NightRaven.Hosting.Interfaces.EventHandlers;
+src/NightRaven.Hosting/Interfaces/Services/IEventBusService.cs   → namespace NightRaven.Hosting.Interfaces.Services;
+src/NightRaven.Network/Interfaces/Encryption/IClientEncryption.cs → namespace NightRaven.Network.Interfaces.Encryption;
+src/NightRaven.Network/Interfaces/Framing/INetFramer.cs           → namespace NightRaven.Network.Interfaces.Framing;
 ```
 
 - Flat `Interfaces/` directories (interfaces without a domain bucket) are forbidden.
@@ -107,11 +107,11 @@ src/NightHeaven.Network/Interfaces/Framing/INetFramer.cs           → namespace
 
 ```csharp
 // Types/LogLevelType.cs
-namespace NightHeaven.Core.Types;
+namespace NightRaven.Core.Types;
 public enum LogLevelType { ... }
 
 // Types/DirectoryType.cs
-namespace NightHeaven.Core.Types;
+namespace NightRaven.Core.Types;
 public enum DirectoryType { Scripts, Logs, Plugins, Configs }
 ```
 
@@ -128,7 +128,7 @@ public enum DirectoryType { Scripts, Logs, Plugins, Configs }
 private readonly ILogger _logger = Log.ForContext<MyService>();
 ```
 
-- When both Serilog and Microsoft.Extensions.Logging are in scope (e.g., `NightHeaven.Service` which uses `Microsoft.NET.Sdk.Web`), add a using alias to resolve the ambiguity:
+- When both Serilog and Microsoft.Extensions.Logging are in scope (e.g., `NightRaven.Service` which uses `Microsoft.NET.Sdk.Web`), add a using alias to resolve the ambiguity:
 
 ```csharp
 using Serilog;
@@ -140,7 +140,7 @@ using ILogger = Serilog.ILogger;
 
 ## 9. Event Bus
 
-- All event types must implement `INightHeavenEvent`.
+- All event types must implement `INightRavenEvent`.
 - Use `IEventBus.Subscribe<T>` to register handlers; use `IEventBus.PublishAsync<T>` to emit events.
 - Subscriber classes live in `Subscribers/` and register themselves in the constructor.
 
@@ -157,7 +157,7 @@ internal class MySubscriber
 
 ## 10. Plugin System
 
-- Plugins implement `ISourcePlugin` (Id in reverse-domain format: `com.github.author.NightHeaven.plugins.name`).
+- Plugins implement `ISourcePlugin` (Id in reverse-domain format: `com.github.author.NightRaven.plugins.name`).
 - Plugins receive an `IPluginContext` — use `context.EventBus` to publish, `context.Logger` to log, `context.ConfigPath` for config.
 - Plugin hosts are loaded via `PluginLoadContext` (`AssemblyLoadContext(isCollectible: true)`) for hot-reload support.
 
@@ -177,15 +177,15 @@ internal class MySubscriber
 ### 13.1 Structure
 
 ```
-tests/NightHeaven.Tests/<Domain>/<Subdomain>/<SubjectName>Tests.cs
-namespace NightHeaven.Tests.<Domain>.<Subdomain>;
+tests/NightRaven.Tests/<Domain>/<Subdomain>/<SubjectName>Tests.cs
+namespace NightRaven.Tests.<Domain>.<Subdomain>;
 ```
 
 Examples:
 ```
-tests/NightHeaven.Tests/Core/EventBusServiceTests.cs   → namespace NightHeaven.Tests.Core;
-tests/NightHeaven.Tests/Service/UnixSocketServerTests.cs → namespace NightHeaven.Tests.Service;
-tests/NightHeaven.Tests/Support/FakeSourcePlugin.cs    → namespace NightHeaven.Tests.Support;
+tests/NightRaven.Tests/Core/EventBusServiceTests.cs   → namespace NightRaven.Tests.Core;
+tests/NightRaven.Tests/Service/UnixSocketServerTests.cs → namespace NightRaven.Tests.Service;
+tests/NightRaven.Tests/Support/FakeSourcePlugin.cs    → namespace NightRaven.Tests.Support;
 ```
 
 ### 13.2 Naming
@@ -197,14 +197,14 @@ tests/NightHeaven.Tests/Support/FakeSourcePlugin.cs    → namespace NightHeaven
 
 ### 13.3 Test Support
 
-- Shared fakes, builders, and helpers go in `tests/NightHeaven.Tests/Support/`.
+- Shared fakes, builders, and helpers go in `tests/NightRaven.Tests/Support/`.
 - Do not mix reusable test infrastructure into domain test files.
 
 ### 13.4 InternalsVisibleTo
 
-`NightHeaven.Service.csproj` exposes internals to `NightHeaven.Tests` via:
+`NightRaven.Service.csproj` exposes internals to `NightRaven.Tests` via:
 ```xml
-<InternalsVisibleTo Include="NightHeaven.Tests"/>
+<InternalsVisibleTo Include="NightRaven.Tests"/>
 ```
 
 ## 14. Commits

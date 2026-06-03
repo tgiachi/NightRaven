@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Interfaces;
+using NightRaven.Hosting.Interfaces;
 
-namespace NightHeaven.Tests.Hosting.Configuration.Support;
+namespace NightRaven.Tests.Hosting.Configuration.Support;
 
 public sealed class ValidatableSettings : IValidatableConfig
 {

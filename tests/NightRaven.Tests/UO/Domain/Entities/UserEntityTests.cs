@@ -1,8 +1,8 @@
-using NightHeaven.Core.Ids;
-using NightHeaven.UO.Domain.Entities;
-using NightHeaven.UO.Domain.Types;
+using NightRaven.Core.Ids;
+using NightRaven.UO.Domain.Entities;
+using NightRaven.UO.Domain.Types;
 
-namespace NightHeaven.Tests.UO.Domain.Entities;
+namespace NightRaven.Tests.UO.Domain.Entities;
 
 public class UserEntityTests
 {

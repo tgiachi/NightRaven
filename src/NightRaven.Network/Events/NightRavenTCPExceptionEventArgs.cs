@@ -1,13 +1,13 @@
-using NightHeaven.Network.Client;
+using NightRaven.Network.Client;
 
-namespace NightHeaven.Network.Events;
+namespace NightRaven.Network.Events;
 
 /// <summary>
 /// Event payload containing an exception raised by server or client network loops.
 /// </summary>
-public sealed class NightHeavenTCPExceptionEventArgs : EventArgs
+public sealed class NightRavenTCPExceptionEventArgs : EventArgs
 {
-    public NightHeavenTCPExceptionEventArgs(Exception exception, NightHeavenTCPClient? client = null)
+    public NightRavenTCPExceptionEventArgs(Exception exception, NightRavenTCPClient? client = null)
     {
         Exception = exception;
         Client = client;
@@ -21,5 +21,5 @@ public sealed class NightHeavenTCPExceptionEventArgs : EventArgs
     /// <summary>
     /// Client related to the exception, when available.
     /// </summary>
-    public NightHeavenTCPClient? Client { get; }
+    public NightRavenTCPClient? Client { get; }
 }

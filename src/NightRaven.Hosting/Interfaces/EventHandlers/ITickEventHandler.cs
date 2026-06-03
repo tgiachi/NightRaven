@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Interfaces.Events;
+using NightRaven.Hosting.Interfaces.Events;
 
-namespace NightHeaven.Hosting.Interfaces.EventHandlers;
+namespace NightRaven.Hosting.Interfaces.EventHandlers;
 
 /// <summary>
 /// Handles a single <typeparamref name="TEvent" /> on the tick path.

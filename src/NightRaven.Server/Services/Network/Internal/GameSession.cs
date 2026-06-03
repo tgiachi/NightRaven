@@ -1,6 +1,6 @@
-using NightHeaven.Network.Client;
+using NightRaven.Network.Client;
 
-namespace NightHeaven.Server.Services.Network.Internal;
+namespace NightRaven.Server.Services.Network.Internal;
 
 /// <summary>
 /// Minimal per-connection session: tracks the owning client and a pending byte buffer that the
@@ -11,7 +11,7 @@ public sealed class GameSession
     private readonly Lock _pendingBytesSync = new();
     private readonly List<byte> _pendingBytes = [];
 
-    public GameSession(NightHeavenTCPClient client)
+    public GameSession(NightRavenTCPClient client)
     {
         ArgumentNullException.ThrowIfNull(client);
 
@@ -27,7 +27,7 @@ public sealed class GameSession
     /// <summary>
     /// Owning TCP client.
     /// </summary>
-    public NightHeavenTCPClient Client { get; }
+    public NightRavenTCPClient Client { get; }
 
     /// <summary>
     /// Executes <paramref name="action" /> with exclusive access to the pending byte buffer.

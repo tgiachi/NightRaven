@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.NetworkInformation;
 
-namespace NightHeaven.Core.Utils;
+namespace NightRaven.Core.Utils;
 
 /// <summary>
 /// Provides utilities for enumerating the host's network interfaces and addresses.

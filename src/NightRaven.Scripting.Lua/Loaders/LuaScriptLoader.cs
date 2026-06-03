@@ -1,9 +1,9 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.Loaders;
-using NightHeaven.Core.Extensions.Directories;
+using NightRaven.Core.Extensions.Directories;
 using Serilog;
 
-namespace NightHeaven.Scripting.Lua.Loaders;
+namespace NightRaven.Scripting.Lua.Loaders;
 
 /// <summary>
 /// Custom script loader for MoonSharp that loads Lua modules from the configured Scripts directory.

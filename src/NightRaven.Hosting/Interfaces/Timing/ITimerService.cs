@@ -1,12 +1,12 @@
-using NightHeaven.Hosting.Interfaces.Services;
+using NightRaven.Hosting.Interfaces.Services;
 
-namespace NightHeaven.Hosting.Interfaces.Timing;
+namespace NightRaven.Hosting.Interfaces.Timing;
 
 /// <summary>
 /// Hashed timer wheel driven by the game loop. Callbacks run synchronously
 /// on the game-loop thread, in publish order, with the same determinism as tick events.
 /// </summary>
-public interface ITimerService : INightHeavenService
+public interface ITimerService : INightRavenService
 {
     /// <summary>
     /// Registers a timer.

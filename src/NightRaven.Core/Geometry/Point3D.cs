@@ -15,11 +15,11 @@
 
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using NightHeaven.Core.Extensions.Strings;
-using NightHeaven.Core.Interfaces.Geometry;
-using NightHeaven.Core.Types;
+using NightRaven.Core.Extensions.Strings;
+using NightRaven.Core.Interfaces.Geometry;
+using NightRaven.Core.Types;
 
-namespace NightHeaven.Core.Geometry;
+namespace NightRaven.Core.Geometry;
 
 /// <summary>
 /// Represents Point3D.

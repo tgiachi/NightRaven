@@ -1,4 +1,4 @@
-namespace NightHeaven.Persistence.Data;
+namespace NightRaven.Persistence.Data;
 
 /// <summary>
 /// Serialized snapshot bucket for a single registered entity type.

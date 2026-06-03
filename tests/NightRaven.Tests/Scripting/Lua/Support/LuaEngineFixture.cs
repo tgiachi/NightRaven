@@ -1,10 +1,10 @@
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Scripting.Lua.Data.Config;
-using NightHeaven.Scripting.Lua.Data.Internal;
-using NightHeaven.Scripting.Lua.Services;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Scripting.Lua.Data.Config;
+using NightRaven.Scripting.Lua.Data.Internal;
+using NightRaven.Scripting.Lua.Services;
 
-namespace NightHeaven.Tests.Scripting.Lua.Support;
+namespace NightRaven.Tests.Scripting.Lua.Support;
 
 /// <summary>
 /// Builds a real <see cref="LuaScriptEngineService" /> backed by a throwaway temp scripts directory

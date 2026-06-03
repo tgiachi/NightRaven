@@ -14,13 +14,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj"/>
+        <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <!-- The Server registers the orchestrator/descriptor natively on DryIoc; they stay internal. -->
-        <InternalsVisibleTo Include="NightHeaven.Server"/>
-        <InternalsVisibleTo Include="NightHeaven.Tests"/>
+        <InternalsVisibleTo Include="NightRaven.Server"/>
+        <InternalsVisibleTo Include="NightRaven.Tests"/>
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace NightHeaven.Persistence.Internal;
+namespace NightRaven.Persistence.Internal;
 
 /// <summary>
 /// FNV-1a 32-bit checksum used to validate journal records.

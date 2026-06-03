@@ -1,13 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightHeaven.Hosting.Data;
-using NightHeaven.Hosting.Data.Timing;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Server.Services.EventBus;
-using NightHeaven.Server.Services.GameLoop;
-using NightHeaven.Server.Services.Timing;
-using NightHeaven.Tests.Hosting.EventBus.Support;
+using NightRaven.Hosting.Data;
+using NightRaven.Hosting.Data.Timing;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Server.Services.EventBus;
+using NightRaven.Server.Services.GameLoop;
+using NightRaven.Server.Services.Timing;
+using NightRaven.Tests.Hosting.EventBus.Support;
 
-namespace NightHeaven.Tests.Hosting.EventBus;
+namespace NightRaven.Tests.Hosting.EventBus;
 
 public class GameLoopServiceTests
 {

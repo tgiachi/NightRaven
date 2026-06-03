@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a boot-time .NET plugin loader that scans `plugins/`, validates plugin metadata/dependencies, loads plugin DLLs, and lets plugins register NightHeaven container features before global TOML config binding.
+**Goal:** Build a boot-time .NET plugin loader that scans `plugins/`, validates plugin metadata/dependencies, loads plugin DLLs, and lets plugins register NightRaven container features before global TOML config binding.
 
-**Architecture:** Add a new `NightHeaven.Plugins` project containing the public plugin contract, plugin context/config loading, dependency ordering, assembly loading, and `PluginLoaderService`. The Server project exposes a DryIoc helper `AddNightHeavenPlugins(directoriesConfig)` and calls it in `Program.cs` after built-in modules and before `AddNightHeavenConfig(...)`. Tests use small fixture plugin projects copied into temporary plugin folders so assembly loading is exercised for real.
+**Architecture:** Add a new `NightRaven.Plugins` project containing the public plugin contract, plugin context/config loading, dependency ordering, assembly loading, and `PluginLoaderService`. The Server project exposes a DryIoc helper `AddNightRavenPlugins(directoriesConfig)` and calls it in `Program.cs` after built-in modules and before `AddNightRavenConfig(...)`. Tests use small fixture plugin projects copied into temporary plugin folders so assembly loading is exercised for real.
 
 **Tech Stack:** .NET 10, DryIoc, Tomlyn 2.4.1, Serilog, AssemblyLoadContext/AssemblyDependencyResolver, xUnit.
 
@@ -12,10 +12,10 @@
 
 ## File Structure
 
-**New project: `src/NightHeaven.Plugins/`**
+**New project: `src/NightRaven.Plugins/`**
 
-- `NightHeaven.Plugins.csproj` - public plugin API and loader library. References Core, Hosting, DryIoc, Tomlyn, Serilog.
-- `Interfaces/INightHeavenPlugin.cs` - public plugin contract.
+- `NightRaven.Plugins.csproj` - public plugin API and loader library. References Core, Hosting, DryIoc, Tomlyn, Serilog.
+- `Interfaces/INightRavenPlugin.cs` - public plugin contract.
 - `Data/PluginMetadata.cs` - public metadata record/class exposed by plugins.
 - `Data/PluginContext.cs` - public per-plugin context with TOML config helper.
 - `Data/LoadedPlugin.cs` - loaded plugin descriptor returned by the loader.
@@ -25,42 +25,42 @@
 
 **Server integration**
 
-- `src/NightHeaven.Server/NightHeaven.Server.csproj` - reference `NightHeaven.Plugins`.
-- `src/NightHeaven.Server/Extensions/DryIoc/PluginContainerExtensions.cs` - `AddNightHeavenPlugins`.
-- `src/NightHeaven.Server/Program.cs` - call `AddNightHeavenPlugins(directoriesConfig)` before `AddNightHeavenConfig(...)`.
+- `src/NightRaven.Server/NightRaven.Server.csproj` - reference `NightRaven.Plugins`.
+- `src/NightRaven.Server/Extensions/DryIoc/PluginContainerExtensions.cs` - `AddNightRavenPlugins`.
+- `src/NightRaven.Server/Program.cs` - call `AddNightRavenPlugins(directoriesConfig)` before `AddNightRavenConfig(...)`.
 
 **Solution/test project**
 
-- `NightHeaven.slnx` - add `NightHeaven.Plugins` and plugin fixture projects.
-- `tests/NightHeaven.Tests/NightHeaven.Tests.csproj` - reference `NightHeaven.Plugins` and fixture projects.
+- `NightRaven.slnx` - add `NightRaven.Plugins` and plugin fixture projects.
+- `tests/NightRaven.Tests/NightRaven.Tests.csproj` - reference `NightRaven.Plugins` and fixture projects.
 
 **Test fixture projects**
 
-- `tests/NightHeaven.PluginFixtures.Basic/` - one valid plugin that registers a config section and Lua script module.
-- `tests/NightHeaven.PluginFixtures.Empty/` - no plugin implementation, used for load failure tests.
-- `tests/NightHeaven.PluginFixtures.Multiple/` - two plugin implementations, used for load failure tests.
+- `tests/NightRaven.PluginFixtures.Basic/` - one valid plugin that registers a config section and Lua script module.
+- `tests/NightRaven.PluginFixtures.Empty/` - no plugin implementation, used for load failure tests.
+- `tests/NightRaven.PluginFixtures.Multiple/` - two plugin implementations, used for load failure tests.
 
 **Tests**
 
-- `tests/NightHeaven.Tests/Plugins/PluginContextTests.cs`
-- `tests/NightHeaven.Tests/Plugins/PluginDependencySorterTests.cs`
-- `tests/NightHeaven.Tests/Plugins/PluginLoaderServiceTests.cs`
-- `tests/NightHeaven.Tests/Plugins/PluginContainerExtensionsTests.cs`
-- `tests/NightHeaven.Tests/Plugins/Support/FakePlugin.cs`
-- `tests/NightHeaven.Tests/Plugins/Support/PluginFixtureCopy.cs`
+- `tests/NightRaven.Tests/Plugins/PluginContextTests.cs`
+- `tests/NightRaven.Tests/Plugins/PluginDependencySorterTests.cs`
+- `tests/NightRaven.Tests/Plugins/PluginLoaderServiceTests.cs`
+- `tests/NightRaven.Tests/Plugins/PluginContainerExtensionsTests.cs`
+- `tests/NightRaven.Tests/Plugins/Support/FakePlugin.cs`
+- `tests/NightRaven.Tests/Plugins/Support/PluginFixtureCopy.cs`
 
-## Task 1: Add `NightHeaven.Plugins` project and public contracts
+## Task 1: Add `NightRaven.Plugins` project and public contracts
 
 **Files:**
 
-- Modify: `NightHeaven.slnx`
-- Create: `src/NightHeaven.Plugins/NightHeaven.Plugins.csproj`
-- Create: `src/NightHeaven.Plugins/Interfaces/INightHeavenPlugin.cs`
-- Create: `src/NightHeaven.Plugins/Data/PluginMetadata.cs`
+- Modify: `NightRaven.slnx`
+- Create: `src/NightRaven.Plugins/NightRaven.Plugins.csproj`
+- Create: `src/NightRaven.Plugins/Interfaces/INightRavenPlugin.cs`
+- Create: `src/NightRaven.Plugins/Data/PluginMetadata.cs`
 
 - [ ] **Step 1: Add the project file**
 
-Create `src/NightHeaven.Plugins/NightHeaven.Plugins.csproj`:
+Create `src/NightRaven.Plugins/NightRaven.Plugins.csproj`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -78,12 +78,12 @@ Create `src/NightHeaven.Plugins/NightHeaven.Plugins.csproj`:
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj" />
-        <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj" />
+        <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj" />
+        <ProjectReference Include="..\NightRaven.Hosting\NightRaven.Hosting.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="NightHeaven.Tests" />
+        <InternalsVisibleTo Include="NightRaven.Tests" />
     </ItemGroup>
 
 </Project>
@@ -91,35 +91,35 @@ Create `src/NightHeaven.Plugins/NightHeaven.Plugins.csproj`:
 
 - [ ] **Step 2: Add the project to the solution**
 
-Modify `NightHeaven.slnx` so it includes the plugin project:
+Modify `NightRaven.slnx` so it includes the plugin project:
 
 ```xml
 <Solution>
-    <Project Path="src/NightHeaven.Scripting.Lua/NightHeaven.Scripting.Lua.csproj" />
-    <Project Path="src/NightHeaven.Core/NightHeaven.Core.csproj" />
-    <Project Path="src/NightHeaven.Persistence/NightHeaven.Persistence.csproj" />
-    <Project Path="src/NightHeaven.Hosting/NightHeaven.Hosting.csproj" />
-    <Project Path="src/NightHeaven.Plugins/NightHeaven.Plugins.csproj" />
-    <Project Path="src/NightHeaven.Network.UO/NightHeaven.Network.UO.csproj" />
-    <Project Path="src/NightHeaven.Network/NightHeaven.Network.csproj" />
-    <Project Path="src/NightHeaven.Server/NightHeaven.Server.csproj" />
-    <Project Path="tests/NightHeaven.Tests/NightHeaven.Tests.csproj" />
+    <Project Path="src/NightRaven.Scripting.Lua/NightRaven.Scripting.Lua.csproj" />
+    <Project Path="src/NightRaven.Core/NightRaven.Core.csproj" />
+    <Project Path="src/NightRaven.Persistence/NightRaven.Persistence.csproj" />
+    <Project Path="src/NightRaven.Hosting/NightRaven.Hosting.csproj" />
+    <Project Path="src/NightRaven.Plugins/NightRaven.Plugins.csproj" />
+    <Project Path="src/NightRaven.Network.UO/NightRaven.Network.UO.csproj" />
+    <Project Path="src/NightRaven.Network/NightRaven.Network.csproj" />
+    <Project Path="src/NightRaven.Server/NightRaven.Server.csproj" />
+    <Project Path="tests/NightRaven.Tests/NightRaven.Tests.csproj" />
 </Solution>
 ```
 
 - [ ] **Step 3: Create metadata type**
 
-Create `src/NightHeaven.Plugins/Data/PluginMetadata.cs`:
+Create `src/NightRaven.Plugins/Data/PluginMetadata.cs`:
 
 ```csharp
-namespace NightHeaven.Plugins.Data;
+namespace NightRaven.Plugins.Data;
 
 /// <summary>
-/// Describes a NightHeaven plugin. This is the source of truth for plugin identity.
+/// Describes a NightRaven plugin. This is the source of truth for plugin identity.
 /// </summary>
 public sealed class PluginMetadata
 {
-    /// <summary>Stable lowercase dotted plugin identifier, for example <c>nightheaven.weather</c>.</summary>
+    /// <summary>Stable lowercase dotted plugin identifier, for example <c>nightraven.weather</c>.</summary>
     public required string Id { get; init; }
 
     /// <summary>Human-readable plugin name.</summary>
@@ -141,18 +141,18 @@ public sealed class PluginMetadata
 
 - [ ] **Step 4: Create plugin interface**
 
-Create `src/NightHeaven.Plugins/Interfaces/INightHeavenPlugin.cs`:
+Create `src/NightRaven.Plugins/Interfaces/INightRavenPlugin.cs`:
 
 ```csharp
 using DryIoc;
-using NightHeaven.Plugins.Data;
+using NightRaven.Plugins.Data;
 
-namespace NightHeaven.Plugins.Interfaces;
+namespace NightRaven.Plugins.Interfaces;
 
 /// <summary>
-/// Implemented by trusted .NET plugins loaded by NightHeaven during server startup.
+/// Implemented by trusted .NET plugins loaded by NightRaven during server startup.
 /// </summary>
-public interface INightHeavenPlugin
+public interface INightRavenPlugin
 {
     /// <summary>Plugin identity, descriptive information, and dependency declarations.</summary>
     PluginMetadata Metadata { get; }
@@ -174,7 +174,7 @@ This will not compile yet because `PluginContext` is added in Task 2.
 Run:
 
 ```bash
-dotnet build src/NightHeaven.Plugins/NightHeaven.Plugins.csproj -c Debug -nologo
+dotnet build src/NightRaven.Plugins/NightRaven.Plugins.csproj -c Debug -nologo
 ```
 
 Expected: FAIL with a compiler error mentioning `PluginContext` is not defined.
@@ -185,41 +185,41 @@ Do not commit yet. Task 2 completes the public contract.
 
 **Files:**
 
-- Create: `src/NightHeaven.Plugins/Data/PluginContext.cs`
-- Test: `tests/NightHeaven.Tests/Plugins/PluginContextTests.cs`
-- Modify: `tests/NightHeaven.Tests/NightHeaven.Tests.csproj`
+- Create: `src/NightRaven.Plugins/Data/PluginContext.cs`
+- Test: `tests/NightRaven.Tests/Plugins/PluginContextTests.cs`
+- Modify: `tests/NightRaven.Tests/NightRaven.Tests.csproj`
 
-- [ ] **Step 1: Reference `NightHeaven.Plugins` from tests**
+- [ ] **Step 1: Reference `NightRaven.Plugins` from tests**
 
-Modify `tests/NightHeaven.Tests/NightHeaven.Tests.csproj` and add this project reference:
+Modify `tests/NightRaven.Tests/NightRaven.Tests.csproj` and add this project reference:
 
 ```xml
-<ProjectReference Include="..\..\src\NightHeaven.Plugins\NightHeaven.Plugins.csproj"/>
+<ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj"/>
 ```
 
 The references block should include:
 
 ```xml
 <ItemGroup>
-    <ProjectReference Include="..\..\src\NightHeaven.Core\NightHeaven.Core.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Hosting\NightHeaven.Hosting.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Network\NightHeaven.Network.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Persistence\NightHeaven.Persistence.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Plugins\NightHeaven.Plugins.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Server\NightHeaven.Server.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Core\NightRaven.Core.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Hosting\NightRaven.Hosting.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Network\NightRaven.Network.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Persistence\NightRaven.Persistence.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Server\NightRaven.Server.csproj"/>
 </ItemGroup>
 ```
 
 - [ ] **Step 2: Write failing tests**
 
-Create `tests/NightHeaven.Tests/Plugins/PluginContextTests.cs`:
+Create `tests/NightRaven.Tests/Plugins/PluginContextTests.cs`:
 
 ```csharp
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Plugins.Data;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Plugins.Data;
 
-namespace NightHeaven.Tests.Plugins;
+namespace NightRaven.Tests.Plugins;
 
 public sealed class PluginContextTests : IDisposable
 {
@@ -228,7 +228,7 @@ public sealed class PluginContextTests : IDisposable
         $"nh-plugin-context-{Guid.NewGuid():N}"
     );
 
-    private string PluginDirectory => Path.Combine(_root, "plugins", "nightheaven.test");
+    private string PluginDirectory => Path.Combine(_root, "plugins", "nightraven.test");
 
     [Fact]
     public void LoadConfig_MissingFile_WritesDefaultsAndReturnsDefaults()
@@ -297,25 +297,25 @@ public sealed class PluginContextTests : IDisposable
 Run:
 
 ```bash
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj --filter "FullyQualifiedName~PluginContextTests" --nologo
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj --filter "FullyQualifiedName~PluginContextTests" --nologo
 ```
 
 Expected: FAIL because `PluginContext` does not exist.
 
 - [ ] **Step 4: Implement `PluginContext`**
 
-Create `src/NightHeaven.Plugins/Data/PluginContext.cs`:
+Create `src/NightRaven.Plugins/Data/PluginContext.cs`:
 
 ```csharp
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Hosting.Configuration;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Hosting.Configuration;
 using Serilog;
 using Tomlyn;
 
-namespace NightHeaven.Plugins.Data;
+namespace NightRaven.Plugins.Data;
 
 /// <summary>
-/// Per-plugin startup context passed to <see cref="NightHeaven.Plugins.Interfaces.INightHeavenPlugin" />.
+/// Per-plugin startup context passed to <see cref="NightRaven.Plugins.Interfaces.INightRavenPlugin" />.
 /// </summary>
 public sealed class PluginContext
 {
@@ -337,7 +337,7 @@ public sealed class PluginContext
     /// <summary>Absolute path to the optional plugin runtime TOML config.</summary>
     public string PluginConfigPath { get; }
 
-    /// <summary>Global NightHeaven directory configuration.</summary>
+    /// <summary>Global NightRaven directory configuration.</summary>
     public DirectoriesConfig Directories { get; }
 
     /// <summary>
@@ -391,7 +391,7 @@ public sealed class PluginContext
 Run:
 
 ```bash
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj --filter "FullyQualifiedName~PluginContextTests" --nologo
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj --filter "FullyQualifiedName~PluginContextTests" --nologo
 ```
 
 Expected: PASS, 3 tests.
@@ -401,7 +401,7 @@ Expected: PASS, 3 tests.
 Run:
 
 ```bash
-dotnet build src/NightHeaven.Plugins/NightHeaven.Plugins.csproj -c Debug -nologo
+dotnet build src/NightRaven.Plugins/NightRaven.Plugins.csproj -c Debug -nologo
 ```
 
 Expected: `Build succeeded.`
@@ -409,7 +409,7 @@ Expected: `Build succeeded.`
 - [ ] **Step 7: Commit**
 
 ```bash
-git add NightHeaven.slnx src/NightHeaven.Plugins tests/NightHeaven.Tests/NightHeaven.Tests.csproj tests/NightHeaven.Tests/Plugins/PluginContextTests.cs
+git add NightRaven.slnx src/NightRaven.Plugins tests/NightRaven.Tests/NightRaven.Tests.csproj tests/NightRaven.Tests/Plugins/PluginContextTests.cs
 git commit -m "feat(plugins): add public plugin contract and context"
 ```
 
@@ -417,23 +417,23 @@ git commit -m "feat(plugins): add public plugin contract and context"
 
 **Files:**
 
-- Create: `src/NightHeaven.Plugins/Data/LoadedPlugin.cs`
-- Create: `src/NightHeaven.Plugins/Internal/PluginDependencySorter.cs`
-- Create: `tests/NightHeaven.Tests/Plugins/Support/FakePlugin.cs`
-- Test: `tests/NightHeaven.Tests/Plugins/PluginDependencySorterTests.cs`
+- Create: `src/NightRaven.Plugins/Data/LoadedPlugin.cs`
+- Create: `src/NightRaven.Plugins/Internal/PluginDependencySorter.cs`
+- Create: `tests/NightRaven.Tests/Plugins/Support/FakePlugin.cs`
+- Test: `tests/NightRaven.Tests/Plugins/PluginDependencySorterTests.cs`
 
 - [ ] **Step 1: Write fake plugin support**
 
-Create `tests/NightHeaven.Tests/Plugins/Support/FakePlugin.cs`:
+Create `tests/NightRaven.Tests/Plugins/Support/FakePlugin.cs`:
 
 ```csharp
 using DryIoc;
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Interfaces;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Interfaces;
 
-namespace NightHeaven.Tests.Plugins.Support;
+namespace NightRaven.Tests.Plugins.Support;
 
-public sealed class FakePlugin : INightHeavenPlugin
+public sealed class FakePlugin : INightRavenPlugin
 {
     public FakePlugin(string id, params string[] dependencies)
     {
@@ -442,7 +442,7 @@ public sealed class FakePlugin : INightHeavenPlugin
             Id = id,
             Name = id,
             Version = new(1, 0, 0),
-            Author = "NightHeaven Tests",
+            Author = "NightRaven Tests",
             Dependencies = dependencies
         };
     }
@@ -455,27 +455,27 @@ public sealed class FakePlugin : INightHeavenPlugin
 
 - [ ] **Step 2: Write failing dependency tests**
 
-Create `tests/NightHeaven.Tests/Plugins/PluginDependencySorterTests.cs`:
+Create `tests/NightRaven.Tests/Plugins/PluginDependencySorterTests.cs`:
 
 ```csharp
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Internal;
-using NightHeaven.Tests.Plugins.Support;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Internal;
+using NightRaven.Tests.Plugins.Support;
 
-namespace NightHeaven.Tests.Plugins;
+namespace NightRaven.Tests.Plugins;
 
 public class PluginDependencySorterTests
 {
     [Fact]
     public void ValidateAndSort_DependentPlugin_ReturnsDependencyFirst()
     {
-        var dependent = Loaded("nightheaven.dependent", "nightheaven.dependency");
-        var dependency = Loaded("nightheaven.dependency");
+        var dependent = Loaded("nightraven.dependent", "nightraven.dependency");
+        var dependency = Loaded("nightraven.dependency");
 
         var sorted = PluginDependencySorter.ValidateAndSort([dependent, dependency]);
 
         Assert.Equal(
-            ["nightheaven.dependency", "nightheaven.dependent"],
+            ["nightraven.dependency", "nightraven.dependent"],
             sorted.Select(p => p.Metadata.Id).ToArray()
         );
     }
@@ -485,7 +485,7 @@ public class PluginDependencySorterTests
     {
         var ex = Assert.Throws<InvalidOperationException>(
             () => PluginDependencySorter.ValidateAndSort(
-                [Loaded("nightheaven.duplicate"), Loaded("nightheaven.duplicate")]
+                [Loaded("nightraven.duplicate"), Loaded("nightraven.duplicate")]
             )
         );
 
@@ -497,7 +497,7 @@ public class PluginDependencySorterTests
     {
         var ex = Assert.Throws<InvalidOperationException>(
             () => PluginDependencySorter.ValidateAndSort(
-                [Loaded("nightheaven.dependent", "nightheaven.missing")]
+                [Loaded("nightraven.dependent", "nightraven.missing")]
             )
         );
 
@@ -510,8 +510,8 @@ public class PluginDependencySorterTests
         var ex = Assert.Throws<InvalidOperationException>(
             () => PluginDependencySorter.ValidateAndSort(
                 [
-                    Loaded("nightheaven.a", "nightheaven.b"),
-                    Loaded("nightheaven.b", "nightheaven.a")
+                    Loaded("nightraven.a", "nightraven.b"),
+                    Loaded("nightraven.b", "nightraven.a")
                 ]
             )
         );
@@ -521,8 +521,8 @@ public class PluginDependencySorterTests
 
     [Theory]
     [InlineData("")]
-    [InlineData("NightHeaven.Bad")]
-    [InlineData("nightheaven bad")]
+    [InlineData("NightRaven.Bad")]
+    [InlineData("nightraven bad")]
     public void ValidateAndSort_InvalidId_Throws(string id)
     {
         var ex = Assert.Throws<InvalidOperationException>(
@@ -546,27 +546,27 @@ public class PluginDependencySorterTests
 Run:
 
 ```bash
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj --filter "FullyQualifiedName~PluginDependencySorterTests" --nologo
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj --filter "FullyQualifiedName~PluginDependencySorterTests" --nologo
 ```
 
 Expected: FAIL because `LoadedPlugin` and `PluginDependencySorter` do not exist.
 
 - [ ] **Step 4: Add loaded plugin descriptor**
 
-Create `src/NightHeaven.Plugins/Data/LoadedPlugin.cs`:
+Create `src/NightRaven.Plugins/Data/LoadedPlugin.cs`:
 
 ```csharp
 using System.Reflection;
-using NightHeaven.Plugins.Interfaces;
+using NightRaven.Plugins.Interfaces;
 
-namespace NightHeaven.Plugins.Data;
+namespace NightRaven.Plugins.Data;
 
 /// <summary>
 /// A plugin instance loaded from a plugin package directory.
 /// </summary>
 public sealed class LoadedPlugin
 {
-    public LoadedPlugin(string pluginDirectory, INightHeavenPlugin instance, Assembly assembly)
+    public LoadedPlugin(string pluginDirectory, INightRavenPlugin instance, Assembly assembly)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginDirectory);
         ArgumentNullException.ThrowIfNull(instance);
@@ -585,7 +585,7 @@ public sealed class LoadedPlugin
     public string PluginDirectory { get; }
 
     /// <summary>The instantiated plugin.</summary>
-    public INightHeavenPlugin Instance { get; }
+    public INightRavenPlugin Instance { get; }
 
     /// <summary>The plugin metadata.</summary>
     public PluginMetadata Metadata { get; }
@@ -597,13 +597,13 @@ public sealed class LoadedPlugin
 
 - [ ] **Step 5: Add dependency sorter**
 
-Create `src/NightHeaven.Plugins/Internal/PluginDependencySorter.cs`:
+Create `src/NightRaven.Plugins/Internal/PluginDependencySorter.cs`:
 
 ```csharp
 using System.Text.RegularExpressions;
-using NightHeaven.Plugins.Data;
+using NightRaven.Plugins.Data;
 
-namespace NightHeaven.Plugins.Internal;
+namespace NightRaven.Plugins.Internal;
 
 internal static partial class PluginDependencySorter
 {
@@ -724,7 +724,7 @@ internal static partial class PluginDependencySorter
 Run:
 
 ```bash
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj --filter "FullyQualifiedName~PluginDependencySorterTests" --nologo
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj --filter "FullyQualifiedName~PluginDependencySorterTests" --nologo
 ```
 
 Expected: PASS, 5 tests.
@@ -732,7 +732,7 @@ Expected: PASS, 5 tests.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add src/NightHeaven.Plugins/Data/LoadedPlugin.cs src/NightHeaven.Plugins/Internal/PluginDependencySorter.cs tests/NightHeaven.Tests/Plugins/Support/FakePlugin.cs tests/NightHeaven.Tests/Plugins/PluginDependencySorterTests.cs
+git add src/NightRaven.Plugins/Data/LoadedPlugin.cs src/NightRaven.Plugins/Internal/PluginDependencySorter.cs tests/NightRaven.Tests/Plugins/Support/FakePlugin.cs tests/NightRaven.Tests/Plugins/PluginDependencySorterTests.cs
 git commit -m "feat(plugins): validate plugin metadata dependencies"
 ```
 
@@ -740,40 +740,40 @@ git commit -m "feat(plugins): validate plugin metadata dependencies"
 
 **Files:**
 
-- Modify: `NightHeaven.slnx`
-- Modify: `tests/NightHeaven.Tests/NightHeaven.Tests.csproj`
-- Create: `tests/NightHeaven.PluginFixtures.Basic/NightHeaven.PluginFixtures.Basic.csproj`
-- Create: `tests/NightHeaven.PluginFixtures.Basic/BasicPlugin.cs`
-- Create: `tests/NightHeaven.PluginFixtures.Empty/NightHeaven.PluginFixtures.Empty.csproj`
-- Create: `tests/NightHeaven.PluginFixtures.Empty/EmptyMarker.cs`
-- Create: `tests/NightHeaven.PluginFixtures.Multiple/NightHeaven.PluginFixtures.Multiple.csproj`
-- Create: `tests/NightHeaven.PluginFixtures.Multiple/MultiplePlugins.cs`
-- Create: `tests/NightHeaven.Tests/Plugins/Support/PluginFixtureCopy.cs`
+- Modify: `NightRaven.slnx`
+- Modify: `tests/NightRaven.Tests/NightRaven.Tests.csproj`
+- Create: `tests/NightRaven.PluginFixtures.Basic/NightRaven.PluginFixtures.Basic.csproj`
+- Create: `tests/NightRaven.PluginFixtures.Basic/BasicPlugin.cs`
+- Create: `tests/NightRaven.PluginFixtures.Empty/NightRaven.PluginFixtures.Empty.csproj`
+- Create: `tests/NightRaven.PluginFixtures.Empty/EmptyMarker.cs`
+- Create: `tests/NightRaven.PluginFixtures.Multiple/NightRaven.PluginFixtures.Multiple.csproj`
+- Create: `tests/NightRaven.PluginFixtures.Multiple/MultiplePlugins.cs`
+- Create: `tests/NightRaven.Tests/Plugins/Support/PluginFixtureCopy.cs`
 
 - [ ] **Step 1: Add fixture projects to solution**
 
-Modify `NightHeaven.slnx`:
+Modify `NightRaven.slnx`:
 
 ```xml
 <Solution>
-    <Project Path="src/NightHeaven.Scripting.Lua/NightHeaven.Scripting.Lua.csproj" />
-    <Project Path="src/NightHeaven.Core/NightHeaven.Core.csproj" />
-    <Project Path="src/NightHeaven.Persistence/NightHeaven.Persistence.csproj" />
-    <Project Path="src/NightHeaven.Hosting/NightHeaven.Hosting.csproj" />
-    <Project Path="src/NightHeaven.Plugins/NightHeaven.Plugins.csproj" />
-    <Project Path="src/NightHeaven.Network.UO/NightHeaven.Network.UO.csproj" />
-    <Project Path="src/NightHeaven.Network/NightHeaven.Network.csproj" />
-    <Project Path="src/NightHeaven.Server/NightHeaven.Server.csproj" />
-    <Project Path="tests/NightHeaven.PluginFixtures.Basic/NightHeaven.PluginFixtures.Basic.csproj" />
-    <Project Path="tests/NightHeaven.PluginFixtures.Empty/NightHeaven.PluginFixtures.Empty.csproj" />
-    <Project Path="tests/NightHeaven.PluginFixtures.Multiple/NightHeaven.PluginFixtures.Multiple.csproj" />
-    <Project Path="tests/NightHeaven.Tests/NightHeaven.Tests.csproj" />
+    <Project Path="src/NightRaven.Scripting.Lua/NightRaven.Scripting.Lua.csproj" />
+    <Project Path="src/NightRaven.Core/NightRaven.Core.csproj" />
+    <Project Path="src/NightRaven.Persistence/NightRaven.Persistence.csproj" />
+    <Project Path="src/NightRaven.Hosting/NightRaven.Hosting.csproj" />
+    <Project Path="src/NightRaven.Plugins/NightRaven.Plugins.csproj" />
+    <Project Path="src/NightRaven.Network.UO/NightRaven.Network.UO.csproj" />
+    <Project Path="src/NightRaven.Network/NightRaven.Network.csproj" />
+    <Project Path="src/NightRaven.Server/NightRaven.Server.csproj" />
+    <Project Path="tests/NightRaven.PluginFixtures.Basic/NightRaven.PluginFixtures.Basic.csproj" />
+    <Project Path="tests/NightRaven.PluginFixtures.Empty/NightRaven.PluginFixtures.Empty.csproj" />
+    <Project Path="tests/NightRaven.PluginFixtures.Multiple/NightRaven.PluginFixtures.Multiple.csproj" />
+    <Project Path="tests/NightRaven.Tests/NightRaven.Tests.csproj" />
 </Solution>
 ```
 
 - [ ] **Step 2: Create basic fixture project**
 
-Create `tests/NightHeaven.PluginFixtures.Basic/NightHeaven.PluginFixtures.Basic.csproj`:
+Create `tests/NightRaven.PluginFixtures.Basic/NightRaven.PluginFixtures.Basic.csproj`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -786,34 +786,34 @@ Create `tests/NightHeaven.PluginFixtures.Basic/NightHeaven.PluginFixtures.Basic.
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\NightHeaven.Plugins\NightHeaven.Plugins.csproj" />
-        <ProjectReference Include="..\..\src\NightHeaven.Server\NightHeaven.Server.csproj" />
-        <ProjectReference Include="..\..\src\NightHeaven.Scripting.Lua\NightHeaven.Scripting.Lua.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.Server\NightRaven.Server.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.Scripting.Lua\NightRaven.Scripting.Lua.csproj" />
     </ItemGroup>
 
 </Project>
 ```
 
-Create `tests/NightHeaven.PluginFixtures.Basic/BasicPlugin.cs`:
+Create `tests/NightRaven.PluginFixtures.Basic/BasicPlugin.cs`:
 
 ```csharp
 using DryIoc;
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Interfaces;
-using NightHeaven.Scripting.Lua.Attributes.Scripts;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Scripting.Lua.Extensions.Scripts;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Interfaces;
+using NightRaven.Scripting.Lua.Attributes.Scripts;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Scripting.Lua.Extensions.Scripts;
 
-namespace NightHeaven.PluginFixtures.Basic;
+namespace NightRaven.PluginFixtures.Basic;
 
-public sealed class BasicPlugin : INightHeavenPlugin
+public sealed class BasicPlugin : INightRavenPlugin
 {
     public PluginMetadata Metadata { get; } = new()
     {
-        Id = "nightheaven.fixture.basic",
+        Id = "nightraven.fixture.basic",
         Name = "Basic Fixture Plugin",
         Version = new(1, 0, 0),
-        Author = "NightHeaven Tests"
+        Author = "NightRaven Tests"
     };
 
     public void Configure(IContainer container, PluginContext context)
@@ -840,7 +840,7 @@ public sealed class BasicPluginScriptModule;
 
 - [ ] **Step 3: Create empty fixture project**
 
-Create `tests/NightHeaven.PluginFixtures.Empty/NightHeaven.PluginFixtures.Empty.csproj`:
+Create `tests/NightRaven.PluginFixtures.Empty/NightRaven.PluginFixtures.Empty.csproj`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -855,17 +855,17 @@ Create `tests/NightHeaven.PluginFixtures.Empty/NightHeaven.PluginFixtures.Empty.
 </Project>
 ```
 
-Create `tests/NightHeaven.PluginFixtures.Empty/EmptyMarker.cs`:
+Create `tests/NightRaven.PluginFixtures.Empty/EmptyMarker.cs`:
 
 ```csharp
-namespace NightHeaven.PluginFixtures.Empty;
+namespace NightRaven.PluginFixtures.Empty;
 
 public sealed class EmptyMarker;
 ```
 
 - [ ] **Step 4: Create multiple fixture project**
 
-Create `tests/NightHeaven.PluginFixtures.Multiple/NightHeaven.PluginFixtures.Multiple.csproj`:
+Create `tests/NightRaven.PluginFixtures.Multiple/NightRaven.PluginFixtures.Multiple.csproj`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -878,42 +878,42 @@ Create `tests/NightHeaven.PluginFixtures.Multiple/NightHeaven.PluginFixtures.Mul
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\NightHeaven.Plugins\NightHeaven.Plugins.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj" />
     </ItemGroup>
 
 </Project>
 ```
 
-Create `tests/NightHeaven.PluginFixtures.Multiple/MultiplePlugins.cs`:
+Create `tests/NightRaven.PluginFixtures.Multiple/MultiplePlugins.cs`:
 
 ```csharp
 using DryIoc;
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Interfaces;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Interfaces;
 
-namespace NightHeaven.PluginFixtures.Multiple;
+namespace NightRaven.PluginFixtures.Multiple;
 
-public sealed class FirstPlugin : INightHeavenPlugin
+public sealed class FirstPlugin : INightRavenPlugin
 {
     public PluginMetadata Metadata { get; } = new()
     {
-        Id = "nightheaven.fixture.first",
+        Id = "nightraven.fixture.first",
         Name = "First Fixture Plugin",
         Version = new(1, 0, 0),
-        Author = "NightHeaven Tests"
+        Author = "NightRaven Tests"
     };
 
     public void Configure(IContainer container, PluginContext context) { }
 }
 
-public sealed class SecondPlugin : INightHeavenPlugin
+public sealed class SecondPlugin : INightRavenPlugin
 {
     public PluginMetadata Metadata { get; } = new()
     {
-        Id = "nightheaven.fixture.second",
+        Id = "nightraven.fixture.second",
         Name = "Second Fixture Plugin",
         Version = new(1, 0, 0),
-        Author = "NightHeaven Tests"
+        Author = "NightRaven Tests"
     };
 
     public void Configure(IContainer container, PluginContext context) { }
@@ -922,28 +922,28 @@ public sealed class SecondPlugin : INightHeavenPlugin
 
 - [ ] **Step 5: Reference fixture projects from tests**
 
-Modify `tests/NightHeaven.Tests/NightHeaven.Tests.csproj`:
+Modify `tests/NightRaven.Tests/NightRaven.Tests.csproj`:
 
 ```xml
 <ItemGroup>
-    <ProjectReference Include="..\..\src\NightHeaven.Core\NightHeaven.Core.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Hosting\NightHeaven.Hosting.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Network\NightHeaven.Network.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Persistence\NightHeaven.Persistence.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Plugins\NightHeaven.Plugins.csproj"/>
-    <ProjectReference Include="..\..\src\NightHeaven.Server\NightHeaven.Server.csproj"/>
-    <ProjectReference Include="..\NightHeaven.PluginFixtures.Basic\NightHeaven.PluginFixtures.Basic.csproj"/>
-    <ProjectReference Include="..\NightHeaven.PluginFixtures.Empty\NightHeaven.PluginFixtures.Empty.csproj"/>
-    <ProjectReference Include="..\NightHeaven.PluginFixtures.Multiple\NightHeaven.PluginFixtures.Multiple.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Core\NightRaven.Core.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Hosting\NightRaven.Hosting.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Network\NightRaven.Network.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Persistence\NightRaven.Persistence.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj"/>
+    <ProjectReference Include="..\..\src\NightRaven.Server\NightRaven.Server.csproj"/>
+    <ProjectReference Include="..\NightRaven.PluginFixtures.Basic\NightRaven.PluginFixtures.Basic.csproj"/>
+    <ProjectReference Include="..\NightRaven.PluginFixtures.Empty\NightRaven.PluginFixtures.Empty.csproj"/>
+    <ProjectReference Include="..\NightRaven.PluginFixtures.Multiple\NightRaven.PluginFixtures.Multiple.csproj"/>
 </ItemGroup>
 ```
 
 - [ ] **Step 6: Create fixture copy helper**
 
-Create `tests/NightHeaven.Tests/Plugins/Support/PluginFixtureCopy.cs`:
+Create `tests/NightRaven.Tests/Plugins/Support/PluginFixtureCopy.cs`:
 
 ```csharp
-namespace NightHeaven.Tests.Plugins.Support;
+namespace NightRaven.Tests.Plugins.Support;
 
 public static class PluginFixtureCopy
 {
@@ -970,15 +970,15 @@ public static class PluginFixtureCopy
 Run:
 
 ```bash
-dotnet build NightHeaven.slnx -c Debug -nologo
+dotnet build NightRaven.slnx -c Debug -nologo
 ```
 
-Expected: `Build succeeded.` If the fixture project fails because extension methods are not found, confirm `BasicPlugin.cs` includes both `NightHeaven.Server.Extensions.DryIoc` and `NightHeaven.Scripting.Lua.Extensions.Scripts`.
+Expected: `Build succeeded.` If the fixture project fails because extension methods are not found, confirm `BasicPlugin.cs` includes both `NightRaven.Server.Extensions.DryIoc` and `NightRaven.Scripting.Lua.Extensions.Scripts`.
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add NightHeaven.slnx tests/NightHeaven.PluginFixtures.Basic tests/NightHeaven.PluginFixtures.Empty tests/NightHeaven.PluginFixtures.Multiple tests/NightHeaven.Tests/NightHeaven.Tests.csproj tests/NightHeaven.Tests/Plugins/Support/PluginFixtureCopy.cs
+git add NightRaven.slnx tests/NightRaven.PluginFixtures.Basic tests/NightRaven.PluginFixtures.Empty tests/NightRaven.PluginFixtures.Multiple tests/NightRaven.Tests/NightRaven.Tests.csproj tests/NightRaven.Tests/Plugins/Support/PluginFixtureCopy.cs
 git commit -m "test(plugins): add plugin loader fixture assemblies"
 ```
 
@@ -986,24 +986,24 @@ git commit -m "test(plugins): add plugin loader fixture assemblies"
 
 **Files:**
 
-- Create: `src/NightHeaven.Plugins/Internal/PluginAssemblyLoadContext.cs`
-- Create: `src/NightHeaven.Plugins/Services/PluginLoaderService.cs`
-- Test: `tests/NightHeaven.Tests/Plugins/PluginLoaderServiceTests.cs`
+- Create: `src/NightRaven.Plugins/Internal/PluginAssemblyLoadContext.cs`
+- Create: `src/NightRaven.Plugins/Services/PluginLoaderService.cs`
+- Test: `tests/NightRaven.Tests/Plugins/PluginLoaderServiceTests.cs`
 
 - [ ] **Step 1: Write failing loader tests**
 
-Create `tests/NightHeaven.Tests/Plugins/PluginLoaderServiceTests.cs`:
+Create `tests/NightRaven.Tests/Plugins/PluginLoaderServiceTests.cs`:
 
 ```csharp
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Plugins.Services;
-using NightHeaven.Scripting.Lua.Data.Internal;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Plugins.Support;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Plugins.Services;
+using NightRaven.Scripting.Lua.Data.Internal;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Plugins.Support;
 
-namespace NightHeaven.Tests.Plugins;
+namespace NightRaven.Tests.Plugins;
 
 public sealed class PluginLoaderServiceTests : IDisposable
 {
@@ -1027,24 +1027,24 @@ public sealed class PluginLoaderServiceTests : IDisposable
     [Fact]
     public void LoadAndConfigure_ValidPlugin_LoadsMetadataAndConfiguresContainer()
     {
-        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightHeaven.PluginFixtures.Basic", "basic");
+        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Basic", "basic");
         var container = new Container();
-        container.AddNightHeavenLuaScripting(Directories());
+        container.AddNightRavenLuaScripting(Directories());
         var loader = new PluginLoaderService();
 
         var loaded = loader.LoadAndConfigure(container, Directories());
 
         var plugin = Assert.Single(loaded);
-        Assert.Equal("nightheaven.fixture.basic", plugin.Metadata.Id);
+        Assert.Equal("nightraven.fixture.basic", plugin.Metadata.Id);
         Assert.True(File.Exists(Path.Combine(plugin.PluginDirectory, "plugin.toml")));
         var modules = container.Resolve<List<ScriptModuleData>>();
-        Assert.Contains(modules, module => module.ModuleType.FullName == "NightHeaven.PluginFixtures.Basic.BasicPluginScriptModule");
+        Assert.Contains(modules, module => module.ModuleType.FullName == "NightRaven.PluginFixtures.Basic.BasicPluginScriptModule");
     }
 
     [Fact]
     public void LoadAndConfigure_EmptyPluginDirectory_Throws()
     {
-        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightHeaven.PluginFixtures.Empty", "empty");
+        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Empty", "empty");
         var loader = new PluginLoaderService();
 
         var ex = Assert.Throws<InvalidOperationException>(
@@ -1057,7 +1057,7 @@ public sealed class PluginLoaderServiceTests : IDisposable
     [Fact]
     public void LoadAndConfigure_MultiplePluginImplementations_Throws()
     {
-        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightHeaven.PluginFixtures.Multiple", "multiple");
+        PluginFixtureCopy.CopyFixture(PluginsRoot, "NightRaven.PluginFixtures.Multiple", "multiple");
         var loader = new PluginLoaderService();
 
         var ex = Assert.Throws<InvalidOperationException>(
@@ -1087,27 +1087,27 @@ public sealed class PluginLoaderServiceTests : IDisposable
 Run:
 
 ```bash
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj --filter "FullyQualifiedName~PluginLoaderServiceTests" --nologo
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj --filter "FullyQualifiedName~PluginLoaderServiceTests" --nologo
 ```
 
 Expected: FAIL because `PluginLoaderService` does not exist.
 
 - [ ] **Step 3: Add plugin assembly load context**
 
-Create `src/NightHeaven.Plugins/Internal/PluginAssemblyLoadContext.cs`:
+Create `src/NightRaven.Plugins/Internal/PluginAssemblyLoadContext.cs`:
 
 ```csharp
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace NightHeaven.Plugins.Internal;
+namespace NightRaven.Plugins.Internal;
 
 internal sealed class PluginAssemblyLoadContext : AssemblyLoadContext
 {
     private readonly AssemblyDependencyResolver _resolver;
 
     public PluginAssemblyLoadContext(string pluginDirectory)
-        : base($"NightHeaven.Plugin:{Path.GetFileName(pluginDirectory)}", isCollectible: false)
+        : base($"NightRaven.Plugin:{Path.GetFileName(pluginDirectory)}", isCollectible: false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginDirectory);
         _resolver = new(pluginDirectory);
@@ -1144,19 +1144,19 @@ internal sealed class PluginAssemblyLoadContext : AssemblyLoadContext
 
 - [ ] **Step 4: Add plugin loader service**
 
-Create `src/NightHeaven.Plugins/Services/PluginLoaderService.cs`:
+Create `src/NightRaven.Plugins/Services/PluginLoaderService.cs`:
 
 ```csharp
 using System.Reflection;
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Interfaces;
-using NightHeaven.Plugins.Internal;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Interfaces;
+using NightRaven.Plugins.Internal;
 using Serilog;
 
-namespace NightHeaven.Plugins.Services;
+namespace NightRaven.Plugins.Services;
 
 /// <summary>
 /// Boot-time loader for trusted .NET plugins.
@@ -1239,7 +1239,7 @@ public sealed class PluginLoaderService
         var pluginTypes = assemblies.SelectMany(GetLoadableTypes)
                                     .Where(type =>
                                         type is { IsAbstract: false, IsInterface: false } &&
-                                        typeof(INightHeavenPlugin).IsAssignableFrom(type)
+                                        typeof(INightRavenPlugin).IsAssignableFrom(type)
                                     )
                                     .ToArray();
 
@@ -1259,7 +1259,7 @@ public sealed class PluginLoaderService
 
         try
         {
-            var instance = (INightHeavenPlugin?)Activator.CreateInstance(pluginTypes[0])
+            var instance = (INightRavenPlugin?)Activator.CreateInstance(pluginTypes[0])
                 ?? throw new InvalidOperationException(
                     $"Plugin type '{pluginTypes[0].FullName}' could not be instantiated."
                 );
@@ -1302,7 +1302,7 @@ public sealed class PluginLoaderService
 Run:
 
 ```bash
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj --filter "FullyQualifiedName~PluginLoaderServiceTests" --nologo
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj --filter "FullyQualifiedName~PluginLoaderServiceTests" --nologo
 ```
 
 Expected: PASS, 4 tests.
@@ -1310,7 +1310,7 @@ Expected: PASS, 4 tests.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/NightHeaven.Plugins/Internal/PluginAssemblyLoadContext.cs src/NightHeaven.Plugins/Services/PluginLoaderService.cs tests/NightHeaven.Tests/Plugins/PluginLoaderServiceTests.cs
+git add src/NightRaven.Plugins/Internal/PluginAssemblyLoadContext.cs src/NightRaven.Plugins/Services/PluginLoaderService.cs tests/NightRaven.Tests/Plugins/PluginLoaderServiceTests.cs
 git commit -m "feat(plugins): load and configure plugin assemblies"
 ```
 
@@ -1318,72 +1318,72 @@ git commit -m "feat(plugins): load and configure plugin assemblies"
 
 **Files:**
 
-- Modify: `src/NightHeaven.Server/NightHeaven.Server.csproj`
-- Create: `src/NightHeaven.Server/Extensions/DryIoc/PluginContainerExtensions.cs`
-- Modify: `src/NightHeaven.Server/Program.cs`
-- Test: `tests/NightHeaven.Tests/Plugins/PluginContainerExtensionsTests.cs`
+- Modify: `src/NightRaven.Server/NightRaven.Server.csproj`
+- Create: `src/NightRaven.Server/Extensions/DryIoc/PluginContainerExtensions.cs`
+- Modify: `src/NightRaven.Server/Program.cs`
+- Test: `tests/NightRaven.Tests/Plugins/PluginContainerExtensionsTests.cs`
 
 - [ ] **Step 1: Reference plugin project from server**
 
-Modify `src/NightHeaven.Server/NightHeaven.Server.csproj`:
+Modify `src/NightRaven.Server/NightRaven.Server.csproj`:
 
 ```xml
-<ProjectReference Include="..\NightHeaven.Plugins\NightHeaven.Plugins.csproj" />
+<ProjectReference Include="..\NightRaven.Plugins\NightRaven.Plugins.csproj" />
 ```
 
 The project references block should include:
 
 ```xml
 <ItemGroup>
-    <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj" />
-    <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj" />
-    <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj" />
-    <ProjectReference Include="..\NightHeaven.Persistence\NightHeaven.Persistence.csproj" />
-    <ProjectReference Include="..\NightHeaven.Plugins\NightHeaven.Plugins.csproj" />
-    <ProjectReference Include="..\NightHeaven.Network.UO\NightHeaven.Network.UO.csproj" />
-    <ProjectReference Include="..\NightHeaven.Scripting.Lua\NightHeaven.Scripting.Lua.csproj" />
+    <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj" />
+    <ProjectReference Include="..\NightRaven.Hosting\NightRaven.Hosting.csproj" />
+    <ProjectReference Include="..\NightRaven.Network\NightRaven.Network.csproj" />
+    <ProjectReference Include="..\NightRaven.Persistence\NightRaven.Persistence.csproj" />
+    <ProjectReference Include="..\NightRaven.Plugins\NightRaven.Plugins.csproj" />
+    <ProjectReference Include="..\NightRaven.Network.UO\NightRaven.Network.UO.csproj" />
+    <ProjectReference Include="..\NightRaven.Scripting.Lua\NightRaven.Scripting.Lua.csproj" />
 </ItemGroup>
 ```
 
 - [ ] **Step 2: Write failing container extension test**
 
-Create `tests/NightHeaven.Tests/Plugins/PluginContainerExtensionsTests.cs`:
+Create `tests/NightRaven.Tests/Plugins/PluginContainerExtensionsTests.cs`:
 
 ```csharp
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Hosting.Configuration;
-using NightHeaven.Hosting.Data.Internal;
-using NightHeaven.Scripting.Lua.Data.Internal;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Plugins.Support;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Hosting.Configuration;
+using NightRaven.Hosting.Data.Internal;
+using NightRaven.Scripting.Lua.Data.Internal;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Plugins.Support;
 
-namespace NightHeaven.Tests.Plugins;
+namespace NightRaven.Tests.Plugins;
 
 public sealed class PluginContainerExtensionsTests : IDisposable
 {
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"nh-plugin-container-{Guid.NewGuid():N}");
 
     [Fact]
-    public void AddNightHeavenPlugins_LoadsPluginsBeforeGlobalConfigBinding()
+    public void AddNightRavenPlugins_LoadsPluginsBeforeGlobalConfigBinding()
     {
         var directories = new DirectoriesConfig(_root, Enum.GetNames<DirectoryType>());
-        PluginFixtureCopy.CopyFixture(directories[DirectoryType.Plugins], "NightHeaven.PluginFixtures.Basic", "basic");
+        PluginFixtureCopy.CopyFixture(directories[DirectoryType.Plugins], "NightRaven.PluginFixtures.Basic", "basic");
         var container = new Container();
-        container.AddNightHeavenLuaScripting(directories);
+        container.AddNightRavenLuaScripting(directories);
 
-        container.AddNightHeavenPlugins(directories);
+        container.AddNightRavenPlugins(directories);
         var sections = container.Resolve<List<ConfigSectionRegistration>>();
 
         Assert.Contains(sections, section => section.Name == "fixture_plugin");
         Assert.Contains(
             container.Resolve<List<ScriptModuleData>>(),
-            module => module.ModuleType.FullName == "NightHeaven.PluginFixtures.Basic.BasicPluginScriptModule"
+            module => module.ModuleType.FullName == "NightRaven.PluginFixtures.Basic.BasicPluginScriptModule"
         );
 
-        var configPath = Path.Combine(directories[DirectoryType.Config], "nightheaven.toml");
-        container.AddNightHeavenConfig(configPath);
+        var configPath = Path.Combine(directories[DirectoryType.Config], "nightraven.toml");
+        container.AddNightRavenConfig(configPath);
         Assert.Contains("[fixture_plugin]", File.ReadAllText(configPath));
     }
 
@@ -1404,21 +1404,21 @@ public sealed class PluginContainerExtensionsTests : IDisposable
 Run:
 
 ```bash
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj --filter "FullyQualifiedName~PluginContainerExtensionsTests" --nologo
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj --filter "FullyQualifiedName~PluginContainerExtensionsTests" --nologo
 ```
 
-Expected: FAIL because `AddNightHeavenPlugins` does not exist.
+Expected: FAIL because `AddNightRavenPlugins` does not exist.
 
 - [ ] **Step 4: Add DryIoc plugin extension**
 
-Create `src/NightHeaven.Server/Extensions/DryIoc/PluginContainerExtensions.cs`:
+Create `src/NightRaven.Server/Extensions/DryIoc/PluginContainerExtensions.cs`:
 
 ```csharp
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Plugins.Services;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Plugins.Services;
 
-namespace NightHeaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.DryIoc;
 
 /// <summary>
 /// DryIoc-native registration helper for boot-time .NET plugins.
@@ -1427,9 +1427,9 @@ public static class PluginContainerExtensions
 {
     /// <summary>
     /// Loads trusted .NET plugins from the configured plugins directory and lets them register into the container.
-    /// Must run before <see cref="ConfigContainerExtensions.AddNightHeavenConfig" />.
+    /// Must run before <see cref="ConfigContainerExtensions.AddNightRavenConfig" />.
     /// </summary>
-    public static IContainer AddNightHeavenPlugins(this IContainer container, DirectoriesConfig directoriesConfig)
+    public static IContainer AddNightRavenPlugins(this IContainer container, DirectoriesConfig directoriesConfig)
     {
         ArgumentNullException.ThrowIfNull(container);
         ArgumentNullException.ThrowIfNull(directoriesConfig);
@@ -1444,19 +1444,19 @@ public static class PluginContainerExtensions
 
 - [ ] **Step 5: Wire `Program.cs` boot order**
 
-Modify `src/NightHeaven.Server/Program.cs` so the plugin loader runs after built-in script modules and before global config:
+Modify `src/NightRaven.Server/Program.cs` so the plugin loader runs after built-in script modules and before global config:
 
 ```csharp
 container.RegisterScriptModule<LogModule>();
 
 // Plugins can declare config sections, services, Lua modules, persistence entities, and handlers.
-// This must run before AddNightHeavenConfig so plugin config sections are bound at boot.
-container.AddNightHeavenPlugins(directoriesConfig);
+// This must run before AddNightRavenConfig so plugin config sections are bound at boot.
+container.AddNightRavenPlugins(directoriesConfig);
 
 // Load config.toml once and register every section as a DI instance. Must run after
 // all RegisterConfigSection calls (each module helper declares its section).
-container.AddNightHeavenConfig(
-    Path.Combine(directoriesConfig[DirectoryType.Config], "nightheaven.toml")
+container.AddNightRavenConfig(
+    Path.Combine(directoriesConfig[DirectoryType.Config], "nightraven.toml")
 );
 ```
 
@@ -1465,7 +1465,7 @@ container.AddNightHeavenConfig(
 Run:
 
 ```bash
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj --filter "FullyQualifiedName~PluginContainerExtensionsTests" --nologo
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj --filter "FullyQualifiedName~PluginContainerExtensionsTests" --nologo
 ```
 
 Expected: PASS, 1 test.
@@ -1475,7 +1475,7 @@ Expected: PASS, 1 test.
 Run:
 
 ```bash
-dotnet build src/NightHeaven.Server/NightHeaven.Server.csproj -c Debug -nologo
+dotnet build src/NightRaven.Server/NightRaven.Server.csproj -c Debug -nologo
 ```
 
 Expected: `Build succeeded.`
@@ -1483,7 +1483,7 @@ Expected: `Build succeeded.`
 - [ ] **Step 8: Commit**
 
 ```bash
-git add src/NightHeaven.Server/NightHeaven.Server.csproj src/NightHeaven.Server/Extensions/DryIoc/PluginContainerExtensions.cs src/NightHeaven.Server/Program.cs tests/NightHeaven.Tests/Plugins/PluginContainerExtensionsTests.cs
+git add src/NightRaven.Server/NightRaven.Server.csproj src/NightRaven.Server/Extensions/DryIoc/PluginContainerExtensions.cs src/NightRaven.Server/Program.cs tests/NightRaven.Tests/Plugins/PluginContainerExtensionsTests.cs
 git commit -m "feat(plugins): wire plugin loading into server boot"
 ```
 
@@ -1499,7 +1499,7 @@ git commit -m "feat(plugins): wire plugin loading into server boot"
 Run:
 
 ```bash
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj -c Release --nologo
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj -c Release --nologo
 ```
 
 Expected: PASS. The total test count will be higher than the current 458 because plugin tests were added.
@@ -1509,7 +1509,7 @@ Expected: PASS. The total test count will be higher than the current 458 because
 Run:
 
 ```bash
-dotnet build NightHeaven.slnx -c Release -nologo
+dotnet build NightRaven.slnx -c Release -nologo
 ```
 
 Expected: `Build succeeded.`
@@ -1519,18 +1519,18 @@ Expected: `Build succeeded.`
 Run:
 
 ```bash
-rm -rf /tmp/nightheaven-plugin-smoke
-timeout 8s env NIGHTHEAVEN_ROOT=/tmp/nightheaven-plugin-smoke ASPNETCORE_URLS=http://127.0.0.1:0 dotnet run --project src/NightHeaven.Server/NightHeaven.Server.csproj -c Release --no-launch-profile
+rm -rf /tmp/nightraven-plugin-smoke
+timeout 8s env NIGHTRAVEN_ROOT=/tmp/nightraven-plugin-smoke ASPNETCORE_URLS=http://127.0.0.1:0 dotnet run --project src/NightRaven.Server/NightRaven.Server.csproj -c Release --no-launch-profile
 ```
 
-Expected: exit code `124` from `timeout`, logs show normal startup/shutdown, and `/tmp/nightheaven-plugin-smoke/plugins` exists.
+Expected: exit code `124` from `timeout`, logs show normal startup/shutdown, and `/tmp/nightraven-plugin-smoke/plugins` exists.
 
 - [ ] **Step 4: Build Docker image**
 
 Run:
 
 ```bash
-docker build -f src/NightHeaven.Server/Dockerfile -t nightheaven-server-plugin-check .
+docker build -f src/NightRaven.Server/Dockerfile -t nightraven-server-plugin-check .
 ```
 
 Expected: Docker build succeeds. Existing repository warnings are acceptable if there are no errors.
@@ -1553,10 +1553,10 @@ git commit -m "fix(plugins): complete plugin startup verification"
   - Fail-fast loader: Tasks 3 and 5.
   - Dependency validation/topological order: Task 3.
   - Assembly loading from `plugins/*`: Tasks 4-5.
-  - Boot integration before `AddNightHeavenConfig`: Task 6.
+  - Boot integration before `AddNightRavenConfig`: Task 6.
   - Empty/missing directory behavior: Task 5 and Task 7.
 - Placeholder scan: no `TBD`, no deferred implementation steps.
 - Type consistency:
-  - `INightHeavenPlugin.Configure(IContainer container, PluginContext context)` is used consistently.
+  - `INightRavenPlugin.Configure(IContainer container, PluginContext context)` is used consistently.
   - `PluginMetadata.Dependencies` is used consistently.
   - `PluginLoaderService.LoadAndConfigure(IContainer container, DirectoriesConfig directories)` is used consistently.

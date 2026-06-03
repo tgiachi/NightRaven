@@ -1,4 +1,4 @@
-namespace NightHeaven.Core.Collections;
+namespace NightRaven.Core.Collections;
 
 public static class CollectionThrowStrings
 {

@@ -1,7 +1,7 @@
-using NightHeaven.Core.Buffers;
-using NightHeaven.Core.Types;
+using NightRaven.Core.Buffers;
+using NightRaven.Core.Types;
 
-namespace NightHeaven.Core.Utils;
+namespace NightRaven.Core.Utils;
 
 /// <summary>
 /// Provides utility methods for string operations, including various case conversion methods.

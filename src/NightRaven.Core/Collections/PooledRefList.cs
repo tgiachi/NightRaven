@@ -1,9 +1,9 @@
 using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using NightHeaven.Core.Buffers;
+using NightRaven.Core.Buffers;
 
-namespace NightHeaven.Core.Collections;
+namespace NightRaven.Core.Collections;
 
 [DebuggerDisplay("Count = {Count}")]
 public ref struct PooledRefList<T>

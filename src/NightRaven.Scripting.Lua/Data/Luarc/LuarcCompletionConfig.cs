@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace NightHeaven.Scripting.Lua.Data.Luarc;
+namespace NightRaven.Scripting.Lua.Data.Luarc;
 
 /// <summary>
 /// Completion configuration for Lua Language Server

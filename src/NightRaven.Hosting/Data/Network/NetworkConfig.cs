@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Data.Network;
+namespace NightRaven.Hosting.Data.Network;
 
 /// <summary>
 /// Configuration for the network service: TCP game listener, UDP ping echo server and parser limits.

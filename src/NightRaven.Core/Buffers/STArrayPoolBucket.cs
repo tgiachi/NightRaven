@@ -1,4 +1,4 @@
-namespace NightHeaven.Core.Buffers;
+namespace NightRaven.Core.Buffers;
 
 internal struct STArrayPoolBucket<T>
 {

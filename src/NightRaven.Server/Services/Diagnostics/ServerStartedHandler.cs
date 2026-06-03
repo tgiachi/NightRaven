@@ -1,9 +1,9 @@
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Server.Data.Events;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Server.Data.Events;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace NightHeaven.Server.Services.Diagnostics;
+namespace NightRaven.Server.Services.Diagnostics;
 
 /// <summary>
 /// Diagnostic tick handler that logs the thread it runs on. Confirms that the

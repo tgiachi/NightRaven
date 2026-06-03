@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightHeaven.Hosting.Types.Metrics;
-using NightHeaven.Server.Services.EventBus;
-using NightHeaven.Server.Services.GameLoop;
+using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Server.Services.EventBus;
+using NightRaven.Server.Services.GameLoop;
 
-namespace NightHeaven.Tests.Hosting.Metrics;
+namespace NightRaven.Tests.Hosting.Metrics;
 
 public class GameLoopMetricsTests
 {

@@ -1,6 +1,6 @@
 using System.IO.Compression;
 
-namespace NightHeaven.Core.Compression;
+namespace NightRaven.Core.Compression;
 
 public static class Deflate
 {

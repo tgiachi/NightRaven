@@ -1,21 +1,21 @@
 using Microsoft.Extensions.Hosting;
-using NightHeaven.Hosting.Interfaces.Services;
+using NightRaven.Hosting.Interfaces.Services;
 using Serilog;
 
-namespace NightHeaven.Hosting.Internal;
+namespace NightRaven.Hosting.Internal;
 
 /// <summary>
 /// The single <see cref="IHostedService" /> registered with the host. Dispatches
 /// <see cref="IHostedService.StartAsync" /> and <see cref="IHostedService.StopAsync" />
-/// to every registered <see cref="INightHeavenService" /> in priority order.
+/// to every registered <see cref="INightRavenService" /> in priority order.
 /// </summary>
-internal sealed class NightHeavenServiceOrchestrator : IHostedService
+internal sealed class NightRavenServiceOrchestrator : IHostedService
 {
-    private readonly ILogger _logger = Log.ForContext<NightHeavenServiceOrchestrator>();
-    private readonly NightHeavenServiceDescriptor[] _startOrder;
-    private readonly NightHeavenServiceDescriptor[] _stopOrder;
+    private readonly ILogger _logger = Log.ForContext<NightRavenServiceOrchestrator>();
+    private readonly NightRavenServiceDescriptor[] _startOrder;
+    private readonly NightRavenServiceDescriptor[] _stopOrder;
 
-    public NightHeavenServiceOrchestrator(IEnumerable<NightHeavenServiceDescriptor> descriptors)
+    public NightRavenServiceOrchestrator(IEnumerable<NightRavenServiceDescriptor> descriptors)
     {
         // OrderBy is stable, so equal priorities preserve registration order.
         _startOrder = descriptors.OrderBy(d => d.Priority).ToArray();

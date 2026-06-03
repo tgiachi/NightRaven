@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.UO.Types.Targeting;
+namespace NightRaven.Network.UO.Types.Targeting;
 
 /// <summary>
 /// Defines cursor behavior for the target request.

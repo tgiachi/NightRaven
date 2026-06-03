@@ -1,36 +1,36 @@
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Hosting.Data.Internal;
-using NightHeaven.Scripting.Lua.Data.Internal;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Plugins.Support;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Hosting.Data.Internal;
+using NightRaven.Scripting.Lua.Data.Internal;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Plugins.Support;
 
-namespace NightHeaven.Tests.Plugins;
+namespace NightRaven.Tests.Plugins;
 
 public sealed class PluginContainerExtensionsTests : IDisposable
 {
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"nh-plugin-container-{Guid.NewGuid():N}");
 
     [Fact]
-    public void AddNightHeavenPlugins_LoadsPluginsBeforeGlobalConfigBinding()
+    public void AddNightRavenPlugins_LoadsPluginsBeforeGlobalConfigBinding()
     {
         var directories = new DirectoriesConfig(_root, Enum.GetNames<DirectoryType>());
-        PluginFixtureCopy.CopyFixture(directories[DirectoryType.Plugins], "NightHeaven.PluginFixtures.Basic", "basic");
+        PluginFixtureCopy.CopyFixture(directories[DirectoryType.Plugins], "NightRaven.PluginFixtures.Basic", "basic");
         var container = new Container();
-        container.AddNightHeavenLuaScripting(directories);
+        container.AddNightRavenLuaScripting(directories);
 
-        container.AddNightHeavenPlugins(directories);
+        container.AddNightRavenPlugins(directories);
         var sections = container.Resolve<List<ConfigSectionRegistration>>();
 
         Assert.Contains(sections, section => section.Name == "fixture_plugin");
         Assert.Contains(
             container.Resolve<List<ScriptModuleData>>(),
-            module => module.ModuleType.FullName == "NightHeaven.PluginFixtures.Basic.BasicPluginScriptModule"
+            module => module.ModuleType.FullName == "NightRaven.PluginFixtures.Basic.BasicPluginScriptModule"
         );
 
-        var configPath = Path.Combine(directories[DirectoryType.Config], "nightheaven.toml");
-        container.AddNightHeavenConfig(configPath);
+        var configPath = Path.Combine(directories[DirectoryType.Config], "nightraven.toml");
+        container.AddNightRavenConfig(configPath);
         Assert.Contains("[fixture_plugin]", File.ReadAllText(configPath));
     }
 

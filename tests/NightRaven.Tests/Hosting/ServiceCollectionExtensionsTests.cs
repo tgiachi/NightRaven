@@ -1,13 +1,13 @@
 using DryIoc;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Support;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Support;
 
-namespace NightHeaven.Tests.Hosting;
+namespace NightRaven.Tests.Hosting;
 
 public class ServiceCollectionExtensionsTests
 {
-    private interface IFooService : INightHeavenService;
+    private interface IFooService : INightRavenService;
 
     private sealed class FooService : IFooService
     {
@@ -19,11 +19,11 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddNightHeavenHosting_CalledTwice_ResolvesSingleOrchestrator()
+    public void AddNightRavenHosting_CalledTwice_ResolvesSingleOrchestrator()
     {
         var container = new Container();
-        container.AddNightHeavenHosting();
-        container.AddNightHeavenHosting();
+        container.AddNightRavenHosting();
+        container.AddNightRavenHosting();
 
         // Idempotent: the orchestrator resolves as a single instance.
         Assert.NotNull(container.Orchestrator());
@@ -31,10 +31,10 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddNightHeavenService_WithInterface_RegistersSingletonAndAlias()
+    public void AddNightRavenService_WithInterface_RegistersSingletonAndAlias()
     {
         var container = new Container();
-        container.AddNightHeavenService<IFooService, FooService>();
+        container.AddNightRavenService<IFooService, FooService>();
 
         var asInterface = container.Resolve<IFooService>();
         var asImpl = container.Resolve<FooService>();
@@ -45,10 +45,10 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddNightHeavenService_WithoutInterface_RegistersImplementationOnly()
+    public void AddNightRavenService_WithoutInterface_RegistersImplementationOnly()
     {
         var container = new Container();
-        container.AddNightHeavenService<FooService>();
+        container.AddNightRavenService<FooService>();
 
         Assert.NotNull(container.Resolve<FooService>());
     }

@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Interfaces.Events;
+using NightRaven.Hosting.Interfaces.Events;
 
-namespace NightHeaven.Server.Data.Events;
+namespace NightRaven.Server.Data.Events;
 
 /// <summary>
 /// Tick event published once after the host has fully started.

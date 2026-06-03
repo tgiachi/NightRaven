@@ -1,9 +1,9 @@
-namespace NightHeaven.Hosting.Interfaces.Services;
+namespace NightRaven.Hosting.Interfaces.Services;
 
 /// <summary>
 /// Owns the dedicated game-loop thread that drains tick events from <see cref="IEventBusService" />.
 /// </summary>
-public interface IGameLoopService : INightHeavenService
+public interface IGameLoopService : INightRavenService
 {
     /// <summary>Number of loop iterations performed since start.</summary>
     long TickCount { get; }

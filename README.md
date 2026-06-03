@@ -1,4 +1,4 @@
-# NightHeaven
+# NightRaven
 
 ## Overview
 
@@ -7,13 +7,13 @@ Short description goes here.
 ## Build
 
 ```bash
-dotnet build NightHeaven.slnx
+dotnet build NightRaven.slnx
 ```
 
 ## Test
 
 ```bash
-dotnet test NightHeaven.slnx
+dotnet test NightRaven.slnx
 ```
 
 ## License

@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.Interfaces.Encryption;
+namespace NightRaven.Network.Interfaces.Encryption;
 
 /// <summary>
 /// Defines the contract for client transport encryption algorithms.

@@ -8,9 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\NightHeaven.Plugins\NightHeaven.Plugins.csproj"/>
-        <ProjectReference Include="..\..\src\NightHeaven.Server\NightHeaven.Server.csproj"/>
-        <ProjectReference Include="..\..\src\NightHeaven.Scripting.Lua\NightHeaven.Scripting.Lua.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Server\NightRaven.Server.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Scripting.Lua\NightRaven.Scripting.Lua.csproj"/>
     </ItemGroup>
 
 </Project>

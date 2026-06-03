@@ -1,6 +1,6 @@
-using NightHeaven.Core.Buffers;
+using NightRaven.Core.Buffers;
 
-namespace NightHeaven.Network.Compression;
+namespace NightRaven.Network.Compression;
 
 /// <summary>
 /// Handles outgoing packet compression for the network using the Ultima Online

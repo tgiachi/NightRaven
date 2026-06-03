@@ -1,7 +1,7 @@
-using NightHeaven.Network.Client;
-using NightHeaven.Server.Services.Network.Internal;
+using NightRaven.Network.Client;
+using NightRaven.Server.Services.Network.Internal;
 
-namespace NightHeaven.Server.Interfaces.Network;
+namespace NightRaven.Server.Interfaces.Network;
 
 /// <summary>
 /// Registry of active network sessions keyed by session id.
@@ -29,7 +29,7 @@ public interface ISessionService
     /// </summary>
     /// <param name="client">Owning TCP client.</param>
     /// <returns>The session associated with the client.</returns>
-    GameSession GetOrCreate(NightHeavenTCPClient client);
+    GameSession GetOrCreate(NightRavenTCPClient client);
 
     /// <summary>
     /// Removes a session by its id.

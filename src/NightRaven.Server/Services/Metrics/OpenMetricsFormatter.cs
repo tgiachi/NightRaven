@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Text;
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Types.Metrics;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Types.Metrics;
 
-namespace NightHeaven.Server.Services.Metrics;
+namespace NightRaven.Server.Services.Metrics;
 
 /// <summary>
 /// Renders a <see cref="MetricsSnapshot" /> into OpenMetrics 1.0 text/plain.

@@ -1,8 +1,8 @@
-using NightHeaven.Core.Toml;
+using NightRaven.Core.Toml;
 using Tomlyn;
 using Tomlyn.Serialization;
 
-namespace NightHeaven.Tests.Core.Toml;
+namespace NightRaven.Tests.Core.Toml;
 
 public class TomlUtilsTests : IDisposable
 {

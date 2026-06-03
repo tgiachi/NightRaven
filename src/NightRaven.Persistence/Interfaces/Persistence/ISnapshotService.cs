@@ -1,6 +1,6 @@
-using NightHeaven.Persistence.Data;
+using NightRaven.Persistence.Data;
 
-namespace NightHeaven.Persistence.Interfaces.Persistence;
+namespace NightRaven.Persistence.Interfaces.Persistence;
 
 /// <summary>
 /// Reads and writes complete world snapshots.

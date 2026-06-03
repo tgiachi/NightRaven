@@ -8,24 +8,24 @@ using System.Text;
 using System.Text.RegularExpressions;
 using DryIoc;
 using MoonSharp.Interpreter;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Extensions.Strings;
-using NightHeaven.Core.Json;
-using NightHeaven.Scripting.Lua.Attributes.Scripts;
-using NightHeaven.Scripting.Lua.Context;
-using NightHeaven.Scripting.Lua.Data.Config;
-using NightHeaven.Scripting.Lua.Data.Internal;
-using NightHeaven.Scripting.Lua.Data.Luarc;
-using NightHeaven.Scripting.Lua.Data.Scripts;
-using NightHeaven.Scripting.Lua.Interfaces;
-using NightHeaven.Scripting.Lua.Loaders;
-using NightHeaven.Scripting.Lua.Utils;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Extensions.Strings;
+using NightRaven.Core.Json;
+using NightRaven.Scripting.Lua.Attributes.Scripts;
+using NightRaven.Scripting.Lua.Context;
+using NightRaven.Scripting.Lua.Data.Config;
+using NightRaven.Scripting.Lua.Data.Internal;
+using NightRaven.Scripting.Lua.Data.Luarc;
+using NightRaven.Scripting.Lua.Data.Scripts;
+using NightRaven.Scripting.Lua.Interfaces;
+using NightRaven.Scripting.Lua.Loaders;
+using NightRaven.Scripting.Lua.Utils;
 using Serilog;
 
 #pragma warning disable IL2026 // RequiresUnreferencedCode - Lua scripting uses reflection for dynamic functionality
 #pragma warning disable IL2072 // DynamicallyAccessedMemberTypes - Reflection access is necessary for scripting
 
-namespace NightHeaven.Scripting.Lua.Services;
+namespace NightRaven.Scripting.Lua.Services;
 
 /// <summary>
 /// Lua engine service that integrates MoonSharp with the SquidCraft game engine
@@ -85,7 +85,7 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
         List<ScriptUserData> loadedUserData = null
     )
     {
-        JsonUtils.RegisterJsonContext(NightHeavenScriptJsonContext.Default);
+        JsonUtils.RegisterJsonContext(NightRavenScriptJsonContext.Default);
 
         scriptModules ??= new();
         loadedUserData ??= new();

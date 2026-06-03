@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Interfaces;
+namespace NightRaven.Hosting.Interfaces;
 
 /// <summary>
 /// Optional contract for config sections that validate their own values at load time.

@@ -1,4 +1,4 @@
-namespace NightHeaven.Scripting.Lua.Data.Internal;
+namespace NightRaven.Scripting.Lua.Data.Internal;
 
 /// <summary>
 /// Record containing data about a script module for internal processing.

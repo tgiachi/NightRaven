@@ -1,17 +1,17 @@
 using DryIoc;
-using NightHeaven.Core.Ids;
-using NightHeaven.Persistence.Interfaces.Persistence;
-using NightHeaven.Persistence.Services.Persistence;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Persistence.Support;
-using NightHeaven.Tests.Support;
+using NightRaven.Core.Ids;
+using NightRaven.Persistence.Interfaces.Persistence;
+using NightRaven.Persistence.Services.Persistence;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Persistence.Support;
+using NightRaven.Tests.Support;
 
-namespace NightHeaven.Tests.Persistence.Service;
+namespace NightRaven.Tests.Persistence.Service;
 
 public class PersistenceHostIntegrationTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-persist-host-{Guid.NewGuid():N}");
-    private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
+    private string ConfigPath => Path.Combine(_dir, "nightraven.toml");
 
     public void Dispose()
     {
@@ -65,8 +65,8 @@ public class PersistenceHostIntegrationTests : IDisposable
         var container = new Container();
         container.RegisterPersistenceEntity<TestPlayer, Serial>(1, 1, p => p.Id);
         container.RegisterPersistenceEntity<TestItem, Serial>(2, 1, i => i.Id);
-        container.AddNightHeavenPersistence(_dir);
-        container.AddNightHeavenConfig(ConfigPath);
+        container.AddNightRavenPersistence(_dir);
+        container.AddNightRavenConfig(ConfigPath);
 
         return container;
     }

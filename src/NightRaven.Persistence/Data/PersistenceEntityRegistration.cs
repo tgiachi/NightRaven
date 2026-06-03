@@ -1,6 +1,6 @@
-using NightHeaven.Persistence.Interfaces.Persistence;
+using NightRaven.Persistence.Interfaces.Persistence;
 
-namespace NightHeaven.Persistence.Data;
+namespace NightRaven.Persistence.Data;
 
 /// <summary>
 /// Boot-time registration item accumulated in the container and turned into a registry entry by the

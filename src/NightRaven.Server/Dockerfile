@@ -23,9 +23,9 @@ WORKDIR /src
 # is present in the Docker context.
 COPY ["Directory.Build.props", "global.json", "./"]
 COPY src/ src/
-RUN dotnet restore "src/NightHeaven.Server/NightHeaven.Server.csproj"
+RUN dotnet restore "src/NightRaven.Server/NightRaven.Server.csproj"
 
-RUN dotnet publish "src/NightHeaven.Server/NightHeaven.Server.csproj" \
+RUN dotnet publish "src/NightRaven.Server/NightRaven.Server.csproj" \
         -c "$BUILD_CONFIGURATION" \
         -o /app/publish \
         --no-restore \
@@ -36,10 +36,10 @@ RUN dotnet publish "src/NightHeaven.Server/NightHeaven.Server.csproj" \
 # ---------------------------------------------------------------------------
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 
-# The server writes logs, plugins, scripts and save state under NIGHTHEAVEN_ROOT.
+# The server writes logs, plugins, scripts and save state under NIGHTRAVEN_ROOT.
 # Defaulting to /data keeps runtime state outside /app so the container image
 # stays immutable and a single volume mount preserves everything.
-ENV NIGHTHEAVEN_ROOT=/data \
+ENV NIGHTRAVEN_ROOT=/data \
     ASPNETCORE_URLS=http://+:8080 \
     DOTNET_NOLOGO=1 \
     DOTNET_RUNNING_IN_CONTAINER=true
@@ -58,4 +58,4 @@ EXPOSE 8080
 EXPOSE 2593/tcp
 EXPOSE 12000/udp
 
-ENTRYPOINT ["dotnet", "NightHeaven.Server.dll"]
+ENTRYPOINT ["dotnet", "NightRaven.Server.dll"]

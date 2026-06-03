@@ -1,12 +1,12 @@
 using DryIoc;
-using NightHeaven.Plugins.Data;
+using NightRaven.Plugins.Data;
 
-namespace NightHeaven.Plugins.Interfaces;
+namespace NightRaven.Plugins.Interfaces;
 
 /// <summary>
-/// Implemented by trusted .NET plugins loaded by NightHeaven during server startup.
+/// Implemented by trusted .NET plugins loaded by NightRaven during server startup.
 /// </summary>
-public interface INightHeavenPlugin
+public interface INightRavenPlugin
 {
     /// <summary>Plugin identity, descriptive information, and dependency declarations.</summary>
     PluginMetadata Metadata { get; }

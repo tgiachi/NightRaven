@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace NightHeaven.Core.Utils;
+namespace NightRaven.Core.Utils;
 
 /// <summary>
 /// Provides utilities for working with embedded resources.

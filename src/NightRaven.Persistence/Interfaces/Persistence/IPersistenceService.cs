@@ -1,13 +1,13 @@
-using NightHeaven.Core.Ids;
-using NightHeaven.Hosting.Interfaces.Services;
+using NightRaven.Core.Ids;
+using NightRaven.Hosting.Interfaces.Services;
 
-namespace NightHeaven.Persistence.Interfaces.Persistence;
+namespace NightRaven.Persistence.Interfaces.Persistence;
 
 /// <summary>
 /// Owns persistence lifecycle: loads the snapshot and replays the journal at startup, autosaves
 /// periodically, and hands out per-type <see cref="IDataAccess{TEntity,TKey}" /> instances.
 /// </summary>
-public interface IPersistenceService : INightHeavenService
+public interface IPersistenceService : INightRavenService
 {
     /// <summary>Gets CRUD access for a registered entity type.</summary>
     IDataAccess<TEntity, TKey> GetDataAccess<TEntity, TKey>()

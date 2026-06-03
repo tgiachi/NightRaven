@@ -1,25 +1,25 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using NightHeaven.Network.Client;
-using NightHeaven.Network.Events;
-using NightHeaven.Network.Interfaces.Framing;
-using NightHeaven.Network.Interfaces.Middleware;
+using NightRaven.Network.Client;
+using NightRaven.Network.Events;
+using NightRaven.Network.Interfaces.Framing;
+using NightRaven.Network.Interfaces.Middleware;
 using Serilog;
 
-namespace NightHeaven.Network.Server;
+namespace NightRaven.Network.Server;
 
 /// <summary>
 /// High-throughput TCP server with client lifecycle events and middleware-enabled payload dispatch.
 /// Supports Start/Stop/Start cycles by recreating the underlying socket on each Start.
 /// </summary>
-public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
+public sealed class NightRavenTCPServer : IAsyncDisposable, IDisposable
 {
     private const int DefaultBacklog = 512;
 
-    private readonly ILogger _logger = Log.ForContext<NightHeavenTCPServer>();
+    private readonly ILogger _logger = Log.ForContext<NightRavenTCPServer>();
     private readonly Lock _middlewareSync = new();
-    private readonly ConcurrentDictionary<long, NightHeavenTCPClient> _clients = new();
+    private readonly ConcurrentDictionary<long, NightRavenTCPClient> _clients = new();
     private readonly IPEndPoint _endPoint;
     private readonly INetFramer? _framer;
     private readonly int _receiveBufferSize;
@@ -41,7 +41,7 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
     /// </param>
     /// <param name="receiveBufferSize">Per-client receive chunk size.</param>
     /// <param name="historyBufferCapacity">Per-client history buffer capacity.</param>
-    public NightHeavenTCPServer(
+    public NightRavenTCPServer(
         IPEndPoint endPoint,
         INetFramer? framer = null,
         int receiveBufferSize = 8192,
@@ -57,22 +57,22 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
     /// <summary>
     /// Raised when a client connects.
     /// </summary>
-    public event EventHandler<NightHeavenTCPClientEventArgs>? OnClientConnect;
+    public event EventHandler<NightRavenTCPClientEventArgs>? OnClientConnect;
 
     /// <summary>
     /// Raised when a client disconnects.
     /// </summary>
-    public event EventHandler<NightHeavenTCPClientEventArgs>? OnClientDisconnect;
+    public event EventHandler<NightRavenTCPClientEventArgs>? OnClientDisconnect;
 
     /// <summary>
     /// Raised when a client sends data after middleware processing.
     /// </summary>
-    public event EventHandler<NightHeavenTCPDataReceivedEventArgs>? OnDataReceived;
+    public event EventHandler<NightRavenTCPDataReceivedEventArgs>? OnDataReceived;
 
     /// <summary>
     /// Raised when an exception happens in accept loop or client loops.
     /// </summary>
-    public event EventHandler<NightHeavenTCPExceptionEventArgs>? OnException;
+    public event EventHandler<NightRavenTCPExceptionEventArgs>? OnException;
 
     /// <summary>
     /// Current listening port. Returns 0 when the server is stopped.
@@ -87,7 +87,7 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
     /// <summary>
     /// Registers middleware in execution order.
     /// </summary>
-    public NightHeavenTCPServer AddMiddleware(INetMiddleware middleware)
+    public NightRavenTCPServer AddMiddleware(INetMiddleware middleware)
     {
         lock (_middlewareSync)
         {
@@ -200,7 +200,7 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
                 var clientSocket = await serverSocket.AcceptAsync(cts.Token);
 
                 var middlewareSnapshot = _middlewares;
-                var client = new NightHeavenTCPClient(
+                var client = new NightRavenTCPClient(
                     clientSocket,
                     middlewareSnapshot,
                     _framer,
@@ -228,7 +228,7 @@ public sealed class NightHeavenTCPServer : IAsyncDisposable, IDisposable
         }
     }
 
-    private void WireClientEvents(NightHeavenTCPClient client)
+    private void WireClientEvents(NightRavenTCPClient client)
     {
         client.OnConnected += (_, args) =>
                               {

@@ -1,12 +1,12 @@
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
-using NightHeaven.Core.Ids;
-using NightHeaven.Persistence.Formatters;
-using NightHeaven.Persistence.Interfaces.Persistence;
-using NightHeaven.Persistence.Internal;
+using NightRaven.Core.Ids;
+using NightRaven.Persistence.Formatters;
+using NightRaven.Persistence.Interfaces.Persistence;
+using NightRaven.Persistence.Internal;
 
-namespace NightHeaven.Persistence.Data;
+namespace NightRaven.Persistence.Data;
 
 /// <summary>
 /// Default descriptor for a persisted entity kind. Serializes via a composite MessagePack resolver

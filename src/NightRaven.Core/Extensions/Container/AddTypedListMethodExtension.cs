@@ -1,6 +1,6 @@
 using DryIoc;
 
-namespace NightHeaven.Core.Extensions.Container;
+namespace NightRaven.Core.Extensions.Container;
 
 /// <summary>
 /// Extension methods for registering typed lists in the dependency injection container.

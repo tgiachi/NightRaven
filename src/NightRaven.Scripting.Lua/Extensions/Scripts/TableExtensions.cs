@@ -1,8 +1,8 @@
 using System.Reflection;
 using MoonSharp.Interpreter;
-using NightHeaven.Scripting.Lua.Proxies;
+using NightRaven.Scripting.Lua.Proxies;
 
-namespace NightHeaven.Scripting.Lua.Extensions.Scripts;
+namespace NightRaven.Scripting.Lua.Extensions.Scripts;
 
 /// <summary>
 /// Provides extension methods for MoonSharp Table objects to enable proxying to interfaces.

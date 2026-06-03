@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace NightHeaven.Core.Utils;
+namespace NightRaven.Core.Utils;
 
 /// <summary>
 /// Provides utility methods for reading assembly version metadata.
@@ -8,9 +8,9 @@ namespace NightHeaven.Core.Utils;
 public static class VersionUtils
 {
     /// <summary>
-    /// Gets the informational version for the NightHeaven.Core assembly.
+    /// Gets the informational version for the NightRaven.Core assembly.
     /// </summary>
-    /// <returns>The package version declared for NightHeaven.Core.</returns>
+    /// <returns>The package version declared for NightRaven.Core.</returns>
     public static string GetVersion()
         => GetVersion(typeof(VersionUtils).Assembly);
 

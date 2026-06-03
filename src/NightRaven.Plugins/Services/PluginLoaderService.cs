@@ -1,14 +1,14 @@
 using System.Reflection;
 using System.Runtime.Loader;
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Interfaces;
-using NightHeaven.Plugins.Internal;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Interfaces;
+using NightRaven.Plugins.Internal;
 using Serilog;
 
-namespace NightHeaven.Plugins.Services;
+namespace NightRaven.Plugins.Services;
 
 /// <summary>
 /// Boot-time loader for trusted .NET plugins.
@@ -106,7 +106,7 @@ public sealed class PluginLoaderService
         var pluginTypes = assemblies.SelectMany(GetLoadableTypes)
                                     .Where(type =>
                                         type is { IsAbstract: false, IsInterface: false } &&
-                                        typeof(INightHeavenPlugin).IsAssignableFrom(type)
+                                        typeof(INightRavenPlugin).IsAssignableFrom(type)
                                     )
                                     .ToArray();
 
@@ -126,7 +126,7 @@ public sealed class PluginLoaderService
 
         try
         {
-            var instance = (INightHeavenPlugin?)Activator.CreateInstance(pluginTypes[0])
+            var instance = (INightRavenPlugin?)Activator.CreateInstance(pluginTypes[0])
                 ?? throw new InvalidOperationException(
                     $"Plugin type '{pluginTypes[0].FullName}' could not be instantiated."
                 );

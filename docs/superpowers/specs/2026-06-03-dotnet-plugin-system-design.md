@@ -2,9 +2,9 @@
 
 ## Goal
 
-Add a boot-time .NET plugin system for NightHeaven. Plugins live under the server
+Add a boot-time .NET plugin system for NightRaven. Plugins live under the server
 `plugins/` directory, expose metadata from code, may read their own optional
-`plugin.toml`, and can register NightHeaven services, config sections, Lua
+`plugin.toml`, and can register NightRaven services, config sections, Lua
 modules, persistence entities, packet handlers, metrics, and event handlers
 before the server container is built.
 
@@ -22,7 +22,7 @@ before the server container is built.
 Create a public plugin API that external plugin projects can reference:
 
 ```csharp
-public interface INightHeavenPlugin
+public interface INightRavenPlugin
 {
     PluginMetadata Metadata { get; }
 
@@ -50,7 +50,7 @@ Metadata validation is fail-fast:
 - `Id`, `Name`, `Author`, and `Version` are required.
 - `Id` must be unique across loaded plugins.
 - `Id` should use lowercase dotted identifiers, for example
-  `nightheaven.weather`.
+  `nightraven.weather`.
 - `Dependencies` contains plugin IDs only, with no version constraints in v1.
 
 ## Plugin Package Layout
@@ -59,18 +59,18 @@ Each plugin is a directory under `plugins/`:
 
 ```text
 plugins/
-  nightheaven.weather/
-    NightHeaven.WeatherPlugin.dll
+  nightraven.weather/
+    NightRaven.WeatherPlugin.dll
     plugin.toml
     dependency-a.dll
 ```
 
 The folder name is a package location, not the plugin identity. The plugin ID is
-read from `INightHeavenPlugin.Metadata.Id`.
+read from `INightRavenPlugin.Metadata.Id`.
 
 The loader scans top-level `*.dll` files in each plugin directory, loads them
 with an assembly resolver rooted at that directory, and discovers
-`INightHeavenPlugin` implementations. Each plugin directory must contain exactly
+`INightRavenPlugin` implementations. Each plugin directory must contain exactly
 one concrete plugin implementation.
 
 ## Plugin Configuration
@@ -112,7 +112,7 @@ Responsibilities:
 1. Ensure the plugins directory exists.
 2. Scan `plugins/*` directories.
 3. Load plugin assemblies from each directory.
-4. Discover exactly one concrete `INightHeavenPlugin` per plugin directory.
+4. Discover exactly one concrete `INightRavenPlugin` per plugin directory.
 5. Instantiate each plugin.
 6. Read and validate each plugin's `Metadata`.
 7. Reject duplicate IDs.
@@ -130,20 +130,20 @@ registered, but before the single server TOML config is loaded.
 
 ```text
 Program.cs
-  AddNightHeavenEventBus()
-  AddNightHeavenTimerWheel()
-  AddNightHeavenMetrics()
-  AddNightHeavenPersistence(...)
-  AddNightHeavenNetwork()
-  AddNightHeavenLuaScripting(...)
+  AddNightRavenEventBus()
+  AddNightRavenTimerWheel()
+  AddNightRavenMetrics()
+  AddNightRavenPersistence(...)
+  AddNightRavenNetwork()
+  AddNightRavenLuaScripting(...)
   RegisterScriptModule<LogModule>()
-  AddNightHeavenPlugins(directoriesConfig)
-  AddNightHeavenConfig(config/nightheaven.toml)
+  AddNightRavenPlugins(directoriesConfig)
+  AddNightRavenConfig(config/nightraven.toml)
   builder.Build()
 ```
 
 This order lets plugins declare their own config sections before
-`AddNightHeavenConfig` binds all registered config.
+`AddNightRavenConfig` binds all registered config.
 
 ## Plugin Capabilities
 
@@ -151,7 +151,7 @@ Inside `Configure`, a plugin can use the same registration APIs as built-in
 modules:
 
 - `RegisterConfigSection<TConfig>(...)`
-- `AddNightHeavenService<TInterface, TImplementation>(priority)`
+- `AddNightRavenService<TInterface, TImplementation>(priority)`
 - `AddTickEventHandler<THandler, TEvent>()`
 - `AddAsyncEventHandler<THandler, TEvent>()`
 - `RegisterScriptModule<TScriptModule>()`
@@ -169,7 +169,7 @@ Use a per-plugin non-collectible `AssemblyLoadContext` with
 dependency probing local to the plugin package while matching the v1 decision to
 avoid unload/hot reload.
 
-The loader should still avoid loading the main NightHeaven assemblies from the
+The loader should still avoid loading the main NightRaven assemblies from the
 plugin directory when those assemblies are already available in the host. Plugin
 projects should reference the host API assemblies but should not copy duplicate
 host assemblies into the plugin package.
@@ -214,7 +214,7 @@ in-memory types.
 ## Open Decisions Locked for V1
 
 - Dependencies are plugin IDs only.
-- Plugin metadata comes from `INightHeavenPlugin.Metadata`.
+- Plugin metadata comes from `INightRavenPlugin.Metadata`.
 - `plugin.toml` is plugin-specific runtime config only.
 - Loader is fail-fast.
 - Loading happens only at boot.

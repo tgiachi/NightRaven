@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Rename the project identity from `NightHeaven` to `NightRaven` across the .NET solution, C# namespaces/types, plugin API, frontend branding, Docker/runtime settings, and documentation.
+**Goal:** Rename the project identity from `NightRaven` to `NightRaven` across the .NET solution, C# namespaces/types, plugin API, frontend branding, Docker/runtime settings, and documentation.
 
 **Architecture:** Treat this as a staged refactor, not a single global replace. First establish a clean baseline and safety branch, then move project directories/files, then rewrite source identifiers and text, then add runtime compatibility for legacy root/config names, and finally verify .NET, web, Docker, and residual text scans.
 
@@ -14,9 +14,9 @@
 
 - Current checkout is `main`.
 - The worktree is dirty with unrelated pending changes. Do not execute this plan until those changes are committed, stashed, or the user explicitly chooses to include them in the rename branch.
-- `dotnet build NightHeaven.slnx -c Debug -nologo` passed before this plan was written.
-- `NightHeaven.slnx` currently uses solution folders and includes runtime projects, test projects, plugin fixture projects, and the new `src/NightHeaven.UO.Domain` project.
-- Text scan found hundreds of tracked references to `NightHeaven`, `nightheaven`, `NIGHTHEAVEN`, `night_heaven`, and related API names.
+- `dotnet build NightRaven.slnx -c Debug -nologo` passed before this plan was written.
+- `NightRaven.slnx` currently uses solution folders and includes runtime projects, test projects, plugin fixture projects, and the new `src/NightRaven.UO.Domain` project.
+- Text scan found hundreds of tracked references to `NightRaven`, `nightraven`, `NIGHTRAVEN`, `night_raven`, and related API names.
 
 ## Rename Policy
 
@@ -35,8 +35,8 @@ Canonical new names:
 
 Compatibility retained for one release:
 
-- `NIGHTHEAVEN_ROOT` remains a fallback if `NIGHTRAVEN_ROOT` is not set.
-- `nightheaven.toml` remains readable if `nightraven.toml` does not exist.
+- `NIGHTRAVEN_ROOT` remains a fallback if `NIGHTRAVEN_ROOT` is not set.
+- `nightraven.toml` remains readable if `nightraven.toml` does not exist.
 - Plugin metadata IDs are renamed to `nightraven.*`; this is a hard API rename because plugins are still pre-release.
 
 Generated and local files excluded from manual edits:
@@ -52,34 +52,34 @@ Generated and local files excluded from manual edits:
 
 Renamed solution and projects:
 
-- Rename: `NightHeaven.slnx` -> `NightRaven.slnx`
-- Rename: `src/NightHeaven.Core/` -> `src/NightRaven.Core/`
-- Rename: `src/NightHeaven.Hosting/` -> `src/NightRaven.Hosting/`
-- Rename: `src/NightHeaven.Network/` -> `src/NightRaven.Network/`
-- Rename: `src/NightHeaven.Network.UO/` -> `src/NightRaven.Network.UO/`
-- Rename: `src/NightHeaven.Persistence/` -> `src/NightRaven.Persistence/`
-- Rename: `src/NightHeaven.Plugins/` -> `src/NightRaven.Plugins/`
-- Rename: `src/NightHeaven.Scripting.Lua/` -> `src/NightRaven.Scripting.Lua/`
-- Rename: `src/NightHeaven.Server/` -> `src/NightRaven.Server/`
-- Rename: `src/NightHeaven.UO.Domain/` -> `src/NightRaven.UO.Domain/`
-- Rename: `tests/NightHeaven.Tests/` -> `tests/NightRaven.Tests/`
-- Rename: `tests/NightHeaven.PluginFixtures.Basic/` -> `tests/NightRaven.PluginFixtures.Basic/`
-- Rename: `tests/NightHeaven.PluginFixtures.Empty/` -> `tests/NightRaven.PluginFixtures.Empty/`
-- Rename: `tests/NightHeaven.PluginFixtures.Multiple/` -> `tests/NightRaven.PluginFixtures.Multiple/`
+- Rename: `NightRaven.slnx` -> `NightRaven.slnx`
+- Rename: `src/NightRaven.Core/` -> `src/NightRaven.Core/`
+- Rename: `src/NightRaven.Hosting/` -> `src/NightRaven.Hosting/`
+- Rename: `src/NightRaven.Network/` -> `src/NightRaven.Network/`
+- Rename: `src/NightRaven.Network.UO/` -> `src/NightRaven.Network.UO/`
+- Rename: `src/NightRaven.Persistence/` -> `src/NightRaven.Persistence/`
+- Rename: `src/NightRaven.Plugins/` -> `src/NightRaven.Plugins/`
+- Rename: `src/NightRaven.Scripting.Lua/` -> `src/NightRaven.Scripting.Lua/`
+- Rename: `src/NightRaven.Server/` -> `src/NightRaven.Server/`
+- Rename: `src/NightRaven.UO.Domain/` -> `src/NightRaven.UO.Domain/`
+- Rename: `tests/NightRaven.Tests/` -> `tests/NightRaven.Tests/`
+- Rename: `tests/NightRaven.PluginFixtures.Basic/` -> `tests/NightRaven.PluginFixtures.Basic/`
+- Rename: `tests/NightRaven.PluginFixtures.Empty/` -> `tests/NightRaven.PluginFixtures.Empty/`
+- Rename: `tests/NightRaven.PluginFixtures.Multiple/` -> `tests/NightRaven.PluginFixtures.Multiple/`
 
 Renamed representative C# symbols and files:
 
-- `INightHeavenPlugin` -> `INightRavenPlugin`
-- `INightHeavenService` -> `INightRavenService`
-- `INightHeavenEvent` -> `INightRavenEvent`
-- `NightHeavenServiceDescriptor` -> `NightRavenServiceDescriptor`
-- `NightHeavenServiceOrchestrator` -> `NightRavenServiceOrchestrator`
-- `NightHeavenTCPClient` -> `NightRavenTCPClient`
-- `NightHeavenTCPServer` -> `NightRavenTCPServer`
-- `NightHeavenUDPServer` -> `NightRavenUDPServer`
-- `NightHeavenScriptJsonContext` -> `NightRavenScriptJsonContext`
-- `NightHeavenContainerExtensions` -> `NightRavenContainerExtensions`
-- `NightHeavenCrest.tsx` -> `NightRavenCrest.tsx`
+- `INightRavenPlugin` -> `INightRavenPlugin`
+- `INightRavenService` -> `INightRavenService`
+- `INightRavenEvent` -> `INightRavenEvent`
+- `NightRavenServiceDescriptor` -> `NightRavenServiceDescriptor`
+- `NightRavenServiceOrchestrator` -> `NightRavenServiceOrchestrator`
+- `NightRavenTCPClient` -> `NightRavenTCPClient`
+- `NightRavenTCPServer` -> `NightRavenTCPServer`
+- `NightRavenUDPServer` -> `NightRavenUDPServer`
+- `NightRavenScriptJsonContext` -> `NightRavenScriptJsonContext`
+- `NightRavenContainerExtensions` -> `NightRavenContainerExtensions`
+- `NightRavenCrest.tsx` -> `NightRavenCrest.tsx`
 
 New runtime compatibility helper:
 
@@ -127,7 +127,7 @@ Expected: branch changes from `main` to `refactor/night-raven-rename`.
 Run:
 
 ```bash
-dotnet build NightHeaven.slnx -c Debug -nologo
+dotnet build NightRaven.slnx -c Debug -nologo
 ```
 
 Expected: `Build succeeded.` with `0 Error(s)`.
@@ -140,7 +140,7 @@ If Step 1 required committing a pre-existing clean baseline, use the user's norm
 
 **Files:**
 
-- Rename all tracked paths containing `NightHeaven`.
+- Rename all tracked paths containing `NightRaven`.
 - Do not rename `bin`, `obj`, `node_modules`, `dist`, `.idea`, or `*.user`.
 
 - [ ] **Step 1: Move solution file, project directories, and named files**
@@ -148,28 +148,28 @@ If Step 1 required committing a pre-existing clean baseline, use the user's norm
 Run:
 
 ```bash
-git mv NightHeaven.slnx NightRaven.slnx
+git mv NightRaven.slnx NightRaven.slnx
 
 for path in \
-  src/NightHeaven.Core \
-  src/NightHeaven.Hosting \
-  src/NightHeaven.Network \
-  src/NightHeaven.Network.UO \
-  src/NightHeaven.Persistence \
-  src/NightHeaven.Plugins \
-  src/NightHeaven.Scripting.Lua \
-  src/NightHeaven.Server \
-  src/NightHeaven.UO.Domain \
-  tests/NightHeaven.Tests \
-  tests/NightHeaven.PluginFixtures.Basic \
-  tests/NightHeaven.PluginFixtures.Empty \
-  tests/NightHeaven.PluginFixtures.Multiple
+  src/NightRaven.Core \
+  src/NightRaven.Hosting \
+  src/NightRaven.Network \
+  src/NightRaven.Network.UO \
+  src/NightRaven.Persistence \
+  src/NightRaven.Plugins \
+  src/NightRaven.Scripting.Lua \
+  src/NightRaven.Server \
+  src/NightRaven.UO.Domain \
+  tests/NightRaven.Tests \
+  tests/NightRaven.PluginFixtures.Basic \
+  tests/NightRaven.PluginFixtures.Empty \
+  tests/NightRaven.PluginFixtures.Multiple
 do
-  git mv "$path" "${path/NightHeaven/NightRaven}"
+  git mv "$path" "${path/NightRaven/NightRaven}"
 done
 
 while IFS= read -r -d '' path; do
-  new_path="${path//NightHeaven/NightRaven}"
+  new_path="${path//NightRaven/NightRaven}"
   if [ "$path" != "$new_path" ]; then
     mkdir -p "$(dirname "$new_path")"
     git mv "$path" "$new_path"
@@ -177,14 +177,14 @@ while IFS= read -r -d '' path; do
 done < <(git ls-files -z)
 ```
 
-Expected: `git status --short` shows renames from `NightHeaven` paths to `NightRaven` paths.
+Expected: `git status --short` shows renames from `NightRaven` paths to `NightRaven` paths.
 
 - [ ] **Step 2: Verify no tracked file path still contains old project names**
 
 Run:
 
 ```bash
-git ls-files | rg 'NightHeaven|nightheaven|NIGHTHEAVEN|night_heaven|night-heaven'
+git ls-files | rg 'NightRaven|nightraven|NIGHTRAVEN|night_raven|night-raven'
 ```
 
 Expected: either no output, or only intentionally excluded local files that are not tracked by Git. If tracked source paths remain, rename them before continuing.
@@ -195,7 +195,7 @@ Run:
 
 ```bash
 git add -A
-git commit -m "refactor: rename NightHeaven paths to NightRaven"
+git commit -m "refactor: rename NightRaven paths to NightRaven"
 ```
 
 Expected: commit contains mostly rename entries and no large content rewrites yet.
@@ -217,12 +217,12 @@ git ls-files -z \
   | grep -z -v -E '(^|/)\.idea(/|$)' \
   | grep -z -v -E '\.user$' \
   | xargs -0 perl -pi -e '
-      s/NIGHTHEAVEN/NIGHTRAVEN/g;
-      s/Night Heaven/Night Raven/g;
-      s/NightHeaven/NightRaven/g;
-      s/night-heaven/night-raven/g;
-      s/night_heaven/night_raven/g;
-      s/nightheaven/nightraven/g;
+      s/NIGHTRAVEN/NIGHTRAVEN/g;
+      s/Night Raven/Night Raven/g;
+      s/NightRaven/NightRaven/g;
+      s/night-raven/night-raven/g;
+      s/night_raven/night_raven/g;
+      s/nightraven/nightraven/g;
     '
 ```
 
@@ -254,7 +254,7 @@ Run after build errors from Step 3 are fixed:
 
 ```bash
 git add -A
-git commit -m "refactor: rename NightHeaven symbols to NightRaven"
+git commit -m "refactor: rename NightRaven symbols to NightRaven"
 ```
 
 Expected: commit contains namespace/type/content rewrites and project reference updates.
@@ -281,14 +281,14 @@ namespace NightRaven.Tests.Server;
 public sealed class RuntimePathsTests : IDisposable
 {
     private readonly string? _oldPrimary = Environment.GetEnvironmentVariable("NIGHTRAVEN_ROOT");
-    private readonly string? _oldLegacy = Environment.GetEnvironmentVariable("NIGHTHEAVEN_ROOT");
+    private readonly string? _oldLegacy = Environment.GetEnvironmentVariable("NIGHTRAVEN_ROOT");
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"nr-runtime-paths-{Guid.NewGuid():N}");
 
     [Fact]
     public void ResolveRootDirectory_CommandLineRoot_WinsOverEnvironment()
     {
         Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", Path.Combine(_root, "env"));
-        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", Path.Combine(_root, "legacy"));
+        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", Path.Combine(_root, "legacy"));
 
         var root = RuntimePaths.ResolveRootDirectory(Path.Combine(_root, "cli"));
 
@@ -299,7 +299,7 @@ public sealed class RuntimePathsTests : IDisposable
     public void ResolveRootDirectory_PrimaryEnvironment_WinsOverLegacy()
     {
         Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", Path.Combine(_root, "new"));
-        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", Path.Combine(_root, "old"));
+        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", Path.Combine(_root, "old"));
 
         var root = RuntimePaths.ResolveRootDirectory(null);
 
@@ -310,7 +310,7 @@ public sealed class RuntimePathsTests : IDisposable
     public void ResolveRootDirectory_LegacyEnvironment_RemainsFallback()
     {
         Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", null);
-        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", Path.Combine(_root, "old"));
+        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", Path.Combine(_root, "old"));
 
         var root = RuntimePaths.ResolveRootDirectory(null);
 
@@ -332,11 +332,11 @@ public sealed class RuntimePathsTests : IDisposable
     {
         var directories = Directories();
         Directory.CreateDirectory(directories[DirectoryType.Config]);
-        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightheaven.toml"), string.Empty);
+        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightraven.toml"), string.Empty);
 
         var configPath = RuntimePaths.ResolveConfigPath(directories);
 
-        Assert.Equal(Path.Combine(directories[DirectoryType.Config], "nightheaven.toml"), configPath);
+        Assert.Equal(Path.Combine(directories[DirectoryType.Config], "nightraven.toml"), configPath);
     }
 
     [Fact]
@@ -344,7 +344,7 @@ public sealed class RuntimePathsTests : IDisposable
     {
         var directories = Directories();
         Directory.CreateDirectory(directories[DirectoryType.Config]);
-        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightheaven.toml"), string.Empty);
+        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightraven.toml"), string.Empty);
         File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightraven.toml"), string.Empty);
 
         var configPath = RuntimePaths.ResolveConfigPath(directories);
@@ -355,7 +355,7 @@ public sealed class RuntimePathsTests : IDisposable
     public void Dispose()
     {
         Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", _oldPrimary);
-        Environment.SetEnvironmentVariable("NIGHTHEAVEN_ROOT", _oldLegacy);
+        Environment.SetEnvironmentVariable("NIGHTRAVEN_ROOT", _oldLegacy);
 
         if (Directory.Exists(_root))
         {
@@ -393,10 +393,10 @@ namespace NightRaven.Server.Data;
 internal static class RuntimePaths
 {
     public const string RootEnvironmentVariable = "NIGHTRAVEN_ROOT";
-    public const string LegacyRootEnvironmentVariable = "NIGHTHEAVEN_ROOT";
+    public const string LegacyRootEnvironmentVariable = "NIGHTRAVEN_ROOT";
     public const string DefaultRootDirectoryName = "night_raven";
     public const string ConfigFileName = "nightraven.toml";
-    public const string LegacyConfigFileName = "nightheaven.toml";
+    public const string LegacyConfigFileName = "nightraven.toml";
 
     public static string ResolveRootDirectory(string? commandLineRootDirectory)
     {
@@ -451,7 +451,7 @@ Replace direct config path construction:
 container.AddNightRavenConfig(RuntimePaths.ResolveConfigPath(directoriesConfig));
 ```
 
-Expected: `NIGHTRAVEN_ROOT` is primary, `NIGHTHEAVEN_ROOT` is fallback, default local root is `night_raven`, and config binding uses `nightraven.toml` unless only `nightheaven.toml` exists.
+Expected: `NIGHTRAVEN_ROOT` is primary, `NIGHTRAVEN_ROOT` is fallback, default local root is `night_raven`, and config binding uses `nightraven.toml` unless only `nightraven.toml` exists.
 
 - [ ] **Step 5: Run compatibility tests**
 
@@ -476,7 +476,7 @@ git commit -m "refactor: add NightRaven runtime path compatibility"
 
 **Files:**
 
-- Rename: `web/src/features/player/NightHeavenCrest.tsx` -> `web/src/features/player/NightRavenCrest.tsx`
+- Rename: `web/src/features/player/NightRavenCrest.tsx` -> `web/src/features/player/NightRavenCrest.tsx`
 - Modify: `web/src/features/auth/FakeLoginPage.tsx`
 - Modify: `web/src/features/player/PlayerPortalShell.tsx`
 - Modify: `web/src/features/player/PlayerDashboard.tsx`
@@ -490,15 +490,15 @@ git commit -m "refactor: add NightRaven runtime path compatibility"
 Run:
 
 ```bash
-rg -n "NightHeavenCrest|NightHeaven|nightheaven" web/src web/index.html
+rg -n "NightRavenCrest|NightRaven|nightraven" web/src web/index.html
 ```
 
 Expected after Task 3 mechanical rewrite: no output. If output remains, replace:
 
 ```text
-NightHeavenCrest -> NightRavenCrest
-NightHeaven -> NightRaven
-nightheaven -> nightraven
+NightRavenCrest -> NightRavenCrest
+NightRaven -> NightRaven
+nightraven -> nightraven
 ```
 
 - [ ] **Step 2: Run frontend build**
@@ -517,7 +517,7 @@ If Step 1 or Step 2 required additional frontend changes, run:
 
 ```bash
 git add web/src web/index.html
-git commit -m "refactor(web): rename NightHeaven branding to NightRaven"
+git commit -m "refactor(web): rename NightRaven branding to NightRaven"
 ```
 
 If no files changed in this task, do not commit.
@@ -537,14 +537,14 @@ If no files changed in this task, do not commit.
 Run:
 
 ```bash
-rg -n "NightHeaven|nightheaven|NIGHTHEAVEN|night_heaven|night-heaven" README.md Directory.Build.props .gitignore src/NightRaven.Server/Dockerfile docs/superpowers
+rg -n "NightRaven|nightraven|NIGHTRAVEN|night_raven|night-raven" README.md Directory.Build.props .gitignore src/NightRaven.Server/Dockerfile docs/superpowers
 ```
 
 Expected: only intentional legacy compatibility references are allowed:
 
 ```text
-NIGHTHEAVEN_ROOT
-nightheaven.toml
+NIGHTRAVEN_ROOT
+nightraven.toml
 ```
 
 Everything else should say `NightRaven`, `nightraven`, `NIGHTRAVEN`, `night_raven`, or `night-raven`.
@@ -571,7 +571,7 @@ Run:
 
 ```bash
 rm -rf /tmp/nightraven-legacy-smoke
-timeout 8s env NIGHTHEAVEN_ROOT=/tmp/nightraven-legacy-smoke ASPNETCORE_URLS=http://127.0.0.1:0 dotnet run --project src/NightRaven.Server/NightRaven.Server.csproj -c Release --no-launch-profile
+timeout 8s env NIGHTRAVEN_ROOT=/tmp/nightraven-legacy-smoke ASPNETCORE_URLS=http://127.0.0.1:0 dotnet run --project src/NightRaven.Server/NightRaven.Server.csproj -c Release --no-launch-profile
 code=$?
 printf 'EXIT_CODE=%s\n' "$code"
 test "$code" -eq 124
@@ -579,7 +579,7 @@ test -d /tmp/nightraven-legacy-smoke/plugins
 test -f /tmp/nightraven-legacy-smoke/config/nightraven.toml
 ```
 
-Expected: exit code `124`, server still honors `NIGHTHEAVEN_ROOT`, and writes the new `nightraven.toml` file.
+Expected: exit code `124`, server still honors `NIGHTRAVEN_ROOT`, and writes the new `nightraven.toml` file.
 
 - [ ] **Step 4: Build Docker image**
 
@@ -597,7 +597,7 @@ Run:
 
 ```bash
 git add README.md Directory.Build.props .gitignore src/NightRaven.Server/Dockerfile docs/superpowers
-git commit -m "docs: rename NightHeaven project references to NightRaven"
+git commit -m "docs: rename NightRaven project references to NightRaven"
 ```
 
 ## Task 7: Final Verification and Residual Scan
@@ -633,16 +633,16 @@ Run:
 
 ```bash
 rg -n --glob '!**/bin/**' --glob '!**/obj/**' --glob '!web/node_modules/**' --glob '!web/dist/**' --glob '!**/*.user' --glob '!.idea/**' \
-  "NightHeaven|nightheaven|NIGHTHEAVEN|night_heaven|night-heaven" .
+  "NightRaven|nightraven|NIGHTRAVEN|night_raven|night-raven" .
 ```
 
 Expected: only intentional compatibility references:
 
 ```text
-src/NightRaven.Server/Data/RuntimePaths.cs: LegacyRootEnvironmentVariable = "NIGHTHEAVEN_ROOT"
-src/NightRaven.Server/Data/RuntimePaths.cs: LegacyConfigFileName = "nightheaven.toml"
+src/NightRaven.Server/Data/RuntimePaths.cs: LegacyRootEnvironmentVariable = "NIGHTRAVEN_ROOT"
+src/NightRaven.Server/Data/RuntimePaths.cs: LegacyConfigFileName = "nightraven.toml"
 tests/NightRaven.Tests/Server/RuntimePathsTests.cs: assertions for legacy environment/config fallback
-docs/superpowers/plans/2026-06-03-nightheaven-to-nightraven-rename.md: documents the old name and compatibility policy
+docs/superpowers/plans/2026-06-03-nightraven-to-nightraven-rename.md: documents the old name and compatibility policy
 ```
 
 - [ ] **Step 4: Verify tracked paths**
@@ -650,7 +650,7 @@ docs/superpowers/plans/2026-06-03-nightheaven-to-nightraven-rename.md: documents
 Run:
 
 ```bash
-git ls-files | rg 'NightHeaven|nightheaven|NIGHTHEAVEN|night_heaven|night-heaven'
+git ls-files | rg 'NightRaven|nightraven|NIGHTRAVEN|night_raven|night-raven'
 ```
 
 Expected: no output.
@@ -673,7 +673,7 @@ git commit -m "refactor: complete NightRaven rename"
 ## Self-Review Checklist
 
 - Spec coverage:
-  - Project identity renamed from `NightHeaven` to `NightRaven`: Tasks 2-3.
+  - Project identity renamed from `NightRaven` to `NightRaven`: Tasks 2-3.
   - `.slnx`, project paths, project references, and namespaces renamed: Tasks 2-3.
   - C# public API names renamed, including plugin and hosting interfaces: Tasks 2-3.
   - Runtime env/config names updated with compatibility: Task 4.

@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.UO.Registry;
+namespace NightRaven.Network.UO.Registry;
 
 /// <summary>
 /// Registers all known UO protocol packets.

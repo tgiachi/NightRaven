@@ -1,4 +1,4 @@
-namespace NightHeaven.Core.Ids;
+namespace NightRaven.Core.Ids;
 
 /// <summary>
 /// Auto-increment wrapper around <see cref="long" /> for use as a persistence entity key.

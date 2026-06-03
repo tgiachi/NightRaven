@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 
-namespace NightHeaven.Core.Utils;
+namespace NightRaven.Core.Utils;
 
 /// <summary>
 /// Provides password hashing and verification helpers using PBKDF2-SHA256.

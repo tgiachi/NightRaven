@@ -1,6 +1,6 @@
-using NightHeaven.Core.Ids;
+using NightRaven.Core.Ids;
 
-namespace NightHeaven.Persistence.Interfaces.Persistence;
+namespace NightRaven.Persistence.Interfaces.Persistence;
 
 /// <summary>
 /// Extends <see cref="IDataAccess{TEntity,TKey}" /> for entities keyed by an

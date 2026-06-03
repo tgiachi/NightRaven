@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace NightHeaven.Core.Collections;
+namespace NightRaven.Core.Collections;
 
 /// <summary>
 /// Non-thread safe, non-guarded enumerator for classes that have internal arrays.

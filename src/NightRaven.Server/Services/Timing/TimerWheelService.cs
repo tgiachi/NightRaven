@@ -1,14 +1,14 @@
 using System.Diagnostics;
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Data.Timing;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Hosting.Interfaces.Timing;
-using NightHeaven.Hosting.Types.Metrics;
-using NightHeaven.Server.Services.Timing.Internal;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Data.Timing;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Hosting.Interfaces.Timing;
+using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Server.Services.Timing.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace NightHeaven.Server.Services.Timing;
+namespace NightRaven.Server.Services.Timing;
 
 /// <summary>
 /// Hashed timer wheel driven by <see cref="ITimerService.UpdateTicksDelta" /> from the game loop.

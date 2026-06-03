@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Data.Metrics;
+namespace NightRaven.Hosting.Data.Metrics;
 
 /// <summary>
 /// Configuration for <see cref="Interfaces.Metrics.IMetricsService" />.

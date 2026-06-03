@@ -1,12 +1,12 @@
 using System.Buffers.Binary;
-using NightHeaven.Network.UO.Data.Packets;
-using NightHeaven.Network.UO.Interfaces;
-using NightHeaven.Network.UO.Registry;
-using NightHeaven.Network.UO.Types.Packets;
+using NightRaven.Network.UO.Data.Packets;
+using NightRaven.Network.UO.Interfaces;
+using NightRaven.Network.UO.Registry;
+using NightRaven.Network.UO.Types.Packets;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace NightHeaven.Server.Services.Network.Internal;
+namespace NightRaven.Server.Services.Network.Internal;
 
 /// <summary>
 /// Pure per-session byte-stream parser: accumulates incoming bytes into a pending buffer and

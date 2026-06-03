@@ -1,12 +1,12 @@
 using System.Text;
-using NightHeaven.Hosting.Data.Internal;
-using NightHeaven.Hosting.Interfaces;
+using NightRaven.Hosting.Data.Internal;
+using NightRaven.Hosting.Interfaces;
 using Serilog;
 using Tomlyn;
 using Tomlyn.Model;
 using ILogger = Serilog.ILogger;
 
-namespace NightHeaven.Hosting.Configuration;
+namespace NightRaven.Hosting.Configuration;
 
 /// <summary>
 /// Loads the single TOML config file once at boot: creates it with defaults when missing, binds each

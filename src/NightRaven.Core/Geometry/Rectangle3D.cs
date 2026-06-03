@@ -14,10 +14,10 @@
  *************************************************************************/
 
 using System.Runtime.CompilerServices;
-using NightHeaven.Core.Extensions.Strings;
-using NightHeaven.Core.Interfaces.Geometry;
+using NightRaven.Core.Extensions.Strings;
+using NightRaven.Core.Interfaces.Geometry;
 
-namespace NightHeaven.Core.Geometry;
+namespace NightRaven.Core.Geometry;
 
 /// <summary>
 /// Represents Rectangle3D.

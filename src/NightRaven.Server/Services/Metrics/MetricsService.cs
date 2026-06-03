@@ -1,10 +1,10 @@
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Hosting.Interfaces.Timing;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Hosting.Interfaces.Timing;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace NightHeaven.Server.Services.Metrics;
+namespace NightRaven.Server.Services.Metrics;
 
 /// <summary>
 /// Background metrics aggregator. Builds a <see cref="MetricsSnapshot" /> every

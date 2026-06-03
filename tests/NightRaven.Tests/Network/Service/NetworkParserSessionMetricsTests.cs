@@ -1,6 +1,6 @@
-using NightHeaven.Server.Services.Network.Internal;
+using NightRaven.Server.Services.Network.Internal;
 
-namespace NightHeaven.Tests.Network.Service;
+namespace NightRaven.Tests.Network.Service;
 
 public class NetworkParserSessionMetricsTests
 {

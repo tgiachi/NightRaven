@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Interfaces.Events;
+using NightRaven.Hosting.Interfaces.Events;
 
-namespace NightHeaven.Tests.Hosting.EventBus.Support;
+namespace NightRaven.Tests.Hosting.EventBus.Support;
 
 internal sealed record TestAsyncEvent(string Payload) : IAsyncEvent;
 

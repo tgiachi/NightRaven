@@ -1,6 +1,6 @@
-using NightHeaven.Network.Compression;
+using NightRaven.Network.Compression;
 
-namespace NightHeaven.Tests.Network.Compression;
+namespace NightRaven.Tests.Network.Compression;
 
 public class NetworkCompressionTests
 {

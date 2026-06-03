@@ -1,8 +1,8 @@
-type NightHeavenCrestProps = {
+type NightRavenCrestProps = {
   compact?: boolean
 }
 
-export function NightHeavenCrest({ compact = false }: NightHeavenCrestProps) {
+export function NightRavenCrest({ compact = false }: NightRavenCrestProps) {
   return (
     <div className={compact ? 'nh-crest nh-crest-compact' : 'nh-crest'} aria-hidden="true">
       <svg viewBox="0 0 120 120" role="img">

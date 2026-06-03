@@ -1,4 +1,4 @@
-namespace NightHeaven.Persistence.Data;
+namespace NightRaven.Persistence.Data;
 
 /// <summary>
 /// Full persisted world state stored periodically on disk.

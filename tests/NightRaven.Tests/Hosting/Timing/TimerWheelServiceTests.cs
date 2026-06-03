@@ -1,7 +1,7 @@
-using NightHeaven.Hosting.Data.Timing;
-using NightHeaven.Server.Services.Timing;
+using NightRaven.Hosting.Data.Timing;
+using NightRaven.Server.Services.Timing;
 
-namespace NightHeaven.Tests.Hosting.Timing;
+namespace NightRaven.Tests.Hosting.Timing;
 
 public class TimerWheelServiceTests
 {

@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Hosting.Interfaces.EventHandlers;
 
-namespace NightHeaven.Tests.Hosting.EventBus.Support;
+namespace NightRaven.Tests.Hosting.EventBus.Support;
 
 internal sealed class TimelineAsyncHandler : IAsyncEventHandler<TestAsyncEvent>
 {

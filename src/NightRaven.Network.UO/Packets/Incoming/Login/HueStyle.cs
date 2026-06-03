@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.UO.Packets.Incoming.Login;
+namespace NightRaven.Network.UO.Packets.Incoming.Login;
 
 /// <summary>
 /// Represents struct.

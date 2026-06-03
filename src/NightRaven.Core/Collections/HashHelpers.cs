@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace NightHeaven.Core.Collections;
+namespace NightRaven.Core.Collections;
 
 internal static class HashHelpers
 {

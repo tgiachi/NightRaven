@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
-namespace NightHeaven.Core.Json;
+namespace NightRaven.Core.Json;
 
 /// <summary>
 /// Provides utility methods for JSON serialization and deserialization.

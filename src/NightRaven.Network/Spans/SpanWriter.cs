@@ -2,9 +2,9 @@ using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using NightHeaven.Core.Buffers;
+using NightRaven.Core.Buffers;
 
-namespace NightHeaven.Network.Spans;
+namespace NightRaven.Network.Spans;
 
 public ref struct SpanWriter : IDisposable
 {

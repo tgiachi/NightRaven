@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using NightHeaven.Scripting.Lua.Data.Luarc;
+using NightRaven.Scripting.Lua.Data.Luarc;
 
-namespace NightHeaven.Scripting.Lua.Context;
+namespace NightRaven.Scripting.Lua.Context;
 
 [JsonSerializable(typeof(LuarcConfig)), JsonSerializable(typeof(LuarcRuntimeConfig)),
  JsonSerializable(typeof(LuarcWorkspaceConfig)), JsonSerializable(typeof(LuarcDiagnosticsConfig)),
@@ -10,4 +10,4 @@ namespace NightHeaven.Scripting.Lua.Context;
 /// <summary>
 /// JSON serialization context for Lua scripting configuration types.
 /// </summary>
-public partial class NightHeavenScriptJsonContext : JsonSerializerContext { }
+public partial class NightRavenScriptJsonContext : JsonSerializerContext { }

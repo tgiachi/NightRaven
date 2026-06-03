@@ -1,7 +1,7 @@
-using NightHeaven.Network.UO.Data.Packets;
-using NightHeaven.Network.UO.Interfaces;
+using NightRaven.Network.UO.Data.Packets;
+using NightRaven.Network.UO.Interfaces;
 
-namespace NightHeaven.Network.UO.Data.Internal.Packets;
+namespace NightRaven.Network.UO.Data.Internal.Packets;
 
 internal readonly record struct PacketRegistration(
     PacketDescriptor Descriptor,

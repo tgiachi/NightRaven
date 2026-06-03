@@ -1,17 +1,17 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using NightHeaven.Network.Server;
+using NightRaven.Network.Server;
 
-namespace NightHeaven.Tests.Network.Server;
+namespace NightRaven.Tests.Network.Server;
 
-public class NightHeavenUDPServerTests
+public class NightRavenUDPServerTests
 {
     [Fact]
     public async Task Receive_DefaultBehaviour_EchoesPayloadBackToSender()
     {
         var port = GetFreeUdpPort();
-        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), false);
+        await using var server = new NightRavenUDPServer(new(IPAddress.Loopback, port), false);
         await server.StartAsync(CancellationToken.None);
 
         using var client = new UdpClient();
@@ -29,7 +29,7 @@ public class NightHeavenUDPServerTests
     public async Task Receive_WithCustomHandler_SendsHandlerResponse()
     {
         var port = GetFreeUdpPort();
-        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), false)
+        await using var server = new NightRavenUDPServer(new(IPAddress.Loopback, port), false)
         {
             OnDatagram = (data, _) =>
                          {
@@ -59,7 +59,7 @@ public class NightHeavenUDPServerTests
     [Fact]
     public async Task Start_BindsAndReportsRunning()
     {
-        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, 0), false);
+        await using var server = new NightRavenUDPServer(new(IPAddress.Loopback, 0), false);
 
         await server.StartAsync(CancellationToken.None);
 
@@ -73,7 +73,7 @@ public class NightHeavenUDPServerTests
     public async Task StopThenStart_RebindsListener()
     {
         var port = GetFreeUdpPort();
-        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), false);
+        await using var server = new NightRavenUDPServer(new(IPAddress.Loopback, port), false);
 
         await server.StartAsync(CancellationToken.None);
         Assert.True(server.IsRunning);

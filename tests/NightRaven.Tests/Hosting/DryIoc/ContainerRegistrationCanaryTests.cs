@@ -1,25 +1,25 @@
 using DryIoc;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Support;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Support;
 
-namespace NightHeaven.Tests.Hosting.DryIocNative;
+namespace NightRaven.Tests.Hosting.DryIocNative;
 
 public class ContainerRegistrationCanaryTests : IDisposable
 {
     private readonly string _dir = Path.Combine(
         Path.GetTempPath(),
-        $"nightheaven-container-canary-{Guid.NewGuid():N}"
+        $"nightraven-container-canary-{Guid.NewGuid():N}"
     );
 
-    private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
+    private string ConfigPath => Path.Combine(_dir, "nightraven.toml");
 
     [Fact]
-    public void AddNightHeavenHosting_CalledTwice_ResolvesSingleOrchestrator()
+    public void AddNightRavenHosting_CalledTwice_ResolvesSingleOrchestrator()
     {
         var container = new Container();
-        container.AddNightHeavenHosting();
-        container.AddNightHeavenHosting();
+        container.AddNightRavenHosting();
+        container.AddNightRavenHosting();
 
         Assert.Same(container.Orchestrator(), container.Orchestrator());
     }
@@ -38,8 +38,8 @@ public class ContainerRegistrationCanaryTests : IDisposable
     public async Task EventBus_RegisteredNatively_ResolvesAndStartsViaOrchestrator()
     {
         var container = new Container();
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenConfig(ConfigPath);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenConfig(ConfigPath);
 
         // Interface aliases resolve to the same singleton instances.
         Assert.NotNull(container.Resolve<IEventBusService>());
@@ -47,7 +47,7 @@ public class ContainerRegistrationCanaryTests : IDisposable
 
         // The orchestrator drives the lifecycle (surfaced as the host's IHostedService in Program.cs).
         var orchestrator = container.Orchestrator();
-        Assert.Equal("NightHeavenServiceOrchestrator", orchestrator.GetType().Name);
+        Assert.Equal("NightRavenServiceOrchestrator", orchestrator.GetType().Name);
 
         await orchestrator.StartAsync(CancellationToken.None);
         await orchestrator.StopAsync(CancellationToken.None);

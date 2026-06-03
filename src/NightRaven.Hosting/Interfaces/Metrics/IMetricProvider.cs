@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Data.Metrics;
 
-namespace NightHeaven.Hosting.Interfaces.Metrics;
+namespace NightRaven.Hosting.Interfaces.Metrics;
 
 /// <summary>
 /// Implemented by services that expose runtime metrics.

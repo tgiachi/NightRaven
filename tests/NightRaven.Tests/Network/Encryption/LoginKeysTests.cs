@@ -1,6 +1,6 @@
-using NightHeaven.Network.Encryption;
+using NightRaven.Network.Encryption;
 
-namespace NightHeaven.Tests.Network.Encryption;
+namespace NightRaven.Tests.Network.Encryption;
 
 public class LoginKeysTests
 {

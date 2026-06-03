@@ -1,21 +1,21 @@
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Internal;
-using NightHeaven.Tests.Plugins.Support;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Internal;
+using NightRaven.Tests.Plugins.Support;
 
-namespace NightHeaven.Tests.Plugins;
+namespace NightRaven.Tests.Plugins;
 
 public class PluginDependencySorterTests
 {
     [Fact]
     public void ValidateAndSort_DependentPlugin_ReturnsDependencyFirst()
     {
-        var dependent = Loaded("nightheaven.dependent", "nightheaven.dependency");
-        var dependency = Loaded("nightheaven.dependency");
+        var dependent = Loaded("nightraven.dependent", "nightraven.dependency");
+        var dependency = Loaded("nightraven.dependency");
 
         var sorted = PluginDependencySorter.ValidateAndSort([dependent, dependency]);
 
         Assert.Equal(
-            ["nightheaven.dependency", "nightheaven.dependent"],
+            ["nightraven.dependency", "nightraven.dependent"],
             sorted.Select(p => p.Metadata.Id).ToArray()
         );
     }
@@ -25,7 +25,7 @@ public class PluginDependencySorterTests
     {
         var ex = Assert.Throws<InvalidOperationException>(
             () => PluginDependencySorter.ValidateAndSort(
-                [Loaded("nightheaven.duplicate"), Loaded("nightheaven.duplicate")]
+                [Loaded("nightraven.duplicate"), Loaded("nightraven.duplicate")]
             )
         );
 
@@ -37,7 +37,7 @@ public class PluginDependencySorterTests
     {
         var ex = Assert.Throws<InvalidOperationException>(
             () => PluginDependencySorter.ValidateAndSort(
-                [Loaded("nightheaven.dependent", "nightheaven.missing")]
+                [Loaded("nightraven.dependent", "nightraven.missing")]
             )
         );
 
@@ -50,8 +50,8 @@ public class PluginDependencySorterTests
         var ex = Assert.Throws<InvalidOperationException>(
             () => PluginDependencySorter.ValidateAndSort(
                 [
-                    Loaded("nightheaven.a", "nightheaven.b"),
-                    Loaded("nightheaven.b", "nightheaven.a")
+                    Loaded("nightraven.a", "nightraven.b"),
+                    Loaded("nightraven.b", "nightraven.a")
                 ]
             )
         );
@@ -61,8 +61,8 @@ public class PluginDependencySorterTests
 
     [Theory]
     [InlineData("")]
-    [InlineData("NightHeaven.Bad")]
-    [InlineData("nightheaven bad")]
+    [InlineData("NightRaven.Bad")]
+    [InlineData("nightraven bad")]
     public void ValidateAndSort_InvalidId_Throws(string id)
     {
         var ex = Assert.Throws<InvalidOperationException>(

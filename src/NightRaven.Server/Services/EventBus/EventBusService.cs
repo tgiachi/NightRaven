@@ -1,14 +1,14 @@
 using System.Threading.Channels;
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Interfaces.Events;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Hosting.Types.Metrics;
-using NightHeaven.Server.Services.EventBus.Internal;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Interfaces.Events;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Server.Services.EventBus.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace NightHeaven.Server.Services.EventBus;
+namespace NightRaven.Server.Services.EventBus;
 
 /// <summary>
 /// Default <see cref="IEventBusService" /> implementation. Routes IAsyncEvent through
@@ -40,7 +40,7 @@ public sealed class EventBusService : IEventBusService, IMetricProvider
         );
     }
 
-    public Action<Type, Exception, INightHeavenEvent>? OnEventError { get; set; }
+    public Action<Type, Exception, INightRavenEvent>? OnEventError { get; set; }
 
     public int CurrentTickQueueDepth => Volatile.Read(ref _tickQueueDepth);
 

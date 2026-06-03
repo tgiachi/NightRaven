@@ -1,6 +1,6 @@
-using NightHeaven.Network.Interfaces.Framing;
+using NightRaven.Network.Interfaces.Framing;
 
-namespace NightHeaven.Tests.Network.Framing;
+namespace NightRaven.Tests.Network.Framing;
 
 /// <summary>
 /// Test framer: each frame starts with a 2-byte big-endian length that includes the prefix itself.

@@ -1,7 +1,7 @@
-using NightHeaven.Network.Spans;
-using NightHeaven.Network.UO.Interfaces;
+using NightRaven.Network.Spans;
+using NightRaven.Network.UO.Interfaces;
 
-namespace NightHeaven.Network.UO.Base;
+namespace NightRaven.Network.UO.Base;
 
 /// <summary>
 /// Base implementation for game network packets with shared opcode and parsing validation logic.

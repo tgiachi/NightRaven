@@ -1,28 +1,28 @@
 using DryIoc;
-using NightHeaven.Hosting.Data.Timing;
-using NightHeaven.Hosting.Interfaces.Timing;
-using NightHeaven.Server.Services.Timing;
+using NightRaven.Hosting.Data.Timing;
+using NightRaven.Hosting.Interfaces.Timing;
+using NightRaven.Server.Services.Timing;
 
-namespace NightHeaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.DryIoc;
 
 /// <summary>
-/// DryIoc-native registration helpers for the NightHeaven timer wheel.
+/// DryIoc-native registration helpers for the NightRaven timer wheel.
 /// </summary>
 public static class TimerContainerExtensions
 {
     private const int TimerWheelPriority = 3;
 
     /// <summary>
-    /// Registers <see cref="TimerWheelService" /> with the NightHeaven hosting orchestrator.
+    /// Registers <see cref="TimerWheelService" /> with the NightRaven hosting orchestrator.
     /// </summary>
     /// <param name="container">DryIoc container.</param>
-    public static IContainer AddNightHeavenTimerWheel(this IContainer container)
+    public static IContainer AddNightRavenTimerWheel(this IContainer container)
     {
-        container.AddNightHeavenHosting();
+        container.AddNightRavenHosting();
 
         container.RegisterConfigSection("timing", () => new TimerWheelConfig());
 
-        container.AddNightHeavenService<ITimerService, TimerWheelService>(TimerWheelPriority);
+        container.AddNightRavenService<ITimerService, TimerWheelService>(TimerWheelPriority);
 
         return container;
     }

@@ -1,15 +1,15 @@
 using System.Net;
 using System.Net.Sockets;
 using DryIoc;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Network.UO.Registry;
-using NightHeaven.Server.Data.Events;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Server.Interfaces.Network;
-using NightHeaven.Server.Services.Network;
-using NightHeaven.Tests.Support;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Network.UO.Registry;
+using NightRaven.Server.Data.Events;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Interfaces.Network;
+using NightRaven.Server.Services.Network;
+using NightRaven.Tests.Support;
 
-namespace NightHeaven.Tests.Network.Service;
+namespace NightRaven.Tests.Network.Service;
 
 public class NetworkServiceIntegrationTests : IDisposable
 {
@@ -95,14 +95,14 @@ public class NetworkServiceIntegrationTests : IDisposable
 
         var container = new Container();
         container.RegisterInstance(capture);
-        container.AddNightHeavenEventBus();
+        container.AddNightRavenEventBus();
 
         var packetRegistry = new PacketRegistry();
         PacketTable.Register(packetRegistry);
         container.RegisterInstance(packetRegistry);
 
-        container.AddNightHeavenNetwork();
-        container.AddNightHeavenConfig(configPath);
+        container.AddNightRavenNetwork();
+        container.AddNightRavenConfig(configPath);
         container.AddTickEventHandler<CaptureDisconnectHandler, PlayerDisconnectedEvent>();
 
         var orchestrator = container.Orchestrator();
@@ -154,14 +154,14 @@ public class NetworkServiceIntegrationTests : IDisposable
 
         var container = new Container();
         container.RegisterInstance(capture);
-        container.AddNightHeavenEventBus();
+        container.AddNightRavenEventBus();
 
         var packetRegistry = new PacketRegistry();
         PacketTable.Register(packetRegistry);
         container.RegisterInstance(packetRegistry);
 
-        container.AddNightHeavenNetwork();
-        container.AddNightHeavenConfig(configPath);
+        container.AddNightRavenNetwork();
+        container.AddNightRavenConfig(configPath);
         container.AddTickEventHandler<CapturePacketHandler, PacketReceivedEvent>();
         container.AddTickEventHandler<CaptureConnectHandler, PlayerConnectedEvent>();
 

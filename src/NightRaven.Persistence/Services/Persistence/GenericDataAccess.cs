@@ -1,11 +1,11 @@
-using NightHeaven.Core.Ids;
-using NightHeaven.Persistence.Data;
-using NightHeaven.Persistence.Interfaces.Persistence;
-using NightHeaven.Persistence.Internal;
-using NightHeaven.Persistence.Types;
+using NightRaven.Core.Ids;
+using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Interfaces.Persistence;
+using NightRaven.Persistence.Internal;
+using NightRaven.Persistence.Types;
 using ZLinq;
 
-namespace NightHeaven.Persistence.Services.Persistence;
+namespace NightRaven.Persistence.Services.Persistence;
 
 /// <summary>
 /// In-memory <see cref="IDataAccess{TEntity,TKey}" /> backed by a shared state store; every mutation

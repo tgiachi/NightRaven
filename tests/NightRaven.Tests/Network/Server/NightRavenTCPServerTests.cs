@@ -1,15 +1,15 @@
 using System.Net;
 using System.Net.Sockets;
-using NightHeaven.Network.Server;
+using NightRaven.Network.Server;
 
-namespace NightHeaven.Tests.Network.Server;
+namespace NightRaven.Tests.Network.Server;
 
-public class NightHeavenTCPServerTests
+public class NightRavenTCPServerTests
 {
     [Fact]
     public async Task Start_AcceptsClient()
     {
-        await using var server = new NightHeavenTCPServer(new(IPAddress.Loopback, 0));
+        await using var server = new NightRavenTCPServer(new(IPAddress.Loopback, 0));
         await server.StartAsync(CancellationToken.None);
 
         var connectedSignal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -28,7 +28,7 @@ public class NightHeavenTCPServerTests
     [Fact]
     public async Task Start_BindsAndListens()
     {
-        await using var server = new NightHeavenTCPServer(new(IPAddress.Loopback, 0));
+        await using var server = new NightRavenTCPServer(new(IPAddress.Loopback, 0));
 
         await server.StartAsync(CancellationToken.None);
 
@@ -43,7 +43,7 @@ public class NightHeavenTCPServerTests
     {
         // Regression: previous implementation kept a single socket field, so Stop closed
         // it and a subsequent Start tried to listen on a disposed socket.
-        await using var server = new NightHeavenTCPServer(new(IPAddress.Loopback, 0));
+        await using var server = new NightRavenTCPServer(new(IPAddress.Loopback, 0));
 
         await server.StartAsync(CancellationToken.None);
         var firstPort = server.Port;

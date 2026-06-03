@@ -1,6 +1,6 @@
-using NightHeaven.Core.Utils;
+using NightRaven.Core.Utils;
 
-namespace NightHeaven.Core.Extensions.Strings;
+namespace NightRaven.Core.Extensions.Strings;
 
 /// <summary>
 /// Provides extension methods for string operations, particularly for case conversions.

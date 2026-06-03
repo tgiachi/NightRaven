@@ -1,7 +1,7 @@
-using NightHeaven.Hosting.Types.Metrics;
-using NightHeaven.Server.Services.Timing;
+using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Server.Services.Timing;
 
-namespace NightHeaven.Tests.Hosting.Timing;
+namespace NightRaven.Tests.Hosting.Timing;
 
 public class TimerWheelServiceMetricsTests
 {

@@ -1,30 +1,30 @@
 using DryIoc;
-using NightHeaven.Plugins.Data;
-using NightHeaven.Plugins.Interfaces;
+using NightRaven.Plugins.Data;
+using NightRaven.Plugins.Interfaces;
 
-namespace NightHeaven.PluginFixtures.Multiple;
+namespace NightRaven.PluginFixtures.Multiple;
 
-public sealed class FirstPlugin : INightHeavenPlugin
+public sealed class FirstPlugin : INightRavenPlugin
 {
     public PluginMetadata Metadata { get; } = new()
     {
-        Id = "nightheaven.fixture.first",
+        Id = "nightraven.fixture.first",
         Name = "First Fixture Plugin",
         Version = new(1, 0, 0),
-        Author = "NightHeaven Tests"
+        Author = "NightRaven Tests"
     };
 
     public void Configure(IContainer container, PluginContext context) { }
 }
 
-public sealed class SecondPlugin : INightHeavenPlugin
+public sealed class SecondPlugin : INightRavenPlugin
 {
     public PluginMetadata Metadata { get; } = new()
     {
-        Id = "nightheaven.fixture.second",
+        Id = "nightraven.fixture.second",
         Name = "Second Fixture Plugin",
         Version = new(1, 0, 0),
-        Author = "NightHeaven Tests"
+        Author = "NightRaven Tests"
     };
 
     public void Configure(IContainer container, PluginContext context) { }

@@ -1,6 +1,6 @@
-using NightHeaven.Network.UO.Types.Packets;
+using NightRaven.Network.UO.Types.Packets;
 
-namespace NightHeaven.Network.UO.Attributes;
+namespace NightRaven.Network.UO.Attributes;
 
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class PacketHandlerAttribute : Attribute

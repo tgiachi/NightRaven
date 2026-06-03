@@ -1,6 +1,6 @@
-using NightHeaven.Core.Random;
+using NightRaven.Core.Random;
 
-namespace NightHeaven.Core.Extensions.Collections;
+namespace NightRaven.Core.Extensions.Collections;
 
 public static class CollectionExtensions
 {

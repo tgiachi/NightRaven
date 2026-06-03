@@ -1,13 +1,13 @@
 using System.Buffers.Binary;
 using MessagePack;
 using MessagePack.Resolvers;
-using NightHeaven.Persistence.Data;
-using NightHeaven.Persistence.Interfaces.Persistence;
-using NightHeaven.Persistence.Internal;
+using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Interfaces.Persistence;
+using NightRaven.Persistence.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace NightHeaven.Persistence.Services.Persistence;
+namespace NightRaven.Persistence.Services.Persistence;
 
 /// <summary>
 /// Append-only journal stored as length+checksum framed MessagePack records. A corrupt trailing

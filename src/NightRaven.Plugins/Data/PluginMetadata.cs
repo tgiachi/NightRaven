@@ -1,11 +1,11 @@
-namespace NightHeaven.Plugins.Data;
+namespace NightRaven.Plugins.Data;
 
 /// <summary>
-/// Describes a NightHeaven plugin. This is the source of truth for plugin identity.
+/// Describes a NightRaven plugin. This is the source of truth for plugin identity.
 /// </summary>
 public sealed class PluginMetadata
 {
-    /// <summary>Stable lowercase dotted plugin identifier, for example <c>nightheaven.weather</c>.</summary>
+    /// <summary>Stable lowercase dotted plugin identifier, for example <c>nightraven.weather</c>.</summary>
     public required string Id { get; init; }
 
     /// <summary>Human-readable plugin name.</summary>

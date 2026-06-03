@@ -1,8 +1,8 @@
 using System.Text;
-using NightHeaven.Core.Text;
-using NightHeaven.Network.Spans;
+using NightRaven.Core.Text;
+using NightRaven.Network.Spans;
 
-namespace NightHeaven.Tests.Network.Spans;
+namespace NightRaven.Tests.Network.Spans;
 
 public class SpanWriterTests
 {
@@ -393,7 +393,7 @@ public class SpanWriterTests
     [Fact]
     public void WriteLittleUni_StringRoundTripsThroughReader_WithCustomEncoding()
     {
-        // Use NightHeaven's TextEncoding.UnicodeLE to confirm GetTerminatorWidth handles
+        // Use NightRaven's TextEncoding.UnicodeLE to confirm GetTerminatorWidth handles
         // custom UnicodeEncoding subclasses correctly.
         Span<byte> backing = stackalloc byte[32];
         var writer = new SpanWriter(backing);

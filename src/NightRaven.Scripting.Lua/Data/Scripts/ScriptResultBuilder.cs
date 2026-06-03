@@ -1,4 +1,4 @@
-namespace NightHeaven.Scripting.Lua.Data.Scripts;
+namespace NightRaven.Scripting.Lua.Data.Scripts;
 
 /// <summary>
 /// Builder class for creating ScriptResult instances.

@@ -1,8 +1,8 @@
 using MoonSharp.Interpreter;
-using NightHeaven.Scripting.Lua.Data.Scripts;
-using NightHeaven.Tests.Scripting.Lua.Support;
+using NightRaven.Scripting.Lua.Data.Scripts;
+using NightRaven.Tests.Scripting.Lua.Support;
 
-namespace NightHeaven.Tests.Scripting.Lua;
+namespace NightRaven.Tests.Scripting.Lua;
 
 public class LuaScriptEngineServiceTests
 {

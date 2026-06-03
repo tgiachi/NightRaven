@@ -1,15 +1,15 @@
 using DryIoc;
-using NightHeaven.Hosting.Data;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Hosting.Interfaces.Events;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Server.Services.EventBus;
-using NightHeaven.Server.Services.GameLoop;
+using NightRaven.Hosting.Data;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Hosting.Interfaces.Events;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Server.Services.EventBus;
+using NightRaven.Server.Services.GameLoop;
 
-namespace NightHeaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.DryIoc;
 
 /// <summary>
-/// DryIoc-native registration helpers for the NightHeaven event bus + game loop.
+/// DryIoc-native registration helpers for the NightRaven event bus + game loop.
 /// </summary>
 public static class EventBusContainerExtensions
 {
@@ -31,17 +31,17 @@ public static class EventBusContainerExtensions
 
     /// <summary>
     /// Registers <see cref="EventBusService" /> and <see cref="GameLoopService" /> with the
-    /// NightHeaven hosting orchestrator.
+    /// NightRaven hosting orchestrator.
     /// </summary>
     /// <param name="container">DryIoc container.</param>
-    public static IContainer AddNightHeavenEventBus(this IContainer container)
+    public static IContainer AddNightRavenEventBus(this IContainer container)
     {
-        container.AddNightHeavenHosting();
+        container.AddNightRavenHosting();
 
         container.RegisterConfigSection("game_loop", () => new GameLoopConfig());
 
-        container.AddNightHeavenService<IEventBusService, EventBusService>(EventBusPriority);
-        container.AddNightHeavenService<IGameLoopService, GameLoopService>(GameLoopPriority);
+        container.AddNightRavenService<IEventBusService, EventBusService>(EventBusPriority);
+        container.AddNightRavenService<IGameLoopService, GameLoopService>(GameLoopPriority);
 
         return container;
     }

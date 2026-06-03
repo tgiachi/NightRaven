@@ -1,7 +1,7 @@
-using NightHeaven.Persistence.Data;
-using NightHeaven.Persistence.Interfaces.Persistence;
+using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Interfaces.Persistence;
 
-namespace NightHeaven.Tests.Persistence.Support;
+namespace NightRaven.Tests.Persistence.Support;
 
 internal sealed class InMemoryJournalService : IJournalService
 {

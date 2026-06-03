@@ -1,4 +1,4 @@
-# NightHeaven
+# NightRaven
 
 Ultima Online server emulator written in modern C#. Conceptual successor to Moongate, redesigned from scratch around an event-driven, modular architecture.
 
@@ -23,11 +23,11 @@ The differentiator is not the language or a paradigm. It's that a new shard oper
 
 ## Architectural rules
 
-- **`NightHeaven.Core` is gameplay-agnostic.** No combat, skills, items, packets, or UO concepts. Only primitives (buffers, collections, strings, encoding, RNG, logging, event bus, etc.).
-- **`NightHeaven.Network` is transport-agnostic.** The middleware pipeline transforms bytes only and does not know about messages, packets, or frames. Protocol-specific framing/parsing lives in dedicated modules that consume `NightHeavenTCPClient.OnDataReceived` and publish typed events on `IEventBus`.
+- **`NightRaven.Core` is gameplay-agnostic.** No combat, skills, items, packets, or UO concepts. Only primitives (buffers, collections, strings, encoding, RNG, logging, event bus, etc.).
+- **`NightRaven.Network` is transport-agnostic.** The middleware pipeline transforms bytes only and does not know about messages, packets, or frames. Protocol-specific framing/parsing lives in dedicated modules that consume `NightRavenTCPClient.OnDataReceived` and publish typed events on `IEventBus`.
 - **UO-specific logic lives in modules** that opt-in through the event bus and plugin system.
 - **Event bus first.** Cross-subsystem communication goes through `IEventBus`; do not inject services directly across module boundaries.
-- **Testability is non-negotiable.** New services come with an interface, DI registration, and a test suite in `tests/NightHeaven.Tests/` mirroring the production folder layout.
+- **Testability is non-negotiable.** New services come with an interface, DI registration, and a test suite in `tests/NightRaven.Tests/` mirroring the production folder layout.
 - **KISS.** When in doubt, pick the simpler design. Avoid premature abstractions and frameworky patterns.
 
 ## Conventions
@@ -43,7 +43,7 @@ The full convention spec lives in [`CODE_CONVENTION.md`](./CODE_CONVENTION.md). 
 - Class member order: `const` → `private readonly _x` → fields → properties → ctor → public → protected → private → `Dispose` (always last).
 - Logging via Serilog static `Log.ForContext<T>()`. No `ILogger<T>` DI.
 - Always `""` instead of `string.Empty`.
-- Tests under `tests/NightHeaven.Tests/<Domain>/<Subdomain>/<Subject>Tests.cs`, one test class per subject, methods named `Method_Scenario_ExpectedResult`. Shared fakes/builders under `tests/.../Support/`.
+- Tests under `tests/NightRaven.Tests/<Domain>/<Subdomain>/<Subject>Tests.cs`, one test class per subject, methods named `Method_Scenario_ExpectedResult`. Shared fakes/builders under `tests/.../Support/`.
 
 ## Commits
 
@@ -55,17 +55,17 @@ The full convention spec lives in [`CODE_CONVENTION.md`](./CODE_CONVENTION.md). 
 
 ## Documentation
 
-- Plan docs and design specs are **not committed** to the repo. They live in `~/docs/plans/NightHeaven/`.
+- Plan docs and design specs are **not committed** to the repo. They live in `~/docs/plans/NightRaven/`.
 - `docs/plans/`, `docs/superpowers/` and similar are explicitly excluded from commits.
 
 ## Useful commands
 
 ```bash
 # Build core
-dotnet build src/NightHeaven.Core/NightHeaven.Core.csproj
+dotnet build src/NightRaven.Core/NightRaven.Core.csproj
 
 # Run full test suite
-dotnet test tests/NightHeaven.Tests/NightHeaven.Tests.csproj
+dotnet test tests/NightRaven.Tests/NightRaven.Tests.csproj
 
 # Full solution build (Release)
 dotnet build -c Release

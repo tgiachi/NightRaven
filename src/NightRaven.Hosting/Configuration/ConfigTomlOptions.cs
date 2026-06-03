@@ -3,7 +3,7 @@ using System.Text.Json;
 using Tomlyn;
 using Tomlyn.Serialization;
 
-namespace NightHeaven.Hosting.Configuration;
+namespace NightRaven.Hosting.Configuration;
 
 /// <summary>
 /// Shared Tomlyn serializer options for config (de)serialization. Enables Tomlyn's reflection-based

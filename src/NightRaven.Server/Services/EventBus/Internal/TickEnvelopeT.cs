@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Interfaces.Events;
+using NightRaven.Hosting.Interfaces.Events;
 
-namespace NightHeaven.Server.Services.EventBus.Internal;
+namespace NightRaven.Server.Services.EventBus.Internal;
 
 /// <summary>
 /// Generic envelope that preserves <typeparamref name="TEvent" /> through the

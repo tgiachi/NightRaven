@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
-using NightHeaven.Core.Types;
+using NightRaven.Core.Types;
 
-namespace NightHeaven.Core.Buffers;
+namespace NightRaven.Core.Buffers;
 
 internal sealed class STArrayPoolStack<T>
 {

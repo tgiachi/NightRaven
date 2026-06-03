@@ -1,4 +1,4 @@
-namespace NightHeaven.Server.Services.Network.Internal;
+namespace NightRaven.Server.Services.Network.Internal;
 
 /// <summary>
 /// Per-session parser counters updated with interlocked operations from the ingress thread.

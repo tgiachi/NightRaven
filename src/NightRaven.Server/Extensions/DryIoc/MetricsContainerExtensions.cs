@@ -1,12 +1,12 @@
 using DryIoc;
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Server.Services.Metrics;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Server.Services.Metrics;
 
-namespace NightHeaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.DryIoc;
 
 /// <summary>
-/// DryIoc-native registration helpers for the NightHeaven metrics service.
+/// DryIoc-native registration helpers for the NightRaven metrics service.
 /// </summary>
 public static class MetricsContainerExtensions
 {
@@ -25,18 +25,18 @@ public static class MetricsContainerExtensions
     }
 
     /// <summary>
-    /// Registers <see cref="MetricsService" /> with the NightHeaven hosting orchestrator.
-    /// Requires <c>AddNightHeavenTimerWheel</c> to have been called earlier so
+    /// Registers <see cref="MetricsService" /> with the NightRaven hosting orchestrator.
+    /// Requires <c>AddNightRavenTimerWheel</c> to have been called earlier so
     /// <see cref="Hosting.Interfaces.Timing.ITimerService" /> is resolvable.
     /// </summary>
     /// <param name="container">DryIoc container.</param>
-    public static IContainer AddNightHeavenMetrics(this IContainer container)
+    public static IContainer AddNightRavenMetrics(this IContainer container)
     {
-        container.AddNightHeavenHosting();
+        container.AddNightRavenHosting();
 
         container.RegisterConfigSection("metrics", () => new MetricsConfig());
 
-        container.AddNightHeavenService<IMetricsService, MetricsService>(MetricsServicePriority);
+        container.AddNightRavenService<IMetricsService, MetricsService>(MetricsServicePriority);
 
         return container;
     }

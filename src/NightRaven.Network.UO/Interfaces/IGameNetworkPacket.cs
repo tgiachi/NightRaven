@@ -1,6 +1,6 @@
-using NightHeaven.Network.Spans;
+using NightRaven.Network.Spans;
 
-namespace NightHeaven.Network.UO.Interfaces;
+namespace NightRaven.Network.UO.Interfaces;
 
 /// <summary>
 /// Defines the contract for parsing and writing a game network packet.

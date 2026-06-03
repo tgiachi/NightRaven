@@ -1,4 +1,4 @@
-namespace NightHeaven.Network.Extensions;
+namespace NightRaven.Network.Extensions;
 
 public static class PacketExtensions
 {

@@ -1,17 +1,17 @@
 using DryIoc;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Core.Utils;
-using NightHeaven.Scripting.Lua.Data.Config;
-using NightHeaven.Scripting.Lua.Data.Internal;
-using NightHeaven.Scripting.Lua.Interfaces;
-using NightHeaven.Scripting.Lua.Services;
-using NightHeaven.Server.Services.Scripting;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Core.Utils;
+using NightRaven.Scripting.Lua.Data.Config;
+using NightRaven.Scripting.Lua.Data.Internal;
+using NightRaven.Scripting.Lua.Interfaces;
+using NightRaven.Scripting.Lua.Services;
+using NightRaven.Server.Services.Scripting;
 
-namespace NightHeaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.DryIoc;
 
 /// <summary>
-/// DryIoc-native registration helpers for the NightHeaven Lua scripting engine.
+/// DryIoc-native registration helpers for the NightRaven Lua scripting engine.
 /// </summary>
 public static class LuaScriptingContainerExtensions
 {
@@ -19,19 +19,19 @@ public static class LuaScriptingContainerExtensions
 
     /// <summary>
     /// Registers the MoonSharp Lua <see cref="IScriptEngineService" /> and drives its lifecycle
-    /// through the NightHeaven hosting orchestrator. The engine resolves the DryIoc
+    /// through the NightRaven hosting orchestrator. The engine resolves the DryIoc
     /// <see cref="IContainer" /> itself to register and resolve script-module types at runtime.
     /// </summary>
     /// <param name="container">DryIoc container.</param>
     /// <param name="directoriesConfig">Resolved directories configuration.</param>
-    public static IContainer AddNightHeavenLuaScripting(
+    public static IContainer AddNightRavenLuaScripting(
         this IContainer container,
         DirectoriesConfig directoriesConfig
     )
     {
         ArgumentNullException.ThrowIfNull(directoriesConfig);
 
-        container.AddNightHeavenHosting();
+        container.AddNightRavenHosting();
 
         var scriptsDirectory = directoriesConfig[DirectoryType.Scripts];
         var config = new LuaEngineConfig(scriptsDirectory, scriptsDirectory, VersionUtils.GetVersion());
@@ -44,7 +44,7 @@ public static class LuaScriptingContainerExtensions
         container.RegisterInstance(new List<ScriptUserData>(), IfAlreadyRegistered.Keep);
 
         container.Register<IScriptEngineService, LuaScriptEngineService>(Reuse.Singleton);
-        container.AddNightHeavenService<LuaScriptHostedService>(LuaScriptingPriority);
+        container.AddNightRavenService<LuaScriptHostedService>(LuaScriptingPriority);
 
         return container;
     }

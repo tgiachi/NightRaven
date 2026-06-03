@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Data.Metrics;
+namespace NightRaven.Hosting.Data.Metrics;
 
 /// <summary>
 /// Point-in-time aggregation of every <see cref="Interfaces.Metrics.IMetricProvider" />'s samples.

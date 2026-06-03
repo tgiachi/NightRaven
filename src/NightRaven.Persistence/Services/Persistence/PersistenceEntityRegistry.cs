@@ -1,7 +1,7 @@
-using NightHeaven.Persistence.Data;
-using NightHeaven.Persistence.Interfaces.Persistence;
+using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Interfaces.Persistence;
 
-namespace NightHeaven.Persistence.Services.Persistence;
+namespace NightRaven.Persistence.Services.Persistence;
 
 /// <summary>
 /// Default in-memory <see cref="IPersistenceEntityRegistry" />.

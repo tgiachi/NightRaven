@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace NightHeaven.Core.Extensions.Strings;
+namespace NightRaven.Core.Extensions.Strings;
 
 public static class OrdinalStringHelpers
 {

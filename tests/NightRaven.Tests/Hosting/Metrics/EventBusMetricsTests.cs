@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Hosting.Types.Metrics;
-using NightHeaven.Server.Services.EventBus;
-using NightHeaven.Tests.Hosting.EventBus.Support;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Server.Services.EventBus;
+using NightRaven.Tests.Hosting.EventBus.Support;
 
-namespace NightHeaven.Tests.Hosting.Metrics;
+namespace NightRaven.Tests.Hosting.Metrics;
 
 public class EventBusMetricsTests
 {

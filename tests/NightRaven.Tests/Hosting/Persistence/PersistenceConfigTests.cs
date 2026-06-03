@@ -1,6 +1,6 @@
-using NightHeaven.Hosting.Data.Persistence;
+using NightRaven.Hosting.Data.Persistence;
 
-namespace NightHeaven.Tests.Hosting.Persistence;
+namespace NightRaven.Tests.Hosting.Persistence;
 
 public class PersistenceConfigTests
 {

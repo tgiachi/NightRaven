@@ -36,18 +36,18 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj"/>
-        <ProjectReference Include="..\NightHeaven.UO.Domain\NightHeaven.UO.Domain.csproj"/>
-        <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj"/>
-        <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj"/>
-        <ProjectReference Include="..\NightHeaven.Persistence\NightHeaven.Persistence.csproj"/>
-        <ProjectReference Include="..\NightHeaven.Plugins\NightHeaven.Plugins.csproj"/>
-        <ProjectReference Include="..\NightHeaven.Network.UO\NightHeaven.Network.UO.csproj"/>
-        <ProjectReference Include="..\NightHeaven.Scripting.Lua\NightHeaven.Scripting.Lua.csproj"/>
+        <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj"/>
+        <ProjectReference Include="..\NightRaven.UO.Domain\NightRaven.UO.Domain.csproj"/>
+        <ProjectReference Include="..\NightRaven.Hosting\NightRaven.Hosting.csproj"/>
+        <ProjectReference Include="..\NightRaven.Network\NightRaven.Network.csproj"/>
+        <ProjectReference Include="..\NightRaven.Persistence\NightRaven.Persistence.csproj"/>
+        <ProjectReference Include="..\NightRaven.Plugins\NightRaven.Plugins.csproj"/>
+        <ProjectReference Include="..\NightRaven.Network.UO\NightRaven.Network.UO.csproj"/>
+        <ProjectReference Include="..\NightRaven.Scripting.Lua\NightRaven.Scripting.Lua.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="NightHeaven.Tests"/>
+        <InternalsVisibleTo Include="NightRaven.Tests"/>
     </ItemGroup>
 
 </Project>

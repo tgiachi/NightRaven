@@ -1,3 +1,3 @@
-namespace NightHeaven.Scripting.Lua.Data.Config;
+namespace NightRaven.Scripting.Lua.Data.Config;
 
 public record LuaEngineConfig(string LuarcDirectory, string ScriptsDirectory, string EngineVersion);

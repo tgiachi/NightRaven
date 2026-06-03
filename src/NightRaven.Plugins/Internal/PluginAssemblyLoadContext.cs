@@ -1,14 +1,14 @@
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace NightHeaven.Plugins.Internal;
+namespace NightRaven.Plugins.Internal;
 
 internal sealed class PluginAssemblyLoadContext : AssemblyLoadContext
 {
     private readonly AssemblyDependencyResolver _resolver;
 
     public PluginAssemblyLoadContext(string pluginAssemblyPath)
-        : base($"NightHeaven.Plugin:{Path.GetFileNameWithoutExtension(pluginAssemblyPath)}", isCollectible: false)
+        : base($"NightRaven.Plugin:{Path.GetFileNameWithoutExtension(pluginAssemblyPath)}", isCollectible: false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginAssemblyPath);
         _resolver = new(pluginAssemblyPath);

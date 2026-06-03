@@ -1,13 +1,13 @@
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Scripting.Lua.Interfaces;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Scripting.Lua.Interfaces;
 
-namespace NightHeaven.Server.Services.Scripting;
+namespace NightRaven.Server.Services.Scripting;
 
 /// <summary>
 /// Hosting adapter that drives the Lua <see cref="IScriptEngineService" /> lifecycle through the
-/// NightHeaven service orchestrator. Keeps the scripting project free of any hosting dependency.
+/// NightRaven service orchestrator. Keeps the scripting project free of any hosting dependency.
 /// </summary>
-public sealed class LuaScriptHostedService : INightHeavenService
+public sealed class LuaScriptHostedService : INightRavenService
 {
     private readonly IScriptEngineService _engine;
 

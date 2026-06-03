@@ -1,8 +1,8 @@
 using System.Net.Sockets;
-using NightHeaven.Network.Client;
-using NightHeaven.Server.Services.Network;
+using NightRaven.Network.Client;
+using NightRaven.Server.Services.Network;
 
-namespace NightHeaven.Tests.Network.Service;
+namespace NightRaven.Tests.Network.Service;
 
 public class SessionServiceTests
 {
@@ -66,6 +66,6 @@ public class SessionServiceTests
         Assert.False(service.TryGet(12345, out _));
     }
 
-    private static NightHeavenTCPClient NewClient()
+    private static NightRavenTCPClient NewClient()
         => new(new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp));
 }

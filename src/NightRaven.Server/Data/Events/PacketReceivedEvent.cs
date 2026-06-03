@@ -1,7 +1,7 @@
-using NightHeaven.Hosting.Interfaces.Events;
-using NightHeaven.Network.UO.Interfaces;
+using NightRaven.Hosting.Interfaces.Events;
+using NightRaven.Network.UO.Interfaces;
 
-namespace NightHeaven.Server.Data.Events;
+namespace NightRaven.Server.Data.Events;
 
 /// <summary>
 /// Tick event published for every successfully parsed inbound packet. Handlers run on the

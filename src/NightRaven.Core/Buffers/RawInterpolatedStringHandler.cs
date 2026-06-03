@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace NightHeaven.Core.Buffers;
+namespace NightRaven.Core.Buffers;
 
 /// <summary>Provides a handler to interpolate strings which UNSAFELY exposes its internal character span.</summary>
 [InterpolatedStringHandler]

@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj"/>
+        <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="NightHeaven.Tests"/>
+        <InternalsVisibleTo Include="NightRaven.Tests"/>
     </ItemGroup>
 
 </Project>

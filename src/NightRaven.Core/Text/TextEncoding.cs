@@ -15,9 +15,9 @@
 
 using System.Runtime.CompilerServices;
 using System.Text;
-using NightHeaven.Core.Buffers;
+using NightRaven.Core.Buffers;
 
-namespace NightHeaven.Core.Text;
+namespace NightRaven.Core.Text;
 
 public static class TextEncoding
 {

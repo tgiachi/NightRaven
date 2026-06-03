@@ -1,6 +1,6 @@
-using NightHeaven.Network.Client;
+using NightRaven.Network.Client;
 
-namespace NightHeaven.Network.Interfaces.Middleware;
+namespace NightRaven.Network.Interfaces.Middleware;
 
 /// <summary>
 /// Transforms raw network bytes for a client connection.
@@ -22,7 +22,7 @@ public interface INetMiddleware
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Transformed bytes, or <see cref="ReadOnlyMemory{T}.Empty" /> to drop the payload.</returns>
     ValueTask<ReadOnlyMemory<byte>> ProcessAsync(
-        NightHeavenTCPClient? client,
+        NightRavenTCPClient? client,
         ReadOnlyMemory<byte> data,
         CancellationToken cancellationToken = default
     );
@@ -35,7 +35,7 @@ public interface INetMiddleware
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Transformed bytes, or <see cref="ReadOnlyMemory{T}.Empty" /> to drop the payload.</returns>
     ValueTask<ReadOnlyMemory<byte>> ProcessSendAsync(
-        NightHeavenTCPClient? client,
+        NightRavenTCPClient? client,
         ReadOnlyMemory<byte> data,
         CancellationToken cancellationToken = default
     )

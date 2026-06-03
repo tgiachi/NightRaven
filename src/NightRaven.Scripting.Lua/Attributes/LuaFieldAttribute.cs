@@ -1,4 +1,4 @@
-namespace NightHeaven.Scripting.Lua.Attributes;
+namespace NightRaven.Scripting.Lua.Attributes;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 public sealed class LuaFieldAttribute : Attribute

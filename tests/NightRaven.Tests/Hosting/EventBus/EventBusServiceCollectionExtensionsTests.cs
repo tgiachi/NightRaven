@@ -1,16 +1,16 @@
 using DryIoc;
-using NightHeaven.Hosting.Data;
-using NightHeaven.Hosting.Interfaces.EventHandlers;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Tests.Hosting.EventBus.Support;
+using NightRaven.Hosting.Data;
+using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Tests.Hosting.EventBus.Support;
 
-namespace NightHeaven.Tests.Hosting.EventBus;
+namespace NightRaven.Tests.Hosting.EventBus;
 
 public class EventBusServiceCollectionExtensionsTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-eventbus-config-{Guid.NewGuid():N}");
-    private string Path_ => Path.Combine(_dir, "nightheaven.toml");
+    private string Path_ => Path.Combine(_dir, "nightraven.toml");
 
     private sealed class NamedAsyncHandler : IAsyncEventHandler<TestAsyncEvent>
     {
@@ -56,8 +56,8 @@ public class EventBusServiceCollectionExtensionsTests : IDisposable
         var timeline = new List<string>();
         var container = new Container();
         container.RegisterInstance(timeline);
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenConfig(Path_);
         container.AddAsyncEventHandler<NamedAsyncHandler, TestAsyncEvent>();
 
         await container.Resolve<IEventBusService>().PublishAsync(new TestAsyncEvent("hello"));
@@ -66,15 +66,15 @@ public class EventBusServiceCollectionExtensionsTests : IDisposable
     }
 
     [Fact]
-    public void AddNightHeavenEventBus_CustomConfig_AppliesConfig()
+    public void AddNightRavenEventBus_CustomConfig_AppliesConfig()
     {
         Directory.CreateDirectory(_dir);
         File.WriteAllText(Path_, "[game_loop]\nidle_sleep_ms = 7\nidle_cpu_enabled = false\n");
 
         var container = new Container();
 
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenConfig(Path_);
 
         var cfg = container.Resolve<GameLoopConfig>();
 
@@ -83,12 +83,12 @@ public class EventBusServiceCollectionExtensionsTests : IDisposable
     }
 
     [Fact]
-    public void AddNightHeavenEventBus_NoCustomConfig_AppliesDefaults()
+    public void AddNightRavenEventBus_NoCustomConfig_AppliesDefaults()
     {
         var container = new Container();
 
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenConfig(Path_);
 
         var cfg = container.Resolve<GameLoopConfig>();
 
@@ -97,12 +97,12 @@ public class EventBusServiceCollectionExtensionsTests : IDisposable
     }
 
     [Fact]
-    public void AddNightHeavenEventBus_RegistersBusAndGameLoop()
+    public void AddNightRavenEventBus_RegistersBusAndGameLoop()
     {
         var container = new Container();
 
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenConfig(Path_);
 
         Assert.NotNull(container.Resolve<IEventBusService>());
         Assert.NotNull(container.Resolve<IGameLoopService>());
@@ -114,8 +114,8 @@ public class EventBusServiceCollectionExtensionsTests : IDisposable
         var timeline = new List<string>();
         var container = new Container();
         container.RegisterInstance(timeline);
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenConfig(Path_);
+        container.AddNightRavenEventBus();
+        container.AddNightRavenConfig(Path_);
         container.AddTickEventHandler<NamedTickHandler, TestTickEvent>();
 
         var bus = container.Resolve<IEventBusService>();

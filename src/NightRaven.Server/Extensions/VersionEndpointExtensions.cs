@@ -1,11 +1,11 @@
-using NightHeaven.Core.Utils;
-using NightHeaven.Server.Data;
+using NightRaven.Core.Utils;
+using NightRaven.Server.Data;
 
-namespace NightHeaven.Server.Extensions;
+namespace NightRaven.Server.Extensions;
 
 public static class VersionEndpointExtensions
 {
-    public static IEndpointConventionBuilder MapNightHeavenVersion(
+    public static IEndpointConventionBuilder MapNightRavenVersion(
         this IEndpointRouteBuilder endpoints,
         string pattern = "/api/version"
     )

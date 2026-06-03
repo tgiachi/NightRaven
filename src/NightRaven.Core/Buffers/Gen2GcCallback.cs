@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 
-namespace NightHeaven.Core.Buffers;
+namespace NightRaven.Core.Buffers;
 
 /// <summary>
 /// Schedules a callback roughly every gen 2 GC (you may see a Gen 0 an Gen 1 but only once)

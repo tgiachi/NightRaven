@@ -1,4 +1,4 @@
-namespace NightHeaven.Persistence.Interfaces.Persistence;
+namespace NightRaven.Persistence.Interfaces.Persistence;
 
 /// <summary>
 /// CRUD access to a registered persisted entity type. Reads complete synchronously from memory;

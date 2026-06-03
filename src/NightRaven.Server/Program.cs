@@ -1,35 +1,35 @@
 using ConsoleAppFramework;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Core.Utils;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Hosting.Internal;
-using NightHeaven.Network.UO.Registry;
-using NightHeaven.Scripting.Lua.Extensions.Scripts;
-using NightHeaven.Scripting.Lua.Modules;
-using NightHeaven.Server.Data.Events;
-using NightHeaven.Server.Extensions;
-using NightHeaven.Server.Extensions.DryIoc;
-using NightHeaven.Server.Services.Diagnostics;
-using NightHeaven.Server.Services.EventBus;
-using NightHeaven.Server.Services.GameLoop;
-using NightHeaven.Server.Services.Network;
-using NightHeaven.Server.Services.Timing;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Core.Utils;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Hosting.Internal;
+using NightRaven.Network.UO.Registry;
+using NightRaven.Scripting.Lua.Extensions.Scripts;
+using NightRaven.Scripting.Lua.Modules;
+using NightRaven.Server.Data.Events;
+using NightRaven.Server.Extensions;
+using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Services.Diagnostics;
+using NightRaven.Server.Services.EventBus;
+using NightRaven.Server.Services.GameLoop;
+using NightRaven.Server.Services.Network;
+using NightRaven.Server.Services.Timing;
 using Serilog;
 
 await ConsoleApp.RunAsync(
     args,
     (CancellationToken cancellationToken, string? rootDirectory = null, bool debug = false) =>
     {
-        rootDirectory ??= Environment.GetEnvironmentVariable("NIGHTHEAVEN_ROOT");
+        rootDirectory ??= Environment.GetEnvironmentVariable("NIGHTRAVEN_ROOT");
 
-        rootDirectory ??= Path.Combine(Directory.GetCurrentDirectory(), "night_heaven");
+        rootDirectory ??= Path.Combine(Directory.GetCurrentDirectory(), "night_raven");
 
         var directoriesConfig = new DirectoriesConfig(rootDirectory, Enum.GetNames<DirectoryType>());
 
-        Console.WriteLine($"NightHeaven UO Server v{VersionUtils.GetVersion()}");
+        Console.WriteLine($"NightRaven UO Server v{VersionUtils.GetVersion()}");
         Console.WriteLine($"Root Directory: {directoriesConfig.Root}");
 
         var builder = WebApplication.CreateBuilder(
@@ -54,14 +54,14 @@ await ConsoleApp.RunAsync(
 
         // The generic host collects hosted services from IServiceCollection, so bridge the
         // DryIoc-registered orchestrator here; it resolves its descriptors from the unified provider.
-        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<NightHeavenServiceOrchestrator>());
+        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<NightRavenServiceOrchestrator>());
 
         // UO packet registry: scan the Network.UO assembly for [PacketHandler] packets.
         var packetRegistry = new PacketRegistry();
         var registeredPackets = PacketTable.Register(packetRegistry);
         Log.Information("Registered {PacketCount} UO packets", registeredPackets);
 
-        // Every NightHeaven service registers natively on the DryIoc container (ASP.NET stays on MEDI,
+        // Every NightRaven service registers natively on the DryIoc container (ASP.NET stays on MEDI,
         // which DryIoc imports). This runs after the IServiceCollection descriptors are populated.
         builder.Host.ConfigureContainer<IContainer>(
             container =>
@@ -69,36 +69,36 @@ await ConsoleApp.RunAsync(
                 container.RegisterInstance(packetRegistry);
 
                 // Event bus + game loop (priority 0 / 10) and the diagnostic handler.
-                container.AddNightHeavenEventBus();
+                container.AddNightRavenEventBus();
                 container.AddTickEventHandler<ServerStartedHandler, ServerStartedEvent>();
 
                 // Metrics: needs the timer wheel for the background refresh.
-                container.AddNightHeavenTimerWheel();
-                container.AddNightHeavenMetrics();
+                container.AddNightRavenTimerWheel();
+                container.AddNightRavenMetrics();
                 container.AddMetricProvider<EventBusService>();
                 container.AddMetricProvider<GameLoopService>();
                 container.AddMetricProvider<TimerWheelService>();
 
                 // Persistence (priority 15): snapshot + journal. No entities registered yet;
                 // modules will call RegisterPersistenceEntity<TEntity,TKey>(...) before this runs.
-                container.AddNightHeavenPersistence(directoriesConfig[DirectoryType.Save]);
+                container.AddNightRavenPersistence(directoriesConfig[DirectoryType.Save]);
 
                 // Network: TCP game listeners + UDP ping server + packet parser (priority 20).
-                container.AddNightHeavenNetwork();
+                container.AddNightRavenNetwork();
                 container.AddMetricProvider<NetworkService>();
 
                 // Lua scripting engine (priority 30).
-                container.AddNightHeavenLuaScripting(directoriesConfig);
+                container.AddNightRavenLuaScripting(directoriesConfig);
 
                 container.RegisterScriptModule<LogModule>();
 
                 // Plugins can declare config sections, services, Lua modules, persistence entities, and handlers.
-                // This must run before AddNightHeavenConfig so plugin config sections are bound at boot.
-                container.AddNightHeavenPlugins(directoriesConfig);
+                // This must run before AddNightRavenConfig so plugin config sections are bound at boot.
+                container.AddNightRavenPlugins(directoriesConfig);
 
                 // Load config.toml once and register every section as a DI instance. Must run after
                 // all RegisterConfigSection calls (each module helper declares its section).
-                container.AddNightHeavenConfig(Path.Combine(directoriesConfig[DirectoryType.Config], "nightheaven.toml"));
+                container.AddNightRavenConfig(Path.Combine(directoriesConfig[DirectoryType.Config], "nightraven.toml"));
             }
         );
 
@@ -117,7 +117,7 @@ await ConsoleApp.RunAsync(
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.MapNightHeavenApiDocs();
+            app.MapNightRavenApiDocs();
         }
 
         app.UseHttpsRedirection();
@@ -125,8 +125,8 @@ await ConsoleApp.RunAsync(
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
-        app.MapNightHeavenVersion();
-        app.MapNightHeavenMetrics();
+        app.MapNightRavenVersion();
+        app.MapNightRavenMetrics();
         app.MapFallbackToFile("index.html");
 
         app.Run();

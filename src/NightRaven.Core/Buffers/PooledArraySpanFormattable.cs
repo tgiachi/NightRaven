@@ -13,7 +13,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  *************************************************************************/
 
-namespace NightHeaven.Core.Buffers;
+namespace NightRaven.Core.Buffers;
 
 /// <summary>
 /// Wrapper for STArray backed strings and char buffers that will be used in InterpolatedStringHandlers.

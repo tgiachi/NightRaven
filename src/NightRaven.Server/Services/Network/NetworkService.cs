@@ -1,21 +1,21 @@
 using System.Collections.Concurrent;
 using System.Net;
-using NightHeaven.Core.Utils;
-using NightHeaven.Hosting.Data.Metrics;
-using NightHeaven.Hosting.Data.Network;
-using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Hosting.Types.Metrics;
-using NightHeaven.Network.Events;
-using NightHeaven.Network.Server;
-using NightHeaven.Network.UO.Registry;
-using NightHeaven.Server.Data.Events;
-using NightHeaven.Server.Interfaces.Network;
-using NightHeaven.Server.Services.Network.Internal;
+using NightRaven.Core.Utils;
+using NightRaven.Hosting.Data.Metrics;
+using NightRaven.Hosting.Data.Network;
+using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Hosting.Types.Metrics;
+using NightRaven.Network.Events;
+using NightRaven.Network.Server;
+using NightRaven.Network.UO.Registry;
+using NightRaven.Server.Data.Events;
+using NightRaven.Server.Interfaces.Network;
+using NightRaven.Server.Services.Network.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace NightHeaven.Server.Services.Network;
+namespace NightRaven.Server.Services.Network;
 
 /// <summary>
 /// Owns the TCP game listeners (one per local interface), the UDP ping echo server and the
@@ -32,12 +32,12 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
     private readonly NetworkConfig _config;
     private readonly PacketParser _parser;
 
-    private readonly List<NightHeavenTCPServer> _tcpServers = [];
+    private readonly List<NightRavenTCPServer> _tcpServers = [];
     private readonly ConcurrentQueue<PendingClientData> _pendingClientDataQueue = new();
     private readonly ConcurrentDictionary<long, NetworkParserSessionMetrics> _parserMetrics = new();
     private readonly AutoResetEvent _pendingClientDataSignal = new(false);
 
-    private NightHeavenUDPServer? _pingServer;
+    private NightRavenUDPServer? _pingServer;
     private Thread? _ingressThread;
     private volatile bool _ingressStopRequested;
     private long _ingressQueueDepth;
@@ -161,7 +161,7 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         }
     }
 
-    private void OnClientConnected(object? sender, NightHeavenTCPClientEventArgs e)
+    private void OnClientConnected(object? sender, NightRavenTCPClientEventArgs e)
     {
         var session = _sessions.GetOrCreate(e.Client);
         _parserMetrics.TryAdd(session.SessionId, new());
@@ -177,7 +177,7 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         );
     }
 
-    private void OnClientData(object? sender, NightHeavenTCPDataReceivedEventArgs e)
+    private void OnClientData(object? sender, NightRavenTCPDataReceivedEventArgs e)
     {
         if (e.Data.IsEmpty)
         {
@@ -189,7 +189,7 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         _pendingClientDataSignal.Set();
     }
 
-    private void OnClientDisconnected(object? sender, NightHeavenTCPClientEventArgs e)
+    private void OnClientDisconnected(object? sender, NightRavenTCPClientEventArgs e)
     {
         var remoteEndPoint = e.Client.RemoteEndPoint?.ToString();
         _sessions.Remove(e.Client.SessionId);
@@ -204,7 +204,7 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         _eventBus.Publish(new PlayerDisconnectedEvent(e.Client.SessionId, remoteEndPoint, DateTimeOffset.UtcNow));
     }
 
-    private void OnClientException(object? sender, NightHeavenTCPExceptionEventArgs e)
+    private void OnClientException(object? sender, NightRavenTCPExceptionEventArgs e)
         => _logger.Error(e.Exception, "Client network exception");
 
     private void ProcessClientData(long sessionId, byte[] data)
@@ -266,7 +266,7 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         _ingressThread = new(RunIngressLoop)
         {
             IsBackground = true,
-            Name = "NightHeaven-NetworkIngress"
+            Name = "NightRaven-NetworkIngress"
         };
         _ingressThread.Start();
     }
@@ -286,7 +286,7 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
     {
         foreach (var endPoint in NetworkUtils.GetListeningAddresses(new(IPAddress.Any, _config.Port)))
         {
-            var server = new NightHeavenTCPServer(new(endPoint.Address, _config.Port));
+            var server = new NightRavenTCPServer(new(endPoint.Address, _config.Port));
             server.OnClientConnect += OnClientConnected;
             server.OnClientDisconnect += OnClientDisconnected;
             server.OnDataReceived += OnClientData;

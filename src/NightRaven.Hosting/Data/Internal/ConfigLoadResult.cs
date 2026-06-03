@@ -1,4 +1,4 @@
-namespace NightHeaven.Hosting.Data.Internal;
+namespace NightRaven.Hosting.Data.Internal;
 
 /// <summary>
 /// One loaded config section: the CLR type and the bound instance to register in DI.

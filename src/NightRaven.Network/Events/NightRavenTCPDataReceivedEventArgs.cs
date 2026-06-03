@@ -1,13 +1,13 @@
-using NightHeaven.Network.Client;
+using NightRaven.Network.Client;
 
-namespace NightHeaven.Network.Events;
+namespace NightRaven.Network.Events;
 
 /// <summary>
 /// Event payload containing data received from a network client.
 /// </summary>
-public sealed class NightHeavenTCPDataReceivedEventArgs : EventArgs
+public sealed class NightRavenTCPDataReceivedEventArgs : EventArgs
 {
-    public NightHeavenTCPDataReceivedEventArgs(NightHeavenTCPClient client, ReadOnlyMemory<byte> data)
+    public NightRavenTCPDataReceivedEventArgs(NightRavenTCPClient client, ReadOnlyMemory<byte> data)
     {
         Client = client;
         Data = data;
@@ -16,7 +16,7 @@ public sealed class NightHeavenTCPDataReceivedEventArgs : EventArgs
     /// <summary>
     /// Source client for the data payload.
     /// </summary>
-    public NightHeavenTCPClient Client { get; }
+    public NightRavenTCPClient Client { get; }
 
     /// <summary>
     /// Received data payload.

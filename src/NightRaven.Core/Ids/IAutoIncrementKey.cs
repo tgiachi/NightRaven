@@ -1,4 +1,4 @@
-namespace NightHeaven.Core.Ids;
+namespace NightRaven.Core.Ids;
 
 /// <summary>
 /// Non-generic marker for runtime checks in type-erased persistence code.
@@ -11,7 +11,7 @@ public interface IAutoIncrementKey
 
 /// <summary>
 /// Typed auto-increment key. Implement on custom ID structs to gain automatic serial allocation
-/// in <see cref="NightHeaven.Persistence.Interfaces.Persistence.IAutoDataAccess{TEntity,TKey}" />.
+/// in <see cref="NightRaven.Persistence.Interfaces.Persistence.IAutoDataAccess{TEntity,TKey}" />.
 /// </summary>
 public interface IAutoIncrementKey<TSelf> : IAutoIncrementKey
     where TSelf : struct, IAutoIncrementKey<TSelf>

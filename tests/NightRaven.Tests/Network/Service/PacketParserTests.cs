@@ -1,9 +1,9 @@
-using NightHeaven.Network.UO.Interfaces;
-using NightHeaven.Network.UO.Registry;
-using NightHeaven.Server.Services.Network.Internal;
-using NightHeaven.Tests.Network.Service.Support;
+using NightRaven.Network.UO.Interfaces;
+using NightRaven.Network.UO.Registry;
+using NightRaven.Server.Services.Network.Internal;
+using NightRaven.Tests.Network.Service.Support;
 
-namespace NightHeaven.Tests.Network.Service;
+namespace NightRaven.Tests.Network.Service;
 
 public class PacketParserTests
 {

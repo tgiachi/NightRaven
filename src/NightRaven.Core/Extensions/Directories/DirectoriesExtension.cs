@@ -1,6 +1,6 @@
-using NightHeaven.Core.Extensions.Env;
+using NightRaven.Core.Extensions.Env;
 
-namespace NightHeaven.Core.Extensions.Directories;
+namespace NightRaven.Core.Extensions.Directories;
 
 /// <summary>
 /// Provides extension methods for directory path resolution and environment variable expansion

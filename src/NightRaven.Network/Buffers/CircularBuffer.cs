@@ -1,7 +1,7 @@
 using System.Collections;
-using NightHeaven.Network.Exceptions.Buffers;
+using NightRaven.Network.Exceptions.Buffers;
 
-namespace NightHeaven.Network.Buffers;
+namespace NightRaven.Network.Buffers;
 
 /// <inheritdoc />
 /// <summary>

@@ -1,7 +1,7 @@
-using NightHeaven.Core.Extensions.Strings;
-using NightHeaven.Core.Utils;
+using NightRaven.Core.Extensions.Strings;
+using NightRaven.Core.Utils;
 
-namespace NightHeaven.Tests.Core.Utils;
+namespace NightRaven.Tests.Core.Utils;
 
 public class StringUtilsTests
 {

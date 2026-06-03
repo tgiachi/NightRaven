@@ -1,4 +1,4 @@
-namespace NightHeaven.Scripting.Lua.Data.Scripts;
+namespace NightRaven.Scripting.Lua.Data.Scripts;
 
 /// <summary>
 /// Detailed information about a JavaScript execution error

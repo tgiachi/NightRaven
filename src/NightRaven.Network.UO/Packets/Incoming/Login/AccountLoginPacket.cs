@@ -1,9 +1,9 @@
-using NightHeaven.Network.Spans;
-using NightHeaven.Network.UO.Attributes;
-using NightHeaven.Network.UO.Base;
-using NightHeaven.Network.UO.Types.Packets;
+using NightRaven.Network.Spans;
+using NightRaven.Network.UO.Attributes;
+using NightRaven.Network.UO.Base;
+using NightRaven.Network.UO.Types.Packets;
 
-namespace NightHeaven.Network.UO.Packets.Incoming.Login;
+namespace NightRaven.Network.UO.Packets.Incoming.Login;
 
 [PacketHandler(0x80, PacketSizing.Fixed, Length = 62, Description = "Login Request")]
 

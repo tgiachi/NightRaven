@@ -1,4 +1,4 @@
-namespace NightHeaven.Persistence.Types;
+namespace NightRaven.Persistence.Types;
 
 /// <summary>
 /// Identifies a journal mutation for a registered entity type.

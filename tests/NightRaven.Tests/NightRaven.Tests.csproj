@@ -23,16 +23,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\NightHeaven.Core\NightHeaven.Core.csproj"/>
-        <ProjectReference Include="..\..\src\NightHeaven.UO.Domain\NightHeaven.UO.Domain.csproj"/>
-        <ProjectReference Include="..\..\src\NightHeaven.Hosting\NightHeaven.Hosting.csproj"/>
-        <ProjectReference Include="..\..\src\NightHeaven.Network\NightHeaven.Network.csproj"/>
-        <ProjectReference Include="..\..\src\NightHeaven.Persistence\NightHeaven.Persistence.csproj"/>
-        <ProjectReference Include="..\..\src\NightHeaven.Plugins\NightHeaven.Plugins.csproj"/>
-        <ProjectReference Include="..\..\src\NightHeaven.Server\NightHeaven.Server.csproj"/>
-        <ProjectReference Include="..\NightHeaven.PluginFixtures.Basic\NightHeaven.PluginFixtures.Basic.csproj"/>
-        <ProjectReference Include="..\NightHeaven.PluginFixtures.Empty\NightHeaven.PluginFixtures.Empty.csproj"/>
-        <ProjectReference Include="..\NightHeaven.PluginFixtures.Multiple\NightHeaven.PluginFixtures.Multiple.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Core\NightRaven.Core.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.UO.Domain\NightRaven.UO.Domain.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Hosting\NightRaven.Hosting.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Network\NightRaven.Network.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Persistence\NightRaven.Persistence.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Server\NightRaven.Server.csproj"/>
+        <ProjectReference Include="..\NightRaven.PluginFixtures.Basic\NightRaven.PluginFixtures.Basic.csproj"/>
+        <ProjectReference Include="..\NightRaven.PluginFixtures.Empty\NightRaven.PluginFixtures.Empty.csproj"/>
+        <ProjectReference Include="..\NightRaven.PluginFixtures.Multiple\NightRaven.PluginFixtures.Multiple.csproj"/>
     </ItemGroup>
 
 </Project>

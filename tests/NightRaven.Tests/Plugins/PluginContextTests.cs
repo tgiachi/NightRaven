@@ -1,8 +1,8 @@
-using NightHeaven.Core.Data.Directories;
-using NightHeaven.Core.Types;
-using NightHeaven.Plugins.Data;
+using NightRaven.Core.Data.Directories;
+using NightRaven.Core.Types;
+using NightRaven.Plugins.Data;
 
-namespace NightHeaven.Tests.Plugins;
+namespace NightRaven.Tests.Plugins;
 
 public sealed class PluginContextTests : IDisposable
 {
@@ -11,7 +11,7 @@ public sealed class PluginContextTests : IDisposable
         $"nh-plugin-context-{Guid.NewGuid():N}"
     );
 
-    private string PluginDirectory => Path.Combine(_root, "plugins", "nightheaven.test");
+    private string PluginDirectory => Path.Combine(_root, "plugins", "nightraven.test");
 
     [Fact]
     public void LoadConfig_MissingFile_WritesDefaultsAndReturnsDefaults()

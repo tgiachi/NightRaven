@@ -1,8 +1,8 @@
-using NightHeaven.Persistence.Data;
-using NightHeaven.Persistence.Services.Persistence;
-using NightHeaven.Persistence.Types;
+using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Services.Persistence;
+using NightRaven.Persistence.Types;
 
-namespace NightHeaven.Tests.Persistence;
+namespace NightRaven.Tests.Persistence;
 
 public class BinaryJournalServiceTests : IDisposable
 {
