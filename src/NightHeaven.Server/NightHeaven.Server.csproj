@@ -32,7 +32,7 @@
         <ProjectReference Include="..\NightHeaven.Hosting\NightHeaven.Hosting.csproj" />
         <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj" />
         <ProjectReference Include="..\NightHeaven.Network.UO\NightHeaven.Network.UO.csproj" />
-        <ProjectReference Include="..\..\NightHeaven.Scripting.Lua\NightHeaven.Scripting.Lua.csproj" />
+        <ProjectReference Include="..\NightHeaven.Scripting.Lua\NightHeaven.Scripting.Lua.csproj" />
     </ItemGroup>
 
     <ItemGroup>

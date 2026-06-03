@@ -14,7 +14,7 @@
 
 
     <ItemGroup>
-      <ProjectReference Include="..\src\NightHeaven.Core\NightHeaven.Core.csproj" />
+      <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj" />
     </ItemGroup>
 
 </Project>

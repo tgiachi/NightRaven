@@ -1,5 +1,5 @@
 <Solution>
-    <Project Path="NightHeaven.Scripting.Lua/NightHeaven.Scripting.Lua.csproj" />
+    <Project Path="src/NightHeaven.Scripting.Lua/NightHeaven.Scripting.Lua.csproj" />
     <Project Path="src/NightHeaven.Core/NightHeaven.Core.csproj" />
     <Project Path="src/NightHeaven.Hosting/NightHeaven.Hosting.csproj" />
     <Project Path="src/NightHeaven.Network.UO/NightHeaven.Network.UO.csproj" />

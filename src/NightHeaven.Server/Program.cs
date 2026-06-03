@@ -7,6 +7,8 @@ using NightHeaven.Core.Utils;
 using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Hosting.Internal;
 using NightHeaven.Network.UO.Registry;
+using NightHeaven.Scripting.Lua.Extensions.Scripts;
+using NightHeaven.Scripting.Lua.Modules;
 using NightHeaven.Server.Data.Events;
 using NightHeaven.Server.Extensions;
 using NightHeaven.Server.Extensions.DryIoc;
@@ -85,6 +87,9 @@ await ConsoleApp.RunAsync(
 
                 // Lua scripting engine (priority 30).
                 container.AddNightHeavenLuaScripting(directoriesConfig);
+
+                container.RegisterScriptModule<LogModule>();
+
             }
         );
 
