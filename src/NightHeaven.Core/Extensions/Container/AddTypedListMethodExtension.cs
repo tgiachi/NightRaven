@@ -1,9 +1,9 @@
 using DryIoc;
 
-namespace NightHeaven.Scripting.Lua.Extensions.Container;
+namespace NightHeaven.Core.Extensions.Container;
 
 /// <summary>
-/// Extension methods for registering typed lists in the DryIoc container.
+/// Extension methods for registering typed lists in the dependency injection container.
 /// </summary>
 public static class AddTypedListMethodExtension
 {
@@ -20,6 +20,7 @@ public static class AddTypedListMethodExtension
         ArgumentNullException.ThrowIfNull(container);
         ArgumentNullException.ThrowIfNull(entity);
 
+        // Try resolve existing list
         if (container.IsRegistered<List<TListEntity>>())
         {
             var typedList = container.Resolve<List<TListEntity>>();
