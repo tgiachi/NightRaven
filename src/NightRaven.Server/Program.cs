@@ -81,6 +81,7 @@ await ConsoleApp.RunAsync(
                 // Event bus + game loop (priority 0 / 10) and the diagnostic handler.
                 container.AddNightRavenEventBus();
                 container.AddTickEventHandler<ServerStartedHandler, ServerStartedEvent>();
+                container.AddNightRavenSeeds();
 
                 // Metrics: needs the timer wheel for the background refresh.
                 container.AddNightRavenTimerWheel();
@@ -91,6 +92,7 @@ await ConsoleApp.RunAsync(
 
                 // UO domain services register persisted entities before persistence starts.
                 container.AddNightRavenUsers();
+                container.AddDefaultAdminUserSeed();
 
                 // Persistence (priority 15): snapshot + journal.
                 container.AddNightRavenPersistence(directoriesConfig[DirectoryType.Save]);
