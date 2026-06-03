@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Server.Extensions.DryIoc;
 using NightHeaven.Tests.Support;
@@ -13,25 +13,6 @@ public class ContainerRegistrationCanaryTests : IDisposable
     );
 
     private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
-
-    [Fact]
-    public async Task EventBus_RegisteredNatively_ResolvesAndStartsViaOrchestrator()
-    {
-        var container = new Container();
-        container.AddNightHeavenEventBus();
-        container.AddNightHeavenConfig(ConfigPath);
-
-        // Interface aliases resolve to the same singleton instances.
-        Assert.NotNull(container.Resolve<IEventBusService>());
-        Assert.NotNull(container.Resolve<IGameLoopService>());
-
-        // The orchestrator drives the lifecycle (surfaced as the host's IHostedService in Program.cs).
-        var orchestrator = container.Orchestrator();
-        Assert.Equal("NightHeavenServiceOrchestrator", orchestrator.GetType().Name);
-
-        await orchestrator.StartAsync(CancellationToken.None);
-        await orchestrator.StopAsync(CancellationToken.None);
-    }
 
     [Fact]
     public void AddNightHeavenHosting_CalledTwice_ResolvesSingleOrchestrator()
@@ -51,5 +32,24 @@ public class ContainerRegistrationCanaryTests : IDisposable
         }
 
         GC.SuppressFinalize(this);
+    }
+
+    [Fact]
+    public async Task EventBus_RegisteredNatively_ResolvesAndStartsViaOrchestrator()
+    {
+        var container = new Container();
+        container.AddNightHeavenEventBus();
+        container.AddNightHeavenConfig(ConfigPath);
+
+        // Interface aliases resolve to the same singleton instances.
+        Assert.NotNull(container.Resolve<IEventBusService>());
+        Assert.NotNull(container.Resolve<IGameLoopService>());
+
+        // The orchestrator drives the lifecycle (surfaced as the host's IHostedService in Program.cs).
+        var orchestrator = container.Orchestrator();
+        Assert.Equal("NightHeavenServiceOrchestrator", orchestrator.GetType().Name);
+
+        await orchestrator.StartAsync(CancellationToken.None);
+        await orchestrator.StopAsync(CancellationToken.None);
     }
 }

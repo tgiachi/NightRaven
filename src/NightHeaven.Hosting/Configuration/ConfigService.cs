@@ -39,7 +39,7 @@ public static class ConfigService
         }
 
         var fileExisted = File.Exists(fullPath);
-        var root = fileExisted ? ParseRoot(fullPath) : new TomlTable();
+        var root = fileExisted ? ParseRoot(fullPath) : new();
 
         var results = new List<ConfigLoadResult>(sections.Count);
         var errors = new List<string>();
@@ -64,7 +64,7 @@ public static class ConfigService
                 errors.AddRange(validatable.Validate().Select(e => $"[{section.Name}] {e}"));
             }
 
-            results.Add(new ConfigLoadResult(section.Type, instance));
+            results.Add(new(section.Type, instance));
         }
 
         WarnUnknownSections(root, sections);
@@ -89,22 +89,6 @@ public static class ConfigService
         return results;
     }
 
-    private static TomlTable ParseRoot(string fullPath)
-    {
-        var text = File.ReadAllText(fullPath);
-
-        try
-        {
-            return TomlSerializer.Deserialize<TomlTable>(text, ConfigTomlOptions.Instance);
-        }
-        catch (Exception ex)
-        {
-            Logger.Fatal(ex, "Malformed config {Path}", fullPath);
-
-            throw new InvalidOperationException($"Malformed config file '{fullPath}'.", ex);
-        }
-    }
-
     private static object BindSection(ConfigSectionRegistration section, TomlTable table)
     {
         try
@@ -118,6 +102,22 @@ public static class ConfigService
             Logger.Fatal(ex, "Config section [{Section}] is invalid", section.Name);
 
             throw new InvalidOperationException($"Config section [{section.Name}] could not be parsed.", ex);
+        }
+    }
+
+    private static TomlTable ParseRoot(string fullPath)
+    {
+        var text = File.ReadAllText(fullPath);
+
+        try
+        {
+            return TomlSerializer.Deserialize<TomlTable>(text, ConfigTomlOptions.Instance);
+        }
+        catch (Exception ex)
+        {
+            Logger.Fatal(ex, "Malformed config {Path}", fullPath);
+
+            throw new InvalidOperationException($"Malformed config file '{fullPath}'.", ex);
         }
     }
 
@@ -158,6 +158,6 @@ public static class ConfigService
 
         var tempPath = fullPath + ".tmp";
         File.WriteAllText(tempPath, builder.ToString());
-        File.Move(tempPath, fullPath, overwrite: true);
+        File.Move(tempPath, fullPath, true);
     }
 }

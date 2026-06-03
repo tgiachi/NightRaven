@@ -37,11 +37,11 @@ public static class LuaScriptingContainerExtensions
         var config = new LuaEngineConfig(scriptsDirectory, scriptsDirectory, VersionUtils.GetVersion());
 
         container.RegisterInstance(config);
-        container.RegisterInstance(directoriesConfig, ifAlreadyRegistered: IfAlreadyRegistered.Keep);
+        container.RegisterInstance(directoriesConfig, IfAlreadyRegistered.Keep);
 
         // Module/userdata accumulator lists the engine resolves from the container.
-        container.RegisterInstance(new List<ScriptModuleData>(), ifAlreadyRegistered: IfAlreadyRegistered.Keep);
-        container.RegisterInstance(new List<ScriptUserData>(), ifAlreadyRegistered: IfAlreadyRegistered.Keep);
+        container.RegisterInstance(new List<ScriptModuleData>(), IfAlreadyRegistered.Keep);
+        container.RegisterInstance(new List<ScriptUserData>(), IfAlreadyRegistered.Keep);
 
         container.Register<IScriptEngineService, LuaScriptEngineService>(Reuse.Singleton);
         container.AddNightHeavenService<LuaScriptHostedService>(LuaScriptingPriority);

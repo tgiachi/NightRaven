@@ -1,6 +1,7 @@
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
+using NightHeaven.Core.Ids;
 using NightHeaven.Persistence.Formatters;
 using NightHeaven.Persistence.Interfaces.Persistence;
 using NightHeaven.Persistence.Internal;
@@ -19,7 +20,12 @@ public sealed class PersistenceEntityDescriptor<TEntity, TKey>
     internal static readonly MessagePackSerializerOptions SerializerOptions =
         MessagePackSerializerOptions.Standard.WithResolver(
             CompositeResolver.Create(
-                new IMessagePackFormatter[] { SerialMessagePackFormatter.Instance },
+                new IMessagePackFormatter[]
+                {
+                    SerialMessagePackFormatter.Instance,
+                    AutoInt32MessagePackFormatter.Instance,
+                    AutoInt64MessagePackFormatter.Instance
+                },
                 new IFormatterResolver[] { ContractlessStandardResolver.Instance }
             )
         );
@@ -78,7 +84,13 @@ public sealed class PersistenceEntityDescriptor<TEntity, TKey>
     void IInternalEntityApplier.ApplyUpsert(PersistenceStateStore stateStore, byte[] payload)
     {
         var entity = DeserializeEntity(payload);
-        stateStore.GetBucket<TEntity, TKey>(TypeId)[GetKey(entity)] = entity;
+        var key = GetKey(entity);
+        stateStore.GetBucket<TEntity, TKey>(TypeId)[key] = entity;
+
+        if (key is IAutoIncrementKey autoKey)
+        {
+            stateStore.TrackKey(TypeId, autoKey);
+        }
     }
 
     EntitySnapshotBucket? IInternalEntityApplier.CaptureBucket(PersistenceStateStore stateStore)
@@ -109,7 +121,13 @@ public sealed class PersistenceEntityDescriptor<TEntity, TKey>
 
         foreach (var entity in DeserializeBucket(bucket.Payload))
         {
-            typed[GetKey(entity)] = entity;
+            var key = GetKey(entity);
+            typed[key] = entity;
+
+            if (key is IAutoIncrementKey autoKey)
+            {
+                stateStore.TrackKey(TypeId, autoKey);
+            }
         }
     }
 }

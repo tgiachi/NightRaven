@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Core.Data.Directories;
 using NightHeaven.Scripting.Lua.Interfaces;
 using NightHeaven.Server.Extensions.DryIoc;
@@ -8,6 +8,31 @@ namespace NightHeaven.Tests.Scripting.Lua;
 
 public class LuaScriptingIntegrationTests
 {
+    [Fact]
+    public void AddNightHeavenLuaScripting_RegistersEngineAndHostedService()
+    {
+        var scriptsDir = Path.Combine(Path.GetTempPath(), $"nh-lua-reg-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(scriptsDir);
+
+        try
+        {
+            var directoriesConfig = new DirectoriesConfig(scriptsDir, Array.Empty<string>());
+
+            var container = new Container();
+            container.AddNightHeavenLuaScripting(directoriesConfig);
+
+            Assert.NotNull(container.Resolve<IScriptEngineService>());
+            Assert.NotNull(container.Orchestrator());
+        }
+        finally
+        {
+            if (Directory.Exists(scriptsDir))
+            {
+                Directory.Delete(scriptsDir, true);
+            }
+        }
+    }
+
     [Fact]
     public async Task FullHost_OnDryIoc_StartsEngineAndRunsBootstrapScript()
     {
@@ -47,31 +72,6 @@ public class LuaScriptingIntegrationTests
             {
                 await orchestrator.StopAsync(CancellationToken.None);
             }
-        }
-        finally
-        {
-            if (Directory.Exists(scriptsDir))
-            {
-                Directory.Delete(scriptsDir, true);
-            }
-        }
-    }
-
-    [Fact]
-    public void AddNightHeavenLuaScripting_RegistersEngineAndHostedService()
-    {
-        var scriptsDir = Path.Combine(Path.GetTempPath(), $"nh-lua-reg-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(scriptsDir);
-
-        try
-        {
-            var directoriesConfig = new DirectoriesConfig(scriptsDir, Array.Empty<string>());
-
-            var container = new Container();
-            container.AddNightHeavenLuaScripting(directoriesConfig);
-
-            Assert.NotNull(container.Resolve<IScriptEngineService>());
-            Assert.NotNull(container.Orchestrator());
         }
         finally
         {

@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Hosting.Data.Timing;
 using NightHeaven.Hosting.Interfaces.Timing;
 using NightHeaven.Server.Extensions.DryIoc;

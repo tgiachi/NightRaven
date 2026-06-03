@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Hosting.Data;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
 using NightHeaven.Hosting.Interfaces.Services;

@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Hosting.Data.Metrics;
 using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Server.Extensions.DryIoc;

@@ -6,8 +6,8 @@ namespace NightHeaven.Core.Ids;
 /// <summary>
 /// Represents a UO entity serial identifier.
 /// </summary>
-public readonly partial struct Serial
-    : IComparable<Serial>, IComparable<uint>, IEquatable<Serial>, ISpanFormattable, ISpanParsable<Serial>
+public readonly struct Serial
+    : IAutoIncrementKey<Serial>, IComparable<Serial>, IComparable<uint>, IEquatable<Serial>, ISpanFormattable, ISpanParsable<Serial>
 {
     public const uint ItemOffset = 0x40000000;
     public const uint MaxItemSerial = 0x7EEEEEEE;
@@ -24,6 +24,10 @@ public readonly partial struct Serial
     }
 
     public uint Value { get; }
+
+    public ulong Sequence => Value;
+
+    public static Serial FromSequence(ulong value) => new((uint)value);
 
     public bool IsMobile
     {

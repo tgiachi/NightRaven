@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
 using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Server.Services.Metrics;
 
@@ -11,14 +9,12 @@ public static class MetricsEndpointExtensions
         this IEndpointRouteBuilder endpoints,
         string pattern = "/metrics"
     )
-    {
-        return endpoints.MapGet(
-                pattern,
-                (IMetricsService metrics) => Results.Text(
-                    OpenMetricsFormatter.Format(metrics.GetSnapshot()),
-                    "text/plain; charset=utf-8"
-                )
-            )
-            .WithName("GetMetrics");
-    }
+        => endpoints.MapGet(
+                        pattern,
+                        (IMetricsService metrics) => Results.Text(
+                            OpenMetricsFormatter.Format(metrics.GetSnapshot()),
+                            "text/plain; charset=utf-8"
+                        )
+                    )
+                    .WithName("GetMetrics");
 }

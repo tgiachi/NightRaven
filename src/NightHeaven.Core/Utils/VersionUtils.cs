@@ -35,4 +35,19 @@ public static class VersionUtils
 
         return assembly.GetName().Version?.ToString() ?? "";
     }
+
+    /// <summary>
+    /// Gets the value of an <see cref="AssemblyMetadataAttribute" /> by key from the specified assembly.
+    /// </summary>
+    /// <param name="assembly">The assembly to read metadata from.</param>
+    /// <param name="key">The metadata key to look up.</param>
+    /// <returns>The metadata value, or an empty string when the key is absent.</returns>
+    public static string GetMetadata(Assembly assembly, string key)
+    {
+        ArgumentNullException.ThrowIfNull(assembly);
+
+        return assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+                       .FirstOrDefault(a => string.Equals(a.Key, key, StringComparison.Ordinal))
+                       ?.Value ?? "";
+    }
 }

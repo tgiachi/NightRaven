@@ -22,7 +22,7 @@ public static class NetworkContainerExtensions
     {
         container.AddNightHeavenHosting();
 
-        container.RegisterConfigSection<NetworkConfig>("network", () => new NetworkConfig());
+        container.RegisterConfigSection("network", () => new NetworkConfig());
 
         container.Register<ISessionService, SessionService>(Reuse.Singleton);
         container.AddNightHeavenService<INetworkService, NetworkService>(NetworkServicePriority);

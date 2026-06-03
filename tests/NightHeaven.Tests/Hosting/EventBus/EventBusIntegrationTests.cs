@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
 using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Server.Extensions.DryIoc;
@@ -52,6 +52,16 @@ public class EventBusIntegrationTests : IDisposable
 
             return Task.CompletedTask;
         }
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
     }
 
     [Fact]
@@ -110,15 +120,5 @@ public class EventBusIntegrationTests : IDisposable
         await orchestrator.StopAsync(CancellationToken.None);
 
         Assert.Equal(new[] { "tick:Integration:42" }, timeline);
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_dir))
-        {
-            Directory.Delete(_dir, true);
-        }
-
-        GC.SuppressFinalize(this);
     }
 }

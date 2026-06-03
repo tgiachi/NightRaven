@@ -59,6 +59,8 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
 
     public string Prefix => "network";
 
+    private readonly record struct PendingClientData(long SessionId, byte[] Data);
+
     public IReadOnlyList<MetricSample> Collect()
     {
         long receivedBytes = 0;
@@ -116,6 +118,12 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         ];
     }
 
+    public void Dispose()
+    {
+        StopIngressLoop();
+        _pendingClientDataSignal.Dispose();
+    }
+
     public Task StartAsync(CancellationToken cancellationToken)
     {
         StartIngressLoop();
@@ -153,33 +161,6 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         }
     }
 
-    private void StartTcpServers(CancellationToken cancellationToken)
-    {
-        foreach (var endPoint in NetworkUtils.GetListeningAddresses(new(IPAddress.Any, _config.Port)))
-        {
-            var server = new NightHeavenTCPServer(new(endPoint.Address, _config.Port));
-            server.OnClientConnect += OnClientConnected;
-            server.OnClientDisconnect += OnClientDisconnected;
-            server.OnDataReceived += OnClientData;
-            server.OnException += OnClientException;
-
-            _tcpServers.Add(server);
-            _ = server.StartAsync(cancellationToken);
-            _logger.Information("TCP game server listening on {Address}:{Port}", endPoint.Address, _config.Port);
-        }
-    }
-
-    private void StartPingServer(CancellationToken cancellationToken)
-    {
-        if (!_config.PingServerEnabled || _config.PingServerPort <= 0)
-        {
-            return;
-        }
-
-        _pingServer = new(new(IPAddress.Any, _config.PingServerPort));
-        _ = _pingServer.StartAsync(cancellationToken);
-    }
-
     private void OnClientConnected(object? sender, NightHeavenTCPClientEventArgs e)
     {
         var session = _sessions.GetOrCreate(e.Client);
@@ -194,6 +175,18 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         _eventBus.Publish(
             new PlayerConnectedEvent(session.SessionId, e.Client.RemoteEndPoint?.ToString(), DateTimeOffset.UtcNow)
         );
+    }
+
+    private void OnClientData(object? sender, NightHeavenTCPDataReceivedEventArgs e)
+    {
+        if (e.Data.IsEmpty)
+        {
+            return;
+        }
+
+        _pendingClientDataQueue.Enqueue(new(e.Client.SessionId, e.Data.ToArray()));
+        Interlocked.Increment(ref _ingressQueueDepth);
+        _pendingClientDataSignal.Set();
     }
 
     private void OnClientDisconnected(object? sender, NightHeavenTCPClientEventArgs e)
@@ -211,48 +204,27 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         _eventBus.Publish(new PlayerDisconnectedEvent(e.Client.SessionId, remoteEndPoint, DateTimeOffset.UtcNow));
     }
 
-    private void OnClientData(object? sender, NightHeavenTCPDataReceivedEventArgs e)
-    {
-        if (e.Data.IsEmpty)
-        {
-            return;
-        }
-
-        _pendingClientDataQueue.Enqueue(new(e.Client.SessionId, e.Data.ToArray()));
-        Interlocked.Increment(ref _ingressQueueDepth);
-        _pendingClientDataSignal.Set();
-    }
-
     private void OnClientException(object? sender, NightHeavenTCPExceptionEventArgs e)
         => _logger.Error(e.Exception, "Client network exception");
 
-    private void StartIngressLoop()
+    private void ProcessClientData(long sessionId, byte[] data)
     {
-        if (_ingressThread is not null)
+        if (!_sessions.TryGet(sessionId, out var session))
         {
             return;
         }
 
-        _ingressStopRequested = false;
-        _ingressThread = new(RunIngressLoop)
-        {
-            IsBackground = true,
-            Name = "NightHeaven-NetworkIngress"
-        };
-        _ingressThread.Start();
-    }
+        var metrics = _parserMetrics.GetOrAdd(sessionId, static _ => new());
 
-    private void StopIngressLoop()
-    {
-        if (_ingressThread is null)
-        {
-            return;
-        }
-
-        _ingressStopRequested = true;
-        _pendingClientDataSignal.Set();
-        _ingressThread.Join(TimeSpan.FromSeconds(2));
-        _ingressThread = null;
+        session.WithPendingBytes(
+            pendingBytes => _parser.Append(
+                pendingBytes,
+                data,
+                metrics,
+                (opCode, packet) =>
+                    _eventBus.Publish(new PacketReceivedEvent(session.SessionId, opCode, packet, DateTimeOffset.UtcNow))
+            )
+        );
     }
 
     private void RunIngressLoop()
@@ -283,31 +255,59 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         }
     }
 
-    private void ProcessClientData(long sessionId, byte[] data)
+    private void StartIngressLoop()
     {
-        if (!_sessions.TryGet(sessionId, out var session))
+        if (_ingressThread is not null)
         {
             return;
         }
 
-        var metrics = _parserMetrics.GetOrAdd(sessionId, static _ => new());
-
-        session.WithPendingBytes(
-            pendingBytes => _parser.Append(
-                pendingBytes,
-                data,
-                metrics,
-                (opCode, packet) =>
-                    _eventBus.Publish(new PacketReceivedEvent(session.SessionId, opCode, packet, DateTimeOffset.UtcNow))
-            )
-        );
+        _ingressStopRequested = false;
+        _ingressThread = new(RunIngressLoop)
+        {
+            IsBackground = true,
+            Name = "NightHeaven-NetworkIngress"
+        };
+        _ingressThread.Start();
     }
 
-    private readonly record struct PendingClientData(long SessionId, byte[] Data);
-
-    public void Dispose()
+    private void StartPingServer(CancellationToken cancellationToken)
     {
-        StopIngressLoop();
-        _pendingClientDataSignal.Dispose();
+        if (!_config.PingServerEnabled || _config.PingServerPort <= 0)
+        {
+            return;
+        }
+
+        _pingServer = new(new(IPAddress.Any, _config.PingServerPort));
+        _ = _pingServer.StartAsync(cancellationToken);
+    }
+
+    private void StartTcpServers(CancellationToken cancellationToken)
+    {
+        foreach (var endPoint in NetworkUtils.GetListeningAddresses(new(IPAddress.Any, _config.Port)))
+        {
+            var server = new NightHeavenTCPServer(new(endPoint.Address, _config.Port));
+            server.OnClientConnect += OnClientConnected;
+            server.OnClientDisconnect += OnClientDisconnected;
+            server.OnDataReceived += OnClientData;
+            server.OnException += OnClientException;
+
+            _tcpServers.Add(server);
+            _ = server.StartAsync(cancellationToken);
+            _logger.Information("TCP game server listening on {Address}:{Port}", endPoint.Address, _config.Port);
+        }
+    }
+
+    private void StopIngressLoop()
+    {
+        if (_ingressThread is null)
+        {
+            return;
+        }
+
+        _ingressStopRequested = true;
+        _pendingClientDataSignal.Set();
+        _ingressThread.Join(TimeSpan.FromSeconds(2));
+        _ingressThread = null;
     }
 }

@@ -1,3 +1,4 @@
+using NightHeaven.Core.Ids;
 using NightHeaven.Persistence.Data;
 using NightHeaven.Persistence.Interfaces.Persistence;
 using NightHeaven.Persistence.Internal;
@@ -10,7 +11,7 @@ namespace NightHeaven.Persistence.Services.Persistence;
 /// In-memory <see cref="IDataAccess{TEntity,TKey}" /> backed by a shared state store; every mutation
 /// is appended to the journal. Reads return detached clones for snapshot isolation.
 /// </summary>
-public sealed class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey>
+public class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey>
     where TKey : notnull
 {
     private readonly PersistenceStateStore _stateStore;
@@ -94,7 +95,14 @@ public sealed class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey
         lock (_stateStore.SyncRoot)
         {
             var clone = _descriptor.Clone(entity);
-            Bucket()[_descriptor.GetKey(clone)] = clone;
+            var key = _descriptor.GetKey(clone);
+            Bucket()[key] = clone;
+
+            if (key is IAutoIncrementKey autoKey)
+            {
+                _stateStore.TrackKey(_descriptor.TypeId, autoKey);
+            }
+
             entry = new()
             {
                 SequenceId = ++_stateStore.LastSequenceId,
@@ -108,6 +116,6 @@ public sealed class GenericDataAccess<TEntity, TKey> : IDataAccess<TEntity, TKey
         await _journalService.AppendAsync(entry, cancellationToken);
     }
 
-    private Dictionary<TKey, TEntity> Bucket()
+    private protected Dictionary<TKey, TEntity> Bucket()
         => _stateStore.GetBucket<TEntity, TKey>(_descriptor.TypeId);
 }

@@ -34,7 +34,7 @@ public static class MetricsContainerExtensions
     {
         container.AddNightHeavenHosting();
 
-        container.RegisterConfigSection<MetricsConfig>("metrics", () => new MetricsConfig());
+        container.RegisterConfigSection("metrics", () => new MetricsConfig());
 
         container.AddNightHeavenService<IMetricsService, MetricsService>(MetricsServicePriority);
 

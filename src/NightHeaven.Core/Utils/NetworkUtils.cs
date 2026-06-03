@@ -23,9 +23,7 @@ public static class NetworkUtils
                                    adapter =>
                                        adapter.GetIPProperties()
                                               .UnicastAddresses
-                                              .Where(
-                                                  unicast => endPoint.AddressFamily == unicast.Address.AddressFamily
-                                              )
+                                              .Where(unicast => endPoint.AddressFamily == unicast.Address.AddressFamily)
                                               .Select(unicast => new IPEndPoint(unicast.Address, endPoint.Port))
                                );
     }

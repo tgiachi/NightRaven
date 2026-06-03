@@ -8,23 +8,10 @@ namespace NightHeaven.Tests.Network.Server;
 public class NightHeavenUDPServerTests
 {
     [Fact]
-    public async Task Start_BindsAndReportsRunning()
-    {
-        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, 0), bindAllInterfaces: false);
-
-        await server.StartAsync(CancellationToken.None);
-
-        Assert.True(server.IsRunning);
-        Assert.Equal(1, server.ListenerCount);
-
-        await server.StopAsync(CancellationToken.None);
-    }
-
-    [Fact]
     public async Task Receive_DefaultBehaviour_EchoesPayloadBackToSender()
     {
         var port = GetFreeUdpPort();
-        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), bindAllInterfaces: false);
+        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), false);
         await server.StartAsync(CancellationToken.None);
 
         using var client = new UdpClient();
@@ -42,20 +29,20 @@ public class NightHeavenUDPServerTests
     public async Task Receive_WithCustomHandler_SendsHandlerResponse()
     {
         var port = GetFreeUdpPort();
-        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), bindAllInterfaces: false)
+        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), false)
         {
             OnDatagram = (data, _) =>
-            {
-                var reply = new byte[data.Length];
-                data.Span.CopyTo(reply);
+                         {
+                             var reply = new byte[data.Length];
+                             data.Span.CopyTo(reply);
 
-                for (var i = 0; i < reply.Length; i++)
-                {
-                    reply[i] = (byte)(reply[i] + 1);
-                }
+                             for (var i = 0; i < reply.Length; i++)
+                             {
+                                 reply[i] = (byte)(reply[i] + 1);
+                             }
 
-                return reply;
-            }
+                             return reply;
+                         }
         };
         await server.StartAsync(CancellationToken.None);
 
@@ -70,10 +57,23 @@ public class NightHeavenUDPServerTests
     }
 
     [Fact]
+    public async Task Start_BindsAndReportsRunning()
+    {
+        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, 0), false);
+
+        await server.StartAsync(CancellationToken.None);
+
+        Assert.True(server.IsRunning);
+        Assert.Equal(1, server.ListenerCount);
+
+        await server.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
     public async Task StopThenStart_RebindsListener()
     {
         var port = GetFreeUdpPort();
-        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), bindAllInterfaces: false);
+        await using var server = new NightHeavenUDPServer(new(IPAddress.Loopback, port), false);
 
         await server.StartAsync(CancellationToken.None);
         Assert.True(server.IsRunning);

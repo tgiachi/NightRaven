@@ -7,6 +7,47 @@ namespace NightHeaven.Tests.Scripting.Lua;
 public class LuaScriptEngineServiceTests
 {
     [Fact]
+    public void AddCallback_EmptyName_Throws()
+    {
+        using var fixture = new LuaEngineFixture();
+
+        Assert.ThrowsAny<ArgumentException>(() => fixture.Engine.AddCallback("", _ => { }));
+    }
+
+    [Fact]
+    public void AddCallback_ExecuteCallback_InvokesRegisteredAction()
+    {
+        using var fixture = new LuaEngineFixture();
+        object[]? received = null;
+        fixture.Engine.AddCallback("onHit", args => received = args);
+
+        fixture.Engine.ExecuteCallback("onHit", 7, "crit");
+
+        Assert.NotNull(received);
+        Assert.Equal(new object[] { 7, "crit" }, received);
+    }
+
+    [Fact]
+    public void AddConstant_ExposesValueAsUpperSnakeCaseGlobal()
+    {
+        using var fixture = new LuaEngineFixture();
+
+        fixture.Engine.AddConstant("maxPlayers", 100);
+
+        var result = fixture.Engine.ExecuteFunction("MAX_PLAYERS");
+        Assert.True(result.Success);
+        Assert.Equal(100d, Assert.IsType<double>(result.Data));
+    }
+
+    [Fact]
+    public void ExecuteCallback_UnknownName_DoesNotThrow()
+    {
+        using var fixture = new LuaEngineFixture();
+
+        fixture.Engine.ExecuteCallback("never_registered");
+    }
+
+    [Fact]
     public void ExecuteFunction_ArithmeticExpression_ReturnsSuccessWithData()
     {
         using var fixture = new LuaEngineFixture();
@@ -15,18 +56,6 @@ public class LuaScriptEngineServiceTests
 
         Assert.True(result.Success);
         Assert.Equal(3d, Assert.IsType<double>(result.Data));
-    }
-
-    [Fact]
-    public void ExecuteFunction_ReadsRegisteredGlobal()
-    {
-        using var fixture = new LuaEngineFixture();
-        fixture.Engine.RegisterGlobal("answer", 42);
-
-        var result = fixture.Engine.ExecuteFunction("answer");
-
-        Assert.True(result.Success);
-        Assert.Equal(42d, Assert.IsType<double>(result.Data));
     }
 
     [Fact]
@@ -41,34 +70,15 @@ public class LuaScriptEngineServiceTests
     }
 
     [Fact]
-    public void ExecuteScript_ValidScript_MutatesGlobalState()
+    public void ExecuteFunction_ReadsRegisteredGlobal()
     {
         using var fixture = new LuaEngineFixture();
+        fixture.Engine.RegisterGlobal("answer", 42);
 
-        fixture.Engine.ExecuteScript("computed = 10 * 5");
+        var result = fixture.Engine.ExecuteFunction("answer");
 
-        var result = fixture.Engine.ExecuteFunction("computed");
-        Assert.Equal(50d, Assert.IsType<double>(result.Data));
-    }
-
-    [Fact]
-    public void ExecuteScript_RuntimeError_Throws()
-    {
-        using var fixture = new LuaEngineFixture();
-
-        Assert.ThrowsAny<InterpreterException>(() => fixture.Engine.ExecuteScript("error('boom')"));
-    }
-
-    [Fact]
-    public void ExecuteScript_RaisesOnScriptErrorEvent()
-    {
-        using var fixture = new LuaEngineFixture();
-        ScriptErrorInfo? captured = null;
-        fixture.Engine.OnScriptError += (_, info) => captured = info;
-
-        Assert.ThrowsAny<InterpreterException>(() => fixture.Engine.ExecuteScript("error('boom')"));
-
-        Assert.NotNull(captured);
+        Assert.True(result.Success);
+        Assert.Equal(42d, Assert.IsType<double>(result.Data));
     }
 
     [Fact]
@@ -86,36 +96,42 @@ public class LuaScriptEngineServiceTests
     }
 
     [Fact]
-    public void AddConstant_ExposesValueAsUpperSnakeCaseGlobal()
+    public void ExecuteScript_RaisesOnScriptErrorEvent()
     {
         using var fixture = new LuaEngineFixture();
+        ScriptErrorInfo? captured = null;
+        fixture.Engine.OnScriptError += (_, info) => captured = info;
 
-        fixture.Engine.AddConstant("maxPlayers", 100);
+        Assert.ThrowsAny<InterpreterException>(() => fixture.Engine.ExecuteScript("error('boom')"));
 
-        var result = fixture.Engine.ExecuteFunction("MAX_PLAYERS");
-        Assert.True(result.Success);
-        Assert.Equal(100d, Assert.IsType<double>(result.Data));
+        Assert.NotNull(captured);
     }
 
     [Fact]
-    public void AddCallback_ExecuteCallback_InvokesRegisteredAction()
+    public void ExecuteScript_RuntimeError_Throws()
     {
         using var fixture = new LuaEngineFixture();
-        object[]? received = null;
-        fixture.Engine.AddCallback("onHit", args => received = args);
 
-        fixture.Engine.ExecuteCallback("onHit", 7, "crit");
-
-        Assert.NotNull(received);
-        Assert.Equal(new object[] { 7, "crit" }, received);
+        Assert.ThrowsAny<InterpreterException>(() => fixture.Engine.ExecuteScript("error('boom')"));
     }
 
     [Fact]
-    public void ExecuteCallback_UnknownName_DoesNotThrow()
+    public void ExecuteScript_ValidScript_MutatesGlobalState()
     {
         using var fixture = new LuaEngineFixture();
 
-        fixture.Engine.ExecuteCallback("never_registered");
+        fixture.Engine.ExecuteScript("computed = 10 * 5");
+
+        var result = fixture.Engine.ExecuteFunction("computed");
+        Assert.Equal(50d, Assert.IsType<double>(result.Data));
+    }
+
+    [Fact]
+    public void RegisterGlobal_NullValue_Throws()
+    {
+        using var fixture = new LuaEngineFixture();
+
+        Assert.Throws<ArgumentNullException>(() => fixture.Engine.RegisterGlobal("x", null!));
     }
 
     [Fact]
@@ -128,6 +144,14 @@ public class LuaScriptEngineServiceTests
 
         Assert.True(result.Success);
         Assert.Equal(42d, Assert.IsType<double>(result.Data));
+    }
+
+    [Theory, InlineData("MyFunction", "my_function"), InlineData("DoThing", "do_thing")]
+    public void ToScriptEngineFunctionName_ConvertsToSnakeCase(string input, string expected)
+    {
+        using var fixture = new LuaEngineFixture();
+
+        Assert.Equal(expected, fixture.Engine.ToScriptEngineFunctionName(input));
     }
 
     [Fact]
@@ -149,31 +173,5 @@ public class LuaScriptEngineServiceTests
         using var fixture = new LuaEngineFixture();
 
         Assert.False(fixture.Engine.UnregisterGlobal("never_set"));
-    }
-
-    [Theory]
-    [InlineData("MyFunction", "my_function")]
-    [InlineData("DoThing", "do_thing")]
-    public void ToScriptEngineFunctionName_ConvertsToSnakeCase(string input, string expected)
-    {
-        using var fixture = new LuaEngineFixture();
-
-        Assert.Equal(expected, fixture.Engine.ToScriptEngineFunctionName(input));
-    }
-
-    [Fact]
-    public void RegisterGlobal_NullValue_Throws()
-    {
-        using var fixture = new LuaEngineFixture();
-
-        Assert.Throws<ArgumentNullException>(() => fixture.Engine.RegisterGlobal("x", null!));
-    }
-
-    [Fact]
-    public void AddCallback_EmptyName_Throws()
-    {
-        using var fixture = new LuaEngineFixture();
-
-        Assert.ThrowsAny<ArgumentException>(() => fixture.Engine.AddCallback("", _ => { }));
     }
 }

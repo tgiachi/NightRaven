@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj" />
+        <ProjectReference Include="..\NightHeaven.Network\NightHeaven.Network.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Data\" />
-      <Folder Include="Packets\" />
+        <Folder Include="Data\"/>
+        <Folder Include="Packets\"/>
     </ItemGroup>
 
 </Project>

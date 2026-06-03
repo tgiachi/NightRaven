@@ -1,3 +1,4 @@
+using NightHeaven.Core.Ids;
 using NightHeaven.Hosting.Data.Metrics;
 using NightHeaven.Hosting.Data.Persistence;
 using NightHeaven.Hosting.Interfaces.Metrics;
@@ -81,6 +82,10 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
     public IDataAccess<TEntity, TKey> GetDataAccess<TEntity, TKey>()
         where TKey : notnull
         => new GenericDataAccess<TEntity, TKey>(_stateStore, _journal, _registry.GetDescriptor<TEntity, TKey>());
+
+    public IAutoDataAccess<TEntity, TKey> GetAutoDataAccess<TEntity, TKey>()
+        where TKey : struct, IAutoIncrementKey<TKey>
+        => new AutoDataAccess<TEntity, TKey>(_stateStore, _journal, _registry.GetDescriptor<TEntity, TKey>());
 
     public async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
     {

@@ -14,22 +14,22 @@ public sealed class SessionService : ISessionService
 
     public int Count => _sessions.Count;
 
-    public GameSession GetOrCreate(NightHeavenTCPClient client)
-    {
-        ArgumentNullException.ThrowIfNull(client);
-
-        return _sessions.GetOrAdd(client.SessionId, static (_, c) => new GameSession(c), client);
-    }
-
-    public bool TryGet(long sessionId, out GameSession session)
-        => _sessions.TryGetValue(sessionId, out session!);
-
-    public bool Remove(long sessionId)
-        => _sessions.TryRemove(sessionId, out _);
-
     public void Clear()
         => _sessions.Clear();
 
     public IReadOnlyCollection<GameSession> GetAll()
         => _sessions.Values.ToArray();
+
+    public GameSession GetOrCreate(NightHeavenTCPClient client)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+
+        return _sessions.GetOrAdd(client.SessionId, static (_, c) => new(c), client);
+    }
+
+    public bool Remove(long sessionId)
+        => _sessions.TryRemove(sessionId, out _);
+
+    public bool TryGet(long sessionId, out GameSession session)
+        => _sessions.TryGetValue(sessionId, out session!);
 }

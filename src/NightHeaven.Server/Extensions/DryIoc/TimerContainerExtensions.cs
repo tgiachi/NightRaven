@@ -20,7 +20,7 @@ public static class TimerContainerExtensions
     {
         container.AddNightHeavenHosting();
 
-        container.RegisterConfigSection<TimerWheelConfig>("timing", () => new TimerWheelConfig());
+        container.RegisterConfigSection("timing", () => new TimerWheelConfig());
 
         container.AddNightHeavenService<ITimerService, TimerWheelService>(TimerWheelPriority);
 

@@ -1,6 +1,7 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Core.Ids;
 using NightHeaven.Persistence.Interfaces.Persistence;
+using NightHeaven.Persistence.Services.Persistence;
 using NightHeaven.Server.Extensions.DryIoc;
 using NightHeaven.Tests.Persistence.Support;
 using NightHeaven.Tests.Support;
@@ -12,18 +13,14 @@ public class PersistenceHostIntegrationTests : IDisposable
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-persist-host-{Guid.NewGuid():N}");
     private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
 
-    private IContainer NewContainer()
+    public void Dispose()
     {
-        Directory.CreateDirectory(_dir);
-        File.WriteAllText(ConfigPath, "[persistence]\nenable_file_lock = false\n");
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
 
-        var container = new Container();
-        container.RegisterPersistenceEntity<TestPlayer, Serial>(1, 1, p => p.Id);
-        container.RegisterPersistenceEntity<TestItem, Serial>(2, 1, i => i.Id);
-        container.AddNightHeavenPersistence(_dir);
-        container.AddNightHeavenConfig(ConfigPath);
-
-        return container;
+        GC.SuppressFinalize(this);
     }
 
     [Fact]
@@ -37,9 +34,9 @@ public class PersistenceHostIntegrationTests : IDisposable
         try
         {
             var players = container.Resolve<IDataAccess<TestPlayer, Serial>>();
-            await players.UpsertAsync(new() { Id = new Serial(1), Name = "Hosted" });
+            await players.UpsertAsync(new() { Id = new(1), Name = "Hosted" });
 
-            Assert.Equal("Hosted", (await players.GetByIdAsync(new Serial(1)))!.Name);
+            Assert.Equal("Hosted", (await players.GetByIdAsync(new(1)))!.Name);
         }
         finally
         {
@@ -51,7 +48,7 @@ public class PersistenceHostIntegrationTests : IDisposable
     public void PersistenceService_ReportsMetrics()
     {
         var container = NewContainer();
-        var metrics = (NightHeaven.Persistence.Services.Persistence.PersistenceService)
+        var metrics = (PersistenceService)
             container.Resolve<IPersistenceService>();
 
         var names = metrics.Collect().Select(s => s.Name).ToHashSet();
@@ -60,13 +57,17 @@ public class PersistenceHostIntegrationTests : IDisposable
         Assert.Contains("snapshots_written_total", names);
     }
 
-    public void Dispose()
+    private IContainer NewContainer()
     {
-        if (Directory.Exists(_dir))
-        {
-            Directory.Delete(_dir, true);
-        }
+        Directory.CreateDirectory(_dir);
+        File.WriteAllText(ConfigPath, "[persistence]\nenable_file_lock = false\n");
 
-        GC.SuppressFinalize(this);
+        var container = new Container();
+        container.RegisterPersistenceEntity<TestPlayer, Serial>(1, 1, p => p.Id);
+        container.RegisterPersistenceEntity<TestItem, Serial>(2, 1, i => i.Id);
+        container.AddNightHeavenPersistence(_dir);
+        container.AddNightHeavenConfig(ConfigPath);
+
+        return container;
     }
 }

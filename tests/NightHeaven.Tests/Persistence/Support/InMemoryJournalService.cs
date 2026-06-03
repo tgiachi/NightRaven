@@ -24,16 +24,16 @@ internal sealed class InMemoryJournalService : IJournalService
     public ValueTask<IReadOnlyCollection<JournalEntry>> ReadAllAsync(CancellationToken cancellationToken = default)
         => ValueTask.FromResult<IReadOnlyCollection<JournalEntry>>(Entries.ToArray());
 
-    public ValueTask TrimThroughSequenceAsync(long inclusiveSequenceId, CancellationToken cancellationToken = default)
+    public ValueTask ResetAsync(CancellationToken cancellationToken = default)
     {
-        Entries.RemoveAll(e => e.SequenceId <= inclusiveSequenceId);
+        Entries.Clear();
 
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask ResetAsync(CancellationToken cancellationToken = default)
+    public ValueTask TrimThroughSequenceAsync(long inclusiveSequenceId, CancellationToken cancellationToken = default)
     {
-        Entries.Clear();
+        Entries.RemoveAll(e => e.SequenceId <= inclusiveSequenceId);
 
         return ValueTask.CompletedTask;
     }

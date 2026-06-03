@@ -71,6 +71,14 @@ public sealed class NightHeavenUDPServer : IAsyncDisposable, IDisposable
         }
     }
 
+    /// <inheritdoc />
+    public void Dispose()
+        => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+        => await StopAsync(CancellationToken.None);
+
     /// <summary>
     /// Starts listening, binding sockets and launching a receive loop per socket. Recreates the
     /// sockets on every call, so Stop/Start cycles are supported.
@@ -240,12 +248,4 @@ public sealed class NightHeavenUDPServer : IAsyncDisposable, IDisposable
                            .Select(address => new IPEndPoint(address.Address, _endPoint.Port))
                            .ToArray();
     }
-
-    /// <inheritdoc />
-    public void Dispose()
-        => DisposeAsync().AsTask().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-        => await StopAsync(CancellationToken.None);
 }

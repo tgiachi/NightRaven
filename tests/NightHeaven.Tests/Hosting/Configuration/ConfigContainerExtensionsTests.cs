@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Server.Extensions.DryIoc;
 using NightHeaven.Tests.Hosting.Configuration.Support;
 
@@ -10,16 +10,15 @@ public class ConfigContainerExtensionsTests : IDisposable
     private string Path_ => Path.Combine(_dir, "nightheaven.toml");
 
     [Fact]
-    public void AddNightHeavenConfig_RegistersBoundInstance()
+    public void AddNightHeavenConfig_MissingFile_CreatesDefaultAndRegistersDefault()
     {
-        Directory.CreateDirectory(_dir);
-        File.WriteAllText(Path_, "[server]\nport = 9000\n");
-
         var container = new Container();
-        container.RegisterConfigSection<TestServerSettings>("server", () => new TestServerSettings());
+        container.RegisterConfigSection("server", () => new TestServerSettings());
+
         container.AddNightHeavenConfig(Path_);
 
-        Assert.Equal(9000, container.Resolve<TestServerSettings>().Port);
+        Assert.True(File.Exists(Path_));
+        Assert.Equal(2593, container.Resolve<TestServerSettings>().Port);
     }
 
     [Fact]
@@ -33,15 +32,16 @@ public class ConfigContainerExtensionsTests : IDisposable
     }
 
     [Fact]
-    public void AddNightHeavenConfig_MissingFile_CreatesDefaultAndRegistersDefault()
+    public void AddNightHeavenConfig_RegistersBoundInstance()
     {
-        var container = new Container();
-        container.RegisterConfigSection<TestServerSettings>("server", () => new TestServerSettings());
+        Directory.CreateDirectory(_dir);
+        File.WriteAllText(Path_, "[server]\nport = 9000\n");
 
+        var container = new Container();
+        container.RegisterConfigSection("server", () => new TestServerSettings());
         container.AddNightHeavenConfig(Path_);
 
-        Assert.True(File.Exists(Path_));
-        Assert.Equal(2593, container.Resolve<TestServerSettings>().Port);
+        Assert.Equal(9000, container.Resolve<TestServerSettings>().Port);
     }
 
     public void Dispose()

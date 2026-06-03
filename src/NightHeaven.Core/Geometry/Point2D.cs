@@ -23,7 +23,7 @@ namespace NightHeaven.Core.Geometry;
 /// <summary>
 /// Represents Point2D.
 /// </summary>
-public partial struct Point2D
+public struct Point2D
     : IPoint2D, IComparable<Point2D>, IComparable<IPoint2D>, IEquatable<object>, IEquatable<Point2D>,
       IEquatable<IPoint2D>, ISpanFormattable, ISpanParsable<Point2D>
 {

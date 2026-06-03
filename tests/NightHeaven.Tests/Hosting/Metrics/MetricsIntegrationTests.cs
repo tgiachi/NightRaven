@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Hosting.Interfaces.Metrics;
 using NightHeaven.Server.Extensions.DryIoc;
 using NightHeaven.Server.Services.EventBus;
@@ -13,6 +13,16 @@ public class MetricsIntegrationTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-metrics-integration-config-{Guid.NewGuid():N}");
     private string Path_ => Path.Combine(_dir, "nightheaven.toml");
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
+    }
 
     [Fact]
     public async Task FullHost_AllProvidersAggregatedAndFormatted()
@@ -55,15 +65,5 @@ public class MetricsIntegrationTests : IDisposable
         Assert.EndsWith("# EOF\n", text);
 
         await orchestrator.StopAsync(CancellationToken.None);
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_dir))
-        {
-            Directory.Delete(_dir, true);
-        }
-
-        GC.SuppressFinalize(this);
     }
 }

@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -59,7 +58,7 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
     private readonly List<ScriptModuleData> _scriptModules;
     private readonly List<ScriptUserData> _loadedUserData;
 
-    private readonly DryIoc.IContainer _serviceProvider;
+    private readonly IContainer _serviceProvider;
     private int _cacheHits;
     private int _cacheMisses;
 
@@ -80,7 +79,7 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
     /// <param name="versionService">The version service.</param>
     public LuaScriptEngineService(
         DirectoriesConfig directoriesConfig,
-        DryIoc.IContainer serviceProvider,
+        IContainer serviceProvider,
         LuaEngineConfig engineConfig,
         List<ScriptModuleData> scriptModules = null,
         List<ScriptUserData> loadedUserData = null

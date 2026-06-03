@@ -20,31 +20,6 @@ public static class PersistenceContainerExtensions
     extension(IContainer container)
     {
         /// <summary>
-        /// Registers a persisted entity type. Accumulates a descriptor consumed by the persistence
-        /// service at boot. Call before <see cref="AddNightHeavenPersistence" />'s service starts.
-        /// </summary>
-        /// <param name="typeId">Stable numeric identifier for the entity kind.</param>
-        /// <param name="schemaVersion">Version of the persisted entity schema.</param>
-        /// <param name="keySelector">Selects the entity key.</param>
-        public IContainer RegisterPersistenceEntity<TEntity, TKey>(
-            ushort typeId,
-            int schemaVersion,
-            Func<TEntity, TKey> keySelector
-        )
-            where TKey : notnull
-        {
-            var descriptor = new PersistenceEntityDescriptor<TEntity, TKey>(
-                typeId,
-                typeof(TEntity).Name,
-                schemaVersion,
-                keySelector
-            );
-            container.AddToRegisterTypedList(new PersistenceEntityRegistration(descriptor));
-
-            return container;
-        }
-
-        /// <summary>
         /// Registers the persistence service (snapshot + journal) with the hosting orchestrator and the
         /// open-generic <see cref="IDataAccess{TEntity,TKey}" />.
         /// </summary>
@@ -53,7 +28,7 @@ public static class PersistenceContainerExtensions
         {
             container.AddNightHeavenHosting();
 
-            container.RegisterConfigSection<PersistenceConfig>("persistence", () => new PersistenceConfig());
+            container.RegisterConfigSection("persistence", () => new PersistenceConfig());
 
             // Ensure a (possibly empty) registration list exists even when no entity was registered.
             if (!container.IsRegistered<List<PersistenceEntityRegistration>>())
@@ -99,6 +74,42 @@ public static class PersistenceContainerExtensions
                 ),
                 setup: Setup.With(asResolutionCall: true)
             );
+
+            // Open-generic IAutoDataAccess<,> resolves through GetAutoDataAccess.
+            container.Register(
+                typeof(IAutoDataAccess<,>),
+                made: Made.Of(
+                    request => typeof(IPersistenceService).GetMethod(nameof(IPersistenceService.GetAutoDataAccess))!
+                                                          .MakeGenericMethod(request.ServiceType.GetGenericArguments()),
+                    ServiceInfo.Of<IPersistenceService>()
+                ),
+                setup: Setup.With(asResolutionCall: true)
+            );
+
+            return container;
+        }
+
+        /// <summary>
+        /// Registers a persisted entity type. Accumulates a descriptor consumed by the persistence
+        /// service at boot. Call before <see cref="AddNightHeavenPersistence" />'s service starts.
+        /// </summary>
+        /// <param name="typeId">Stable numeric identifier for the entity kind.</param>
+        /// <param name="schemaVersion">Version of the persisted entity schema.</param>
+        /// <param name="keySelector">Selects the entity key.</param>
+        public IContainer RegisterPersistenceEntity<TEntity, TKey>(
+            ushort typeId,
+            int schemaVersion,
+            Func<TEntity, TKey> keySelector
+        )
+            where TKey : notnull
+        {
+            var descriptor = new PersistenceEntityDescriptor<TEntity, TKey>(
+                typeId,
+                typeof(TEntity).Name,
+                schemaVersion,
+                keySelector
+            );
+            container.AddToRegisterTypedList(new PersistenceEntityRegistration(descriptor));
 
             return container;
         }

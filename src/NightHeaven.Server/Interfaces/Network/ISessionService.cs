@@ -14,28 +14,6 @@ public interface ISessionService
     int Count { get; }
 
     /// <summary>
-    /// Returns the existing session for <paramref name="client" />, creating one if absent.
-    /// </summary>
-    /// <param name="client">Owning TCP client.</param>
-    /// <returns>The session associated with the client.</returns>
-    GameSession GetOrCreate(NightHeavenTCPClient client);
-
-    /// <summary>
-    /// Tries to get a session by its id.
-    /// </summary>
-    /// <param name="sessionId">Session identifier.</param>
-    /// <param name="session">The session when found.</param>
-    /// <returns><c>true</c> when a session was found; otherwise <c>false</c>.</returns>
-    bool TryGet(long sessionId, out GameSession session);
-
-    /// <summary>
-    /// Removes a session by its id.
-    /// </summary>
-    /// <param name="sessionId">Session identifier.</param>
-    /// <returns><c>true</c> when a session was removed; otherwise <c>false</c>.</returns>
-    bool Remove(long sessionId);
-
-    /// <summary>
     /// Removes every tracked session.
     /// </summary>
     void Clear();
@@ -45,4 +23,26 @@ public interface ISessionService
     /// </summary>
     /// <returns>The current sessions.</returns>
     IReadOnlyCollection<GameSession> GetAll();
+
+    /// <summary>
+    /// Returns the existing session for <paramref name="client" />, creating one if absent.
+    /// </summary>
+    /// <param name="client">Owning TCP client.</param>
+    /// <returns>The session associated with the client.</returns>
+    GameSession GetOrCreate(NightHeavenTCPClient client);
+
+    /// <summary>
+    /// Removes a session by its id.
+    /// </summary>
+    /// <param name="sessionId">Session identifier.</param>
+    /// <returns><c>true</c> when a session was removed; otherwise <c>false</c>.</returns>
+    bool Remove(long sessionId);
+
+    /// <summary>
+    /// Tries to get a session by its id.
+    /// </summary>
+    /// <param name="sessionId">Session identifier.</param>
+    /// <param name="session">The session when found.</param>
+    /// <returns><c>true</c> when a session was found; otherwise <c>false</c>.</returns>
+    bool TryGet(long sessionId, out GameSession session);
 }

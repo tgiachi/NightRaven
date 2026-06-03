@@ -7,11 +7,42 @@ namespace NightHeaven.Tests.Persistence;
 
 public class PersistenceEntityRegistryTests
 {
-    private static PersistenceEntityDescriptor<TestPlayer, Serial> PlayerDescriptor()
-        => new(1, "TestPlayer", 1, p => p.Id);
+    [Fact]
+    public void GetDescriptor_UnknownTypeId_Throws()
+    {
+        var registry = new PersistenceEntityRegistry();
 
-    private static PersistenceEntityDescriptor<TestItem, Serial> ItemDescriptor()
-        => new(2, "TestItem", 1, i => i.Id);
+        Assert.Throws<InvalidOperationException>(() => registry.GetDescriptor(99));
+    }
+
+    [Fact]
+    public void GetDescriptorGeneric_UnregisteredPair_Throws()
+    {
+        var registry = new PersistenceEntityRegistry();
+
+        Assert.Throws<InvalidOperationException>(() => registry.GetDescriptor<TestPlayer, Serial>());
+    }
+
+    [Fact]
+    public void Register_AfterFreeze_Throws()
+    {
+        var registry = new PersistenceEntityRegistry();
+        registry.Freeze();
+
+        Assert.True(registry.IsFrozen);
+        Assert.Throws<InvalidOperationException>(() => registry.Register(PlayerDescriptor()));
+    }
+
+    [Fact]
+    public void Register_DuplicateTypeId_Throws()
+    {
+        var registry = new PersistenceEntityRegistry();
+        registry.Register(PlayerDescriptor());
+
+        Assert.Throws<InvalidOperationException>(
+            () => registry.Register(new PersistenceEntityDescriptor<TestItem, Serial>(1, "Dup", 1, i => i.Id))
+        );
+    }
 
     [Fact]
     public void Register_ThenGetDescriptorByTypeId_ReturnsIt()
@@ -34,40 +65,9 @@ public class PersistenceEntityRegistryTests
         Assert.Equal(2, registry.GetRegisteredDescriptors().Count);
     }
 
-    [Fact]
-    public void Register_DuplicateTypeId_Throws()
-    {
-        var registry = new PersistenceEntityRegistry();
-        registry.Register(PlayerDescriptor());
+    private static PersistenceEntityDescriptor<TestItem, Serial> ItemDescriptor()
+        => new(2, "TestItem", 1, i => i.Id);
 
-        Assert.Throws<InvalidOperationException>(
-            () => registry.Register(new PersistenceEntityDescriptor<TestItem, Serial>(1, "Dup", 1, i => i.Id))
-        );
-    }
-
-    [Fact]
-    public void Register_AfterFreeze_Throws()
-    {
-        var registry = new PersistenceEntityRegistry();
-        registry.Freeze();
-
-        Assert.True(registry.IsFrozen);
-        Assert.Throws<InvalidOperationException>(() => registry.Register(PlayerDescriptor()));
-    }
-
-    [Fact]
-    public void GetDescriptor_UnknownTypeId_Throws()
-    {
-        var registry = new PersistenceEntityRegistry();
-
-        Assert.Throws<InvalidOperationException>(() => registry.GetDescriptor(99));
-    }
-
-    [Fact]
-    public void GetDescriptorGeneric_UnregisteredPair_Throws()
-    {
-        var registry = new PersistenceEntityRegistry();
-
-        Assert.Throws<InvalidOperationException>(() => registry.GetDescriptor<TestPlayer, Serial>());
-    }
+    private static PersistenceEntityDescriptor<TestPlayer, Serial> PlayerDescriptor()
+        => new(1, "TestPlayer", 1, p => p.Id);
 }

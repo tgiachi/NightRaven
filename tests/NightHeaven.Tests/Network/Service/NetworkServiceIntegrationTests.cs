@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
 using NightHeaven.Network.UO.Registry;
 using NightHeaven.Server.Data.Events;
@@ -76,6 +76,75 @@ public class NetworkServiceIntegrationTests : IDisposable
         }
     }
 
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
+    }
+
+    [Fact]
+    public async Task FullHost_ClientDisconnects_PublishesDisconnectAndRemovesSession()
+    {
+        var port = GetFreeTcpPort();
+        var capture = new PacketCapture();
+        var configPath = WriteNetworkConfig(port);
+
+        var container = new Container();
+        container.RegisterInstance(capture);
+        container.AddNightHeavenEventBus();
+
+        var packetRegistry = new PacketRegistry();
+        PacketTable.Register(packetRegistry);
+        container.RegisterInstance(packetRegistry);
+
+        container.AddNightHeavenNetwork();
+        container.AddNightHeavenConfig(configPath);
+        container.AddTickEventHandler<CaptureDisconnectHandler, PlayerDisconnectedEvent>();
+
+        var orchestrator = container.Orchestrator();
+        var network = (NetworkService)container.Resolve<INetworkService>();
+
+        await orchestrator.StartAsync(CancellationToken.None);
+
+        try
+        {
+            var client = new TcpClient();
+            await client.ConnectAsync(IPAddress.Loopback, port);
+
+            await WaitForAsync(() => network.ConnectedSessionCount >= 1, TimeSpan.FromSeconds(5));
+
+            client.Close();
+            client.Dispose();
+
+            await WaitForAsync(
+                () =>
+                {
+                    lock (capture)
+                    {
+                        return capture.Disconnects.Count >= 1;
+                    }
+                },
+                TimeSpan.FromSeconds(5)
+            );
+
+            lock (capture)
+            {
+                Assert.Single(capture.Disconnects);
+            }
+
+            await WaitForAsync(() => network.ConnectedSessionCount == 0, TimeSpan.FromSeconds(5));
+            Assert.Equal(0, network.ConnectedSessionCount);
+        }
+        finally
+        {
+            await orchestrator.StopAsync(CancellationToken.None);
+        }
+    }
+
     [Fact]
     public async Task FullHost_ClientSendsDoubleClick_HandlerObservesPacketAndConnect()
     {
@@ -139,65 +208,6 @@ public class NetworkServiceIntegrationTests : IDisposable
         }
     }
 
-    [Fact]
-    public async Task FullHost_ClientDisconnects_PublishesDisconnectAndRemovesSession()
-    {
-        var port = GetFreeTcpPort();
-        var capture = new PacketCapture();
-        var configPath = WriteNetworkConfig(port);
-
-        var container = new Container();
-        container.RegisterInstance(capture);
-        container.AddNightHeavenEventBus();
-
-        var packetRegistry = new PacketRegistry();
-        PacketTable.Register(packetRegistry);
-        container.RegisterInstance(packetRegistry);
-
-        container.AddNightHeavenNetwork();
-        container.AddNightHeavenConfig(configPath);
-        container.AddTickEventHandler<CaptureDisconnectHandler, PlayerDisconnectedEvent>();
-
-        var orchestrator = container.Orchestrator();
-        var network = (NetworkService)container.Resolve<INetworkService>();
-
-        await orchestrator.StartAsync(CancellationToken.None);
-
-        try
-        {
-            var client = new TcpClient();
-            await client.ConnectAsync(IPAddress.Loopback, port);
-
-            await WaitForAsync(() => network.ConnectedSessionCount >= 1, TimeSpan.FromSeconds(5));
-
-            client.Close();
-            client.Dispose();
-
-            await WaitForAsync(
-                () =>
-                {
-                    lock (capture)
-                    {
-                        return capture.Disconnects.Count >= 1;
-                    }
-                },
-                TimeSpan.FromSeconds(5)
-            );
-
-            lock (capture)
-            {
-                Assert.Single(capture.Disconnects);
-            }
-
-            await WaitForAsync(() => network.ConnectedSessionCount == 0, TimeSpan.FromSeconds(5));
-            Assert.Equal(0, network.ConnectedSessionCount);
-        }
-        finally
-        {
-            await orchestrator.StopAsync(CancellationToken.None);
-        }
-    }
-
     private static int GetFreeTcpPort()
     {
         var listener = new TcpListener(IPAddress.Loopback, 0);
@@ -206,15 +216,6 @@ public class NetworkServiceIntegrationTests : IDisposable
         listener.Stop();
 
         return port;
-    }
-
-    private string WriteNetworkConfig(int port)
-    {
-        Directory.CreateDirectory(_dir);
-        var path = Path.Combine(_dir, $"network-{port}.toml");
-        File.WriteAllText(path, $"[network]\nport = {port}\nping_server_enabled = false\n");
-
-        return path;
     }
 
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)
@@ -234,13 +235,12 @@ public class NetworkServiceIntegrationTests : IDisposable
         throw new TimeoutException($"Condition not met within {timeout}.");
     }
 
-    public void Dispose()
+    private string WriteNetworkConfig(int port)
     {
-        if (Directory.Exists(_dir))
-        {
-            Directory.Delete(_dir, true);
-        }
+        Directory.CreateDirectory(_dir);
+        var path = Path.Combine(_dir, $"network-{port}.toml");
+        File.WriteAllText(path, $"[network]\nport = {port}\nping_server_enabled = false\n");
 
-        GC.SuppressFinalize(this);
+        return path;
     }
 }

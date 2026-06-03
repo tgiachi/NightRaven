@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using NightHeaven.Hosting.Interfaces.Timing;
 using NightHeaven.Server.Extensions.DryIoc;
 using NightHeaven.Tests.Support;
@@ -13,6 +13,16 @@ public class TimerWheelIntegrationTests : IDisposable
     );
 
     private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
+    }
 
     [Fact]
     public async Task FullHost_TimerRegisteredAfterStart_FiresThroughGameLoop()
@@ -40,15 +50,5 @@ public class TimerWheelIntegrationTests : IDisposable
         await orchestrator.StopAsync(CancellationToken.None);
 
         Assert.True(Volatile.Read(ref fired) >= 1, "timer should have fired at least once before stop");
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_dir))
-        {
-            Directory.Delete(_dir, true);
-        }
-
-        GC.SuppressFinalize(this);
     }
 }

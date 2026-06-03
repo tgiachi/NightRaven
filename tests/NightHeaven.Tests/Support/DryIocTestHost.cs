@@ -1,4 +1,4 @@
-using global::DryIoc;
+using DryIoc;
 using Microsoft.Extensions.Hosting;
 using NightHeaven.Hosting.Internal;
 

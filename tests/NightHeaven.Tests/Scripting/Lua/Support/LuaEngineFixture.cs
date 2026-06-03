@@ -12,18 +12,17 @@ namespace NightHeaven.Tests.Scripting.Lua.Support;
 /// </summary>
 internal sealed class LuaEngineFixture : IDisposable
 {
-    private readonly string _scriptsDirectory;
     private readonly Container _container;
 
     public LuaEngineFixture(IEnumerable<ScriptModuleData>? modules = null)
     {
-        _scriptsDirectory = Path.Combine(Path.GetTempPath(), $"nh-lua-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(_scriptsDirectory);
+        ScriptsDirectory = Path.Combine(Path.GetTempPath(), $"nh-lua-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(ScriptsDirectory);
 
-        _container = new Container();
+        _container = new();
 
-        var directoriesConfig = new DirectoriesConfig(_scriptsDirectory, Array.Empty<string>());
-        var config = new LuaEngineConfig(_scriptsDirectory, _scriptsDirectory, "test");
+        var directoriesConfig = new DirectoriesConfig(ScriptsDirectory, Array.Empty<string>());
+        var config = new LuaEngineConfig(ScriptsDirectory, ScriptsDirectory, "test");
 
         Engine = new(
             directoriesConfig,
@@ -36,16 +35,16 @@ internal sealed class LuaEngineFixture : IDisposable
 
     public LuaScriptEngineService Engine { get; }
 
-    public string ScriptsDirectory => _scriptsDirectory;
+    public string ScriptsDirectory { get; }
 
     public void Dispose()
     {
         Engine.Dispose();
         _container.Dispose();
 
-        if (Directory.Exists(_scriptsDirectory))
+        if (Directory.Exists(ScriptsDirectory))
         {
-            Directory.Delete(_scriptsDirectory, true);
+            Directory.Delete(ScriptsDirectory, true);
         }
     }
 }

@@ -4,11 +4,9 @@ using DryIoc.Microsoft.DependencyInjection;
 using NightHeaven.Core.Data.Directories;
 using NightHeaven.Core.Types;
 using NightHeaven.Core.Utils;
-using NightHeaven.Hosting.Data.Persistence;
 using NightHeaven.Hosting.Interfaces.Services;
 using NightHeaven.Hosting.Internal;
 using NightHeaven.Network.UO.Registry;
-using NightHeaven.Persistence.Services.Persistence;
 using NightHeaven.Scripting.Lua.Extensions.Scripts;
 using NightHeaven.Scripting.Lua.Modules;
 using NightHeaven.Server.Data.Events;
@@ -34,9 +32,6 @@ await ConsoleApp.RunAsync(
         Console.WriteLine($"NightHeaven UO Server v{VersionUtils.GetVersion()}");
         Console.WriteLine($"Root Directory: {directoriesConfig.Root}");
 
-
-
-
         var builder = WebApplication.CreateBuilder(
             new WebApplicationOptions
             {
@@ -59,9 +54,7 @@ await ConsoleApp.RunAsync(
 
         // The generic host collects hosted services from IServiceCollection, so bridge the
         // DryIoc-registered orchestrator here; it resolves its descriptors from the unified provider.
-        builder.Services.AddSingleton<IHostedService>(
-            sp => sp.GetRequiredService<NightHeavenServiceOrchestrator>()
-        );
+        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<NightHeavenServiceOrchestrator>());
 
         // UO packet registry: scan the Network.UO assembly for [PacketHandler] packets.
         var packetRegistry = new PacketRegistry();
@@ -86,7 +79,6 @@ await ConsoleApp.RunAsync(
                 container.AddMetricProvider<GameLoopService>();
                 container.AddMetricProvider<TimerWheelService>();
 
-
                 // Persistence (priority 15): snapshot + journal. No entities registered yet;
                 // modules will call RegisterPersistenceEntity<TEntity,TKey>(...) before this runs.
                 container.AddNightHeavenPersistence(directoriesConfig[DirectoryType.Save]);
@@ -106,9 +98,7 @@ await ConsoleApp.RunAsync(
 
                 // Load config.toml once and register every section as a DI instance. Must run after
                 // all RegisterConfigSection calls (each module helper declares its section).
-                container.AddNightHeavenConfig(
-                    Path.Combine(directoriesConfig[DirectoryType.Config], "nightheaven.toml")
-                );
+                container.AddNightHeavenConfig(Path.Combine(directoriesConfig[DirectoryType.Config], "nightheaven.toml"));
             }
         );
 
@@ -135,6 +125,7 @@ await ConsoleApp.RunAsync(
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
+        app.MapNightHeavenVersion();
         app.MapNightHeavenMetrics();
         app.MapFallbackToFile("index.html");
 

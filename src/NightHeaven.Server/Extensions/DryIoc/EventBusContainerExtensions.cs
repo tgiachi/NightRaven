@@ -38,7 +38,7 @@ public static class EventBusContainerExtensions
     {
         container.AddNightHeavenHosting();
 
-        container.RegisterConfigSection<GameLoopConfig>("game_loop", () => new GameLoopConfig());
+        container.RegisterConfigSection("game_loop", () => new GameLoopConfig());
 
         container.AddNightHeavenService<IEventBusService, EventBusService>(EventBusPriority);
         container.AddNightHeavenService<IGameLoopService, GameLoopService>(GameLoopPriority);

@@ -33,28 +33,6 @@ public class PacketRegistry
         Register<TPacket>(opcode, PacketSizing.Fixed, length, description);
     }
 
-    public void RegisterFromAttribute<TPacket>()
-        where TPacket : IGameNetworkPacket, new()
-    {
-        var attribute = typeof(TPacket).GetCustomAttributes(typeof(PacketHandlerAttribute), false)
-                                       .OfType<PacketHandlerAttribute>()
-                                       .SingleOrDefault();
-
-        if (attribute is null)
-        {
-            throw new InvalidOperationException($"Packet type '{typeof(TPacket).Name}' is missing PacketHandlerAttribute.");
-        }
-
-        if (attribute.Sizing == PacketSizing.Fixed)
-        {
-            RegisterFixed<TPacket>(attribute.OpCode, attribute.Length, attribute.Description);
-
-            return;
-        }
-
-        RegisterVariable<TPacket>(attribute.OpCode, attribute.Description);
-    }
-
     /// <summary>
     /// Scans <paramref name="assembly" /> for non-abstract <see cref="IGameNetworkPacket" /> types
     /// annotated with <see cref="PacketHandlerAttribute" /> and registers each one.
@@ -88,6 +66,28 @@ public class PacketRegistry
         }
 
         return count;
+    }
+
+    public void RegisterFromAttribute<TPacket>()
+        where TPacket : IGameNetworkPacket, new()
+    {
+        var attribute = typeof(TPacket).GetCustomAttributes(typeof(PacketHandlerAttribute), false)
+                                       .OfType<PacketHandlerAttribute>()
+                                       .SingleOrDefault();
+
+        if (attribute is null)
+        {
+            throw new InvalidOperationException($"Packet type '{typeof(TPacket).Name}' is missing PacketHandlerAttribute.");
+        }
+
+        if (attribute.Sizing == PacketSizing.Fixed)
+        {
+            RegisterFixed<TPacket>(attribute.OpCode, attribute.Length, attribute.Description);
+
+            return;
+        }
+
+        RegisterVariable<TPacket>(attribute.OpCode, attribute.Description);
     }
 
     public void RegisterVariable<TPacket>(byte opcode, string? description = null)
@@ -143,9 +143,7 @@ public class PacketRegistry
 
         if (sizing == PacketSizing.Fixed && length <= 0)
         {
-            throw new InvalidOperationException(
-                $"Fixed packet '{packetType.Name}' must declare a positive Length."
-            );
+            throw new InvalidOperationException($"Fixed packet '{packetType.Name}' must declare a positive Length.");
         }
 
         if (_registrations.ContainsKey(attribute.OpCode))

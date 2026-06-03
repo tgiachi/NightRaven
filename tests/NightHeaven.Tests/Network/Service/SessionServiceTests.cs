@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Sockets;
 using NightHeaven.Network.Client;
 using NightHeaven.Server.Services.Network;
@@ -7,6 +6,21 @@ namespace NightHeaven.Tests.Network.Service;
 
 public class SessionServiceTests
 {
+    [Fact]
+    public void Clear_RemovesEverySession()
+    {
+        var service = new SessionService();
+        using var a = NewClient();
+        using var b = NewClient();
+        service.GetOrCreate(a);
+        service.GetOrCreate(b);
+
+        service.Clear();
+
+        Assert.Equal(0, service.Count);
+        Assert.Empty(service.GetAll());
+    }
+
     [Fact]
     public void GetOrCreate_SameClient_ReturnsSameSession()
     {
@@ -19,6 +33,18 @@ public class SessionServiceTests
         Assert.Same(first, second);
         Assert.Equal(1, service.Count);
         Assert.Equal(client.SessionId, first.SessionId);
+    }
+
+    [Fact]
+    public void Remove_ExistingSession_ReturnsTrueAndDecrementsCount()
+    {
+        var service = new SessionService();
+        using var client = NewClient();
+        service.GetOrCreate(client);
+
+        Assert.True(service.Remove(client.SessionId));
+        Assert.Equal(0, service.Count);
+        Assert.False(service.Remove(client.SessionId));
     }
 
     [Fact]
@@ -40,33 +66,6 @@ public class SessionServiceTests
         Assert.False(service.TryGet(12345, out _));
     }
 
-    [Fact]
-    public void Remove_ExistingSession_ReturnsTrueAndDecrementsCount()
-    {
-        var service = new SessionService();
-        using var client = NewClient();
-        service.GetOrCreate(client);
-
-        Assert.True(service.Remove(client.SessionId));
-        Assert.Equal(0, service.Count);
-        Assert.False(service.Remove(client.SessionId));
-    }
-
-    [Fact]
-    public void Clear_RemovesEverySession()
-    {
-        var service = new SessionService();
-        using var a = NewClient();
-        using var b = NewClient();
-        service.GetOrCreate(a);
-        service.GetOrCreate(b);
-
-        service.Clear();
-
-        Assert.Equal(0, service.Count);
-        Assert.Empty(service.GetAll());
-    }
-
     private static NightHeavenTCPClient NewClient()
-        => new(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp));
+        => new(new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp));
 }

@@ -9,21 +9,22 @@ public class ConfigServiceTests : IDisposable
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-config-{Guid.NewGuid():N}");
     private string Path_ => Path.Combine(_dir, "nightheaven.toml");
 
-    private static ConfigSectionRegistration ServerSection()
-        => new("server", typeof(TestServerSettings), () => new TestServerSettings());
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
 
-    private static ConfigSectionRegistration ValidatableSection()
-        => new("limits", typeof(ValidatableSettings), () => new ValidatableSettings());
+        GC.SuppressFinalize(this);
+    }
 
     [Fact]
-    public void Load_MissingFile_CreatesDefaultFileAndReturnsDefaults()
+    public void Load_Default_LeavesNoTempFile()
     {
-        var results = ConfigService.Load(Path_, [ServerSection()]);
+        ConfigService.Load(Path_, [ServerSection()]);
 
-        Assert.True(File.Exists(Path_));
-        var settings = Assert.IsType<TestServerSettings>(Assert.Single(results).Instance);
-        Assert.Equal(2593, settings.Port);
-        Assert.Contains("[server]", File.ReadAllText(Path_));
+        Assert.False(File.Exists(Path_ + ".tmp"));
     }
 
     [Fact]
@@ -41,15 +42,13 @@ public class ConfigServiceTests : IDisposable
     }
 
     [Fact]
-    public void Load_MissingSectionInExistingFile_DefaultsAndWritesItBack()
+    public void Load_InvalidValue_Throws()
     {
         Directory.CreateDirectory(_dir);
-        File.WriteAllText(Path_, "[server]\nport = 7000\n");
+        File.WriteAllText(Path_, "[limits]\nmax_players = 0\n");
 
-        var results = ConfigService.Load(Path_, [ServerSection(), ValidatableSection()]);
-
-        Assert.Equal(2, results.Count);
-        Assert.Contains("[limits]", File.ReadAllText(Path_));
+        var ex = Assert.ThrowsAny<Exception>(() => ConfigService.Load(Path_, [ValidatableSection()]));
+        Assert.Contains("MaxPlayers", ex.Message);
     }
 
     [Fact]
@@ -62,13 +61,26 @@ public class ConfigServiceTests : IDisposable
     }
 
     [Fact]
-    public void Load_InvalidValue_Throws()
+    public void Load_MissingFile_CreatesDefaultFileAndReturnsDefaults()
+    {
+        var results = ConfigService.Load(Path_, [ServerSection()]);
+
+        Assert.True(File.Exists(Path_));
+        var settings = Assert.IsType<TestServerSettings>(Assert.Single(results).Instance);
+        Assert.Equal(2593, settings.Port);
+        Assert.Contains("[server]", File.ReadAllText(Path_));
+    }
+
+    [Fact]
+    public void Load_MissingSectionInExistingFile_DefaultsAndWritesItBack()
     {
         Directory.CreateDirectory(_dir);
-        File.WriteAllText(Path_, "[limits]\nmax_players = 0\n");
+        File.WriteAllText(Path_, "[server]\nport = 7000\n");
 
-        var ex = Assert.ThrowsAny<Exception>(() => ConfigService.Load(Path_, [ValidatableSection()]));
-        Assert.Contains("MaxPlayers", ex.Message);
+        var results = ConfigService.Load(Path_, [ServerSection(), ValidatableSection()]);
+
+        Assert.Equal(2, results.Count);
+        Assert.Contains("[limits]", File.ReadAllText(Path_));
     }
 
     [Fact]
@@ -83,21 +95,9 @@ public class ConfigServiceTests : IDisposable
         Assert.Equal(7000, ((TestServerSettings)results[0].Instance).Port);
     }
 
-    [Fact]
-    public void Load_Default_LeavesNoTempFile()
-    {
-        ConfigService.Load(Path_, [ServerSection()]);
+    private static ConfigSectionRegistration ServerSection()
+        => new("server", typeof(TestServerSettings), () => new TestServerSettings());
 
-        Assert.False(File.Exists(Path_ + ".tmp"));
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_dir))
-        {
-            Directory.Delete(_dir, true);
-        }
-
-        GC.SuppressFinalize(this);
-    }
+    private static ConfigSectionRegistration ValidatableSection()
+        => new("limits", typeof(ValidatableSettings), () => new ValidatableSettings());
 }
