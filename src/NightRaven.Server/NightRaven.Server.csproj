@@ -50,4 +50,9 @@
         <InternalsVisibleTo Include="NightRaven.Tests"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Remove="Assets\**\*.*" />
+        <EmbeddedResource Include="Assets\**\*.*" />
+    </ItemGroup>
+
 </Project>

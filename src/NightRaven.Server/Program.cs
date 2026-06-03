@@ -1,6 +1,7 @@
 using ConsoleAppFramework;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
+using System.Reflection;
 using NightRaven.Core.Data.Directories;
 using NightRaven.Core.Types;
 using NightRaven.Core.Utils;
@@ -22,11 +23,21 @@ using Serilog;
 
 await ConsoleApp.RunAsync(
     args,
-    (CancellationToken cancellationToken, string? rootDirectory = null, bool debug = false) =>
+    (CancellationToken cancellationToken, string? rootDirectory = null, bool debug = false, bool header = true) =>
     {
         rootDirectory = RuntimePaths.ResolveRootDirectory(rootDirectory);
 
         var directoriesConfig = new DirectoriesConfig(rootDirectory, Enum.GetNames<DirectoryType>());
+
+        if (header)
+        {
+            var headerContent = ResourceUtils.GetEmbeddedResourceString(
+                Assembly.GetExecutingAssembly(),
+                "Assets/header.txt"
+            );
+
+            Console.WriteLine(headerContent);
+        }
 
         Console.WriteLine($"NightRaven UO Server v{VersionUtils.GetVersion()}");
         Console.WriteLine($"Root Directory: {directoriesConfig.Root}");
