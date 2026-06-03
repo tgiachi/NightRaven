@@ -1,4 +1,5 @@
 using MoonSharp.Interpreter;
+using NightRaven.Core.Utils;
 using NightRaven.Scripting.Lua.Data.Scripts;
 using NightRaven.Tests.Scripting.Lua.Support;
 
@@ -132,6 +133,18 @@ public class LuaScriptEngineServiceTests
         using var fixture = new LuaEngineFixture();
 
         Assert.Throws<ArgumentNullException>(() => fixture.Engine.RegisterGlobal("x", null!));
+    }
+
+    [Fact]
+    public async Task StartAsync_RegistersRuntimeMetadataConstants()
+    {
+        using var fixture = new LuaEngineFixture();
+
+        await fixture.Engine.StartAsync();
+
+        Assert.Equal(VersionUtils.GetVersion(), fixture.Engine.ExecuteFunction("VERSION").Data);
+        Assert.Equal("NightRaven", fixture.Engine.ExecuteFunction("ENGINE").Data);
+        Assert.Equal(PlatformUtils.GetCurrentPlatform().ToString(), fixture.Engine.ExecuteFunction("PLATFORM").Data);
     }
 
     [Fact]

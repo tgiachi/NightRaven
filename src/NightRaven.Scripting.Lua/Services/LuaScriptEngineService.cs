@@ -11,6 +11,7 @@ using MoonSharp.Interpreter;
 using NightRaven.Core.Data.Directories;
 using NightRaven.Core.Extensions.Strings;
 using NightRaven.Core.Json;
+using NightRaven.Core.Utils;
 using NightRaven.Scripting.Lua.Attributes.Scripts;
 using NightRaven.Scripting.Lua.Context;
 using NightRaven.Scripting.Lua.Data.Config;
@@ -637,9 +638,9 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
             // scanners (e.g. LuaComponentLoader) once the script is ready but before bootstrap runs.
             AfterModulesRegistered?.Invoke(LuaScript);
 
-            AddConstant("version", "0.0.1");
-            AddConstant("engine", "SquidVox");
-            AddConstant("platform", Environment.OSVersion.Platform.ToString());
+            AddConstant("version", VersionUtils.GetVersion());
+            AddConstant("engine", "NightRaven");
+            AddConstant("platform", PlatformUtils.GetCurrentPlatform().ToString());
 
             _ = Task.Run(() => GenerateLuaMetaFileAsync(CancellationToken.None), CancellationToken.None);
 
