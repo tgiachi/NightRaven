@@ -2,8 +2,11 @@ using NightRaven.Core.Ids;
 using NightRaven.Hosting.Data.Metrics;
 using NightRaven.Hosting.Data.Persistence;
 using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Hosting.Interfaces.Timing;
 using NightRaven.Hosting.Types.Metrics;
 using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Data.Events;
 using NightRaven.Persistence.Interfaces.Persistence;
 using NightRaven.Persistence.Internal;
 using NightRaven.Persistence.Types;
@@ -24,6 +27,7 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
     private readonly BinaryJournalService _journal;
     private readonly MessagePackSnapshotService _snapshot;
     private readonly PersistenceConfig _config;
+    private readonly IEventBusService? _eventBus;
     private readonly IReadOnlyList<PersistenceEntityRegistration> _registrations;
 
     private long _snapshotsWritten;
@@ -33,7 +37,9 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
     public PersistenceService(
         string saveDirectory,
         PersistenceConfig config,
-        IReadOnlyList<PersistenceEntityRegistration> registrations
+        IReadOnlyList<PersistenceEntityRegistration> registrations,
+        ITimerService? timerService = null,
+        IEventBusService? eventBus = null
     )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(saveDirectory);
@@ -41,9 +47,35 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
         ArgumentNullException.ThrowIfNull(registrations);
 
         _config = config;
+        _eventBus = eventBus;
         _registrations = registrations;
         _journal = new(Path.Combine(saveDirectory, config.JournalFileName), config.EnableFileLock);
         _snapshot = new(Path.Combine(saveDirectory, config.SnapshotFileName));
+
+        timerService?.RegisterTimer(
+            "world_save",
+            _config.AutosaveInterval,
+            SaveSnapshotTimerCallback,
+            _config.AutosaveInterval,
+            repeat: true
+        );
+    }
+
+    private void SaveSnapshotTimerCallback()
+    {
+        _ = Task.Run(
+            async () =>
+            {
+                try
+                {
+                    await SaveSnapshotAsync(CancellationToken.None);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Autosave snapshot failed");
+                }
+            }
+        );
     }
 
     public string Prefix => "persistence";
@@ -134,6 +166,9 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
 
         try
         {
+            var startedAt = DateTimeOffset.UtcNow;
+            await PublishSnapshotEventAsync(new SnapshotSaveStartedEvent(startedAt), cancellationToken);
+
             WorldSnapshot snapshot;
 
             lock (_stateStore.SyncRoot)
@@ -154,6 +189,17 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
 
             await _snapshot.SaveAsync(snapshot, cancellationToken);
             await _journal.TrimThroughSequenceAsync(snapshot.LastSequenceId, cancellationToken);
+
+            var completedAt = DateTimeOffset.UtcNow;
+            await PublishSnapshotEventAsync(
+                new SnapshotSaveCompletedEvent(
+                    snapshot.LastSequenceId,
+                    snapshot.EntityBuckets.Length,
+                    startedAt,
+                    completedAt
+                ),
+                cancellationToken
+            );
 
             Interlocked.Increment(ref _snapshotsWritten);
             Interlocked.Exchange(ref _lastSnapshotUnixMilliseconds, snapshot.CreatedUnixMilliseconds);
@@ -182,6 +228,10 @@ public sealed class PersistenceService : IPersistenceService, IMetricProvider, I
     /// <summary>Test/diagnostic hook: stops without writing a snapshot (forces journal-only recovery).</summary>
     public ValueTask StopWithoutSnapshotAsync()
         => ValueTask.CompletedTask;
+
+    private Task PublishSnapshotEventAsync<TEvent>(TEvent evt, CancellationToken cancellationToken)
+        where TEvent : NightRaven.Hosting.Interfaces.Events.IAsyncEvent
+        => _eventBus?.PublishAsync(evt, cancellationToken) ?? Task.CompletedTask;
 
     private IInternalEntityApplier Applier(ushort typeId)
     {

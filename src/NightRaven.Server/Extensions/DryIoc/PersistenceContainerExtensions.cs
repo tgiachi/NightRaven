@@ -2,6 +2,8 @@ using DryIoc;
 using NightRaven.Core.Extensions.Container;
 using NightRaven.Hosting.Data.Persistence;
 using NightRaven.Hosting.Interfaces.Metrics;
+using NightRaven.Hosting.Interfaces.Services;
+using NightRaven.Hosting.Interfaces.Timing;
 using NightRaven.Hosting.Internal;
 using NightRaven.Persistence.Data;
 using NightRaven.Persistence.Interfaces.Persistence;
@@ -44,7 +46,9 @@ public static class PersistenceContainerExtensions
                 resolver => new PersistenceService(
                     saveDirectory,
                     resolver.Resolve<PersistenceConfig>(),
-                    resolver.Resolve<List<PersistenceEntityRegistration>>()
+                    resolver.Resolve<List<PersistenceEntityRegistration>>(),
+                    resolver.Resolve<ITimerService>(IfUnresolved.ReturnDefault),
+                    resolver.Resolve<IEventBusService>(IfUnresolved.ReturnDefault)
                 ),
                 Reuse.Singleton
             );

@@ -1,6 +1,9 @@
 using NightRaven.Core.Ids;
+using NightRaven.Hosting.Interfaces.Events;
+using NightRaven.Hosting.Interfaces.Services;
 using NightRaven.Hosting.Data.Persistence;
 using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Data.Events;
 using NightRaven.Persistence.Services.Persistence;
 using NightRaven.Tests.Persistence.Support;
 
@@ -75,7 +78,27 @@ public class PersistenceRecoveryTests : IDisposable
         await second.StopAsync(CancellationToken.None);
     }
 
-    private PersistenceService NewService()
+    [Fact]
+    public async Task SaveSnapshotAsync_PublishesStartedAndCompletedEvents()
+    {
+        var bus = new CapturingEventBusService();
+        var service = NewService(bus);
+        await service.StartAsync(CancellationToken.None);
+        await service.GetDataAccess<TestPlayer, Serial>().UpsertAsync(new() { Id = new(1), Name = "Evented" });
+
+        await service.SaveSnapshotAsync();
+
+        var started = Assert.IsType<SnapshotSaveStartedEvent>(bus.AsyncEvents[0]);
+        var completed = Assert.IsType<SnapshotSaveCompletedEvent>(bus.AsyncEvents[1]);
+        Assert.True(completed.At >= started.At);
+        Assert.Equal(started.At, completed.StartedAt);
+        Assert.Equal(1, completed.LastSequenceId);
+        Assert.Equal(1, completed.EntityBucketCount);
+
+        await service.StopWithoutSnapshotAsync();
+    }
+
+    private PersistenceService NewService(IEventBusService? eventBus = null)
     {
         var config = new PersistenceConfig { EnableFileLock = false };
         var registrations = new List<PersistenceEntityRegistration>
@@ -84,6 +107,32 @@ public class PersistenceRecoveryTests : IDisposable
             new(new PersistenceEntityDescriptor<TestItem, Serial>(2, "TestItem", 1, i => i.Id))
         };
 
-        return new(_dir, config, registrations);
+        return new(_dir, config, registrations, eventBus: eventBus);
+    }
+
+    private sealed class CapturingEventBusService : IEventBusService
+    {
+        public List<IAsyncEvent> AsyncEvents { get; } = [];
+        public Action<Type, Exception, INightRavenEvent>? OnEventError { get; set; }
+        public int CurrentTickQueueDepth => 0;
+
+        public int DrainTickEvents(int maxItems) => 0;
+
+        public void Publish<TEvent>(TEvent evt)
+            where TEvent : ITickEvent
+        {
+        }
+
+        public Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
+            where TEvent : IAsyncEvent
+        {
+            AsyncEvents.Add(evt);
+
+            return Task.CompletedTask;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }
