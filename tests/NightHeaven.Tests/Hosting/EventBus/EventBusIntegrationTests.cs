@@ -7,8 +7,15 @@ using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Hosting.EventBus;
 
-public class EventBusIntegrationTests
+public class EventBusIntegrationTests : IDisposable
 {
+    private readonly string _dir = Path.Combine(
+        Path.GetTempPath(),
+        $"nightheaven-eventbus-integration-{Guid.NewGuid():N}"
+    );
+
+    private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
+
     private sealed class IntegrationTickHandler : ITickEventHandler<TestTickEvent>
     {
         private readonly List<string> _timeline;
@@ -54,6 +61,7 @@ public class EventBusIntegrationTests
         var container = new Container();
         container.RegisterInstance(timeline);
         container.AddNightHeavenEventBus();
+        container.AddNightHeavenConfig(ConfigPath);
         container.AddAsyncEventHandler<IntegrationAsyncHandler, TestAsyncEvent>();
 
         var orchestrator = container.Orchestrator();
@@ -75,6 +83,7 @@ public class EventBusIntegrationTests
         var container = new Container();
         container.RegisterInstance(timeline);
         container.AddNightHeavenEventBus();
+        container.AddNightHeavenConfig(ConfigPath);
         container.AddTickEventHandler<IntegrationTickHandler, TestTickEvent>();
 
         var orchestrator = container.Orchestrator();
@@ -101,5 +110,15 @@ public class EventBusIntegrationTests
         await orchestrator.StopAsync(CancellationToken.None);
 
         Assert.Equal(new[] { "tick:Integration:42" }, timeline);
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
     }
 }

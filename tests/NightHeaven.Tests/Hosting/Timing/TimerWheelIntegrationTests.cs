@@ -5,14 +5,22 @@ using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Hosting.Timing;
 
-public class TimerWheelIntegrationTests
+public class TimerWheelIntegrationTests : IDisposable
 {
+    private readonly string _dir = Path.Combine(
+        Path.GetTempPath(),
+        $"nightheaven-timerwheel-integration-{Guid.NewGuid():N}"
+    );
+
+    private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
+
     [Fact]
     public async Task FullHost_TimerRegisteredAfterStart_FiresThroughGameLoop()
     {
         var container = new Container();
         container.AddNightHeavenEventBus();
         container.AddNightHeavenTimerWheel();
+        container.AddNightHeavenConfig(ConfigPath);
 
         var orchestrator = container.Orchestrator();
         var timers = container.Resolve<ITimerService>();
@@ -32,5 +40,15 @@ public class TimerWheelIntegrationTests
         await orchestrator.StopAsync(CancellationToken.None);
 
         Assert.True(Volatile.Read(ref fired) >= 1, "timer should have fired at least once before stop");
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
     }
 }

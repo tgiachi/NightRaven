@@ -7,8 +7,11 @@ using NightHeaven.Tests.Hosting.EventBus.Support;
 
 namespace NightHeaven.Tests.Hosting.EventBus;
 
-public class EventBusServiceCollectionExtensionsTests
+public class EventBusServiceCollectionExtensionsTests : IDisposable
 {
+    private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-eventbus-config-{Guid.NewGuid():N}");
+    private string Path_ => Path.Combine(_dir, "nightheaven.toml");
+
     private sealed class NamedAsyncHandler : IAsyncEventHandler<TestAsyncEvent>
     {
         private readonly List<string> _timeline;
@@ -54,6 +57,7 @@ public class EventBusServiceCollectionExtensionsTests
         var container = new Container();
         container.RegisterInstance(timeline);
         container.AddNightHeavenEventBus();
+        container.AddNightHeavenConfig(Path_);
         container.AddAsyncEventHandler<NamedAsyncHandler, TestAsyncEvent>();
 
         await container.Resolve<IEventBusService>().PublishAsync(new TestAsyncEvent("hello"));
@@ -64,15 +68,13 @@ public class EventBusServiceCollectionExtensionsTests
     [Fact]
     public void AddNightHeavenEventBus_CustomConfig_AppliesConfig()
     {
+        Directory.CreateDirectory(_dir);
+        File.WriteAllText(Path_, "[game_loop]\nidle_sleep_ms = 7\nidle_cpu_enabled = false\n");
+
         var container = new Container();
 
-        container.AddNightHeavenEventBus(
-            cfg =>
-            {
-                cfg.IdleSleepMs = 7;
-                cfg.IdleCpuEnabled = false;
-            }
-        );
+        container.AddNightHeavenEventBus();
+        container.AddNightHeavenConfig(Path_);
 
         var cfg = container.Resolve<GameLoopConfig>();
 
@@ -86,6 +88,7 @@ public class EventBusServiceCollectionExtensionsTests
         var container = new Container();
 
         container.AddNightHeavenEventBus();
+        container.AddNightHeavenConfig(Path_);
 
         var cfg = container.Resolve<GameLoopConfig>();
 
@@ -99,6 +102,7 @@ public class EventBusServiceCollectionExtensionsTests
         var container = new Container();
 
         container.AddNightHeavenEventBus();
+        container.AddNightHeavenConfig(Path_);
 
         Assert.NotNull(container.Resolve<IEventBusService>());
         Assert.NotNull(container.Resolve<IGameLoopService>());
@@ -111,6 +115,7 @@ public class EventBusServiceCollectionExtensionsTests
         var container = new Container();
         container.RegisterInstance(timeline);
         container.AddNightHeavenEventBus();
+        container.AddNightHeavenConfig(Path_);
         container.AddTickEventHandler<NamedTickHandler, TestTickEvent>();
 
         var bus = container.Resolve<IEventBusService>();
@@ -120,5 +125,15 @@ public class EventBusServiceCollectionExtensionsTests
 
         Assert.Equal(1, processed);
         Assert.Equal(new[] { "tick:Named:11" }, timeline);
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
     }
 }

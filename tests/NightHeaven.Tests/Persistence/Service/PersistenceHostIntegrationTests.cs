@@ -10,13 +10,18 @@ namespace NightHeaven.Tests.Persistence.Service;
 public class PersistenceHostIntegrationTests : IDisposable
 {
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-persist-host-{Guid.NewGuid():N}");
+    private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
 
     private IContainer NewContainer()
     {
+        Directory.CreateDirectory(_dir);
+        File.WriteAllText(ConfigPath, "[persistence]\nenable_file_lock = false\n");
+
         var container = new Container();
         container.RegisterPersistenceEntity<TestPlayer, Serial>(1, 1, p => p.Id);
         container.RegisterPersistenceEntity<TestItem, Serial>(2, 1, i => i.Id);
-        container.AddNightHeavenPersistence(_dir, cfg => cfg.EnableFileLock = false);
+        container.AddNightHeavenPersistence(_dir);
+        container.AddNightHeavenConfig(ConfigPath);
 
         return container;
     }

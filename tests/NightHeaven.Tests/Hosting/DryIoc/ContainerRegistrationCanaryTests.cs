@@ -5,13 +5,21 @@ using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Hosting.DryIocNative;
 
-public class ContainerRegistrationCanaryTests
+public class ContainerRegistrationCanaryTests : IDisposable
 {
+    private readonly string _dir = Path.Combine(
+        Path.GetTempPath(),
+        $"nightheaven-container-canary-{Guid.NewGuid():N}"
+    );
+
+    private string ConfigPath => Path.Combine(_dir, "nightheaven.toml");
+
     [Fact]
     public async Task EventBus_RegisteredNatively_ResolvesAndStartsViaOrchestrator()
     {
         var container = new Container();
         container.AddNightHeavenEventBus();
+        container.AddNightHeavenConfig(ConfigPath);
 
         // Interface aliases resolve to the same singleton instances.
         Assert.NotNull(container.Resolve<IEventBusService>());
@@ -33,5 +41,15 @@ public class ContainerRegistrationCanaryTests
         container.AddNightHeavenHosting();
 
         Assert.Same(container.Orchestrator(), container.Orchestrator());
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
     }
 }

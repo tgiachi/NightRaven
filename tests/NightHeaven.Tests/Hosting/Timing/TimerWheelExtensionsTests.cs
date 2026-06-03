@@ -5,19 +5,20 @@ using NightHeaven.Server.Extensions.DryIoc;
 
 namespace NightHeaven.Tests.Hosting.Timing;
 
-public class TimerWheelExtensionsTests
+public class TimerWheelExtensionsTests : IDisposable
 {
+    private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-timing-config-{Guid.NewGuid():N}");
+    private string Path_ => Path.Combine(_dir, "nightheaven.toml");
+
     [Fact]
     public void AddNightHeavenTimerWheel_AppliesCustomConfig()
     {
+        Directory.CreateDirectory(_dir);
+        File.WriteAllText(Path_, "[timing]\ntick_duration = \"00:00:00.0040000\"\nwheel_size = 1024\n");
+
         var container = new Container();
-        container.AddNightHeavenTimerWheel(
-            cfg =>
-            {
-                cfg.TickDuration = TimeSpan.FromMilliseconds(4);
-                cfg.WheelSize = 1024;
-            }
-        );
+        container.AddNightHeavenTimerWheel();
+        container.AddNightHeavenConfig(Path_);
 
         var cfg = container.Resolve<TimerWheelConfig>();
         Assert.Equal(TimeSpan.FromMilliseconds(4), cfg.TickDuration);
@@ -29,6 +30,7 @@ public class TimerWheelExtensionsTests
     {
         var container = new Container();
         container.AddNightHeavenTimerWheel();
+        container.AddNightHeavenConfig(Path_);
 
         var cfg = container.Resolve<TimerWheelConfig>();
         Assert.Equal(TimeSpan.FromMilliseconds(8), cfg.TickDuration);
@@ -40,8 +42,19 @@ public class TimerWheelExtensionsTests
     {
         var container = new Container();
         container.AddNightHeavenTimerWheel();
+        container.AddNightHeavenConfig(Path_);
 
         Assert.NotNull(container.Resolve<ITimerService>());
         Assert.NotNull(container.Resolve<TimerWheelConfig>());
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
     }
 }

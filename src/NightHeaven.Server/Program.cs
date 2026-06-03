@@ -97,6 +97,11 @@ await ConsoleApp.RunAsync(
 
                 container.RegisterScriptModule<LogModule>();
 
+                // Load config.toml once and register every section as a DI instance. Must run after
+                // all RegisterConfigSection calls (each module helper declares its section).
+                container.AddNightHeavenConfig(
+                    Path.Combine(directoriesConfig[DirectoryType.Config], "nightheaven.toml")
+                );
             }
         );
 

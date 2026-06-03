@@ -9,15 +9,22 @@ using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Hosting.Metrics;
 
-public class MetricsIntegrationTests
+public class MetricsIntegrationTests : IDisposable
 {
+    private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-metrics-integration-config-{Guid.NewGuid():N}");
+    private string Path_ => Path.Combine(_dir, "nightheaven.toml");
+
     [Fact]
     public async Task FullHost_AllProvidersAggregatedAndFormatted()
     {
+        Directory.CreateDirectory(_dir);
+        File.WriteAllText(Path_, "[metrics]\nrefresh_interval = \"00:00:00.0500000\"\n");
+
         var container = new Container();
         container.AddNightHeavenEventBus();
         container.AddNightHeavenTimerWheel();
-        container.AddNightHeavenMetrics(cfg => cfg.RefreshInterval = TimeSpan.FromMilliseconds(50));
+        container.AddNightHeavenMetrics();
+        container.AddNightHeavenConfig(Path_);
 
         container.AddMetricProvider<EventBusService>();
         container.AddMetricProvider<GameLoopService>();
@@ -48,5 +55,15 @@ public class MetricsIntegrationTests
         Assert.EndsWith("# EOF\n", text);
 
         await orchestrator.StopAsync(CancellationToken.None);
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
     }
 }

@@ -11,8 +11,10 @@ using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Network.Service;
 
-public class NetworkServiceIntegrationTests
+public class NetworkServiceIntegrationTests : IDisposable
 {
+    private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nh-network-config-{Guid.NewGuid():N}");
+
     private sealed class PacketCapture
     {
         public List<PacketReceivedEvent> Packets { get; } = [];
@@ -79,6 +81,7 @@ public class NetworkServiceIntegrationTests
     {
         var port = GetFreeTcpPort();
         var capture = new PacketCapture();
+        var configPath = WriteNetworkConfig(port);
 
         var container = new Container();
         container.RegisterInstance(capture);
@@ -88,13 +91,8 @@ public class NetworkServiceIntegrationTests
         PacketTable.Register(packetRegistry);
         container.RegisterInstance(packetRegistry);
 
-        container.AddNightHeavenNetwork(
-            cfg =>
-            {
-                cfg.Port = port;
-                cfg.PingServerEnabled = false;
-            }
-        );
+        container.AddNightHeavenNetwork();
+        container.AddNightHeavenConfig(configPath);
         container.AddTickEventHandler<CapturePacketHandler, PacketReceivedEvent>();
         container.AddTickEventHandler<CaptureConnectHandler, PlayerConnectedEvent>();
 
@@ -146,6 +144,7 @@ public class NetworkServiceIntegrationTests
     {
         var port = GetFreeTcpPort();
         var capture = new PacketCapture();
+        var configPath = WriteNetworkConfig(port);
 
         var container = new Container();
         container.RegisterInstance(capture);
@@ -155,13 +154,8 @@ public class NetworkServiceIntegrationTests
         PacketTable.Register(packetRegistry);
         container.RegisterInstance(packetRegistry);
 
-        container.AddNightHeavenNetwork(
-            cfg =>
-            {
-                cfg.Port = port;
-                cfg.PingServerEnabled = false;
-            }
-        );
+        container.AddNightHeavenNetwork();
+        container.AddNightHeavenConfig(configPath);
         container.AddTickEventHandler<CaptureDisconnectHandler, PlayerDisconnectedEvent>();
 
         var orchestrator = container.Orchestrator();
@@ -214,6 +208,15 @@ public class NetworkServiceIntegrationTests
         return port;
     }
 
+    private string WriteNetworkConfig(int port)
+    {
+        Directory.CreateDirectory(_dir);
+        var path = Path.Combine(_dir, $"network-{port}.toml");
+        File.WriteAllText(path, $"[network]\nport = {port}\nping_server_enabled = false\n");
+
+        return path;
+    }
+
     private static async Task WaitForAsync(Func<bool> condition, TimeSpan timeout)
     {
         var deadline = DateTime.UtcNow + timeout;
@@ -229,5 +232,15 @@ public class NetworkServiceIntegrationTests
         }
 
         throw new TimeoutException($"Condition not met within {timeout}.");
+    }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_dir))
+        {
+            Directory.Delete(_dir, true);
+        }
+
+        GC.SuppressFinalize(this);
     }
 }
