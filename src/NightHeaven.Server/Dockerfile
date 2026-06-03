@@ -19,20 +19,12 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Copy solution-wide build props + every referenced csproj first so the
-# `dotnet restore` layer caches across source-only changes.
+# Copy source before restore so every project referenced by the server project
+# is present in the Docker context.
 COPY ["Directory.Build.props", "global.json", "./"]
-COPY ["src/NightHeaven.Core/NightHeaven.Core.csproj", "src/NightHeaven.Core/"]
-COPY ["src/NightHeaven.Hosting/NightHeaven.Hosting.csproj", "src/NightHeaven.Hosting/"]
-COPY ["src/NightHeaven.Network/NightHeaven.Network.csproj", "src/NightHeaven.Network/"]
-COPY ["src/NightHeaven.Network.UO/NightHeaven.Network.UO.csproj", "src/NightHeaven.Network.UO/"]
-COPY ["src/NightHeaven.Persistence/NightHeaven.Persistence.csproj", "src/NightHeaven.Persistence/"]
-COPY ["src/NightHeaven.Scripting.Lua/NightHeaven.Scripting.Lua.csproj", "src/NightHeaven.Scripting.Lua/"]
-COPY ["src/NightHeaven.Server/NightHeaven.Server.csproj", "src/NightHeaven.Server/"]
+COPY src/ src/
 RUN dotnet restore "src/NightHeaven.Server/NightHeaven.Server.csproj"
 
-# Now bring in the sources and publish.
-COPY src/ src/
 RUN dotnet publish "src/NightHeaven.Server/NightHeaven.Server.csproj" \
         -c "$BUILD_CONFIGURATION" \
         -o /app/publish \
