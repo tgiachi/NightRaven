@@ -1,0 +1,72 @@
+using MessagePack;
+using MessagePack.Formatters;
+using MessagePack.Resolvers;
+using NightHeaven.Persistence.Formatters;
+using NightHeaven.Persistence.Interfaces.Persistence;
+
+namespace NightHeaven.Persistence.Data;
+
+/// <summary>
+/// Default descriptor for a persisted entity kind. Serializes via a composite MessagePack resolver
+/// (<see cref="SerialMessagePackFormatter" /> first, then contractless), so plain POCO entities —
+/// including those with <c>Serial</c> fields/keys — need no attributes.
+/// </summary>
+public sealed class PersistenceEntityDescriptor<TEntity, TKey> : IPersistenceEntityDescriptor<TEntity, TKey>
+    where TKey : notnull
+{
+    internal static readonly MessagePackSerializerOptions SerializerOptions =
+        MessagePackSerializerOptions.Standard.WithResolver(
+            CompositeResolver.Create(
+                new IMessagePackFormatter[] { SerialMessagePackFormatter.Instance },
+                new IFormatterResolver[] { ContractlessStandardResolver.Instance }
+            )
+        );
+
+    private readonly Func<TEntity, TKey> _keySelector;
+
+    public PersistenceEntityDescriptor(
+        ushort typeId,
+        string typeName,
+        int schemaVersion,
+        Func<TEntity, TKey> keySelector
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(typeName);
+        ArgumentNullException.ThrowIfNull(keySelector);
+
+        TypeId = typeId;
+        TypeName = typeName;
+        SchemaVersion = schemaVersion;
+        _keySelector = keySelector;
+    }
+
+    public ushort TypeId { get; }
+    public string TypeName { get; }
+    public int SchemaVersion { get; }
+    public Type EntityType => typeof(TEntity);
+    public Type KeyType => typeof(TKey);
+
+    public TKey GetKey(TEntity entity)
+        => _keySelector(entity);
+
+    public TEntity Clone(TEntity entity)
+        => DeserializeEntity(SerializeEntity(entity));
+
+    public byte[] SerializeEntity(TEntity entity)
+        => MessagePackSerializer.Serialize(entity, SerializerOptions);
+
+    public TEntity DeserializeEntity(byte[] payload)
+        => MessagePackSerializer.Deserialize<TEntity>(payload, SerializerOptions)!;
+
+    public byte[] SerializeKey(TKey key)
+        => MessagePackSerializer.Serialize(key, SerializerOptions);
+
+    public TKey DeserializeKey(byte[] payload)
+        => MessagePackSerializer.Deserialize<TKey>(payload, SerializerOptions)!;
+
+    public byte[] SerializeBucket(IReadOnlyCollection<TEntity> entities)
+        => MessagePackSerializer.Serialize(entities, SerializerOptions);
+
+    public IReadOnlyList<TEntity> DeserializeBucket(byte[] payload)
+        => MessagePackSerializer.Deserialize<List<TEntity>>(payload, SerializerOptions) ?? [];
+}
