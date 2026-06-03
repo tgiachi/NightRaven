@@ -9,6 +9,7 @@ using NightRaven.Hosting.Internal;
 using NightRaven.Network.UO.Registry;
 using NightRaven.Scripting.Lua.Extensions.Scripts;
 using NightRaven.Scripting.Lua.Modules;
+using NightRaven.Server.Data;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Extensions;
 using NightRaven.Server.Extensions.DryIoc;
@@ -23,9 +24,7 @@ await ConsoleApp.RunAsync(
     args,
     (CancellationToken cancellationToken, string? rootDirectory = null, bool debug = false) =>
     {
-        rootDirectory ??= Environment.GetEnvironmentVariable("NIGHTRAVEN_ROOT");
-
-        rootDirectory ??= Path.Combine(Directory.GetCurrentDirectory(), "night_raven");
+        rootDirectory = RuntimePaths.ResolveRootDirectory(rootDirectory);
 
         var directoriesConfig = new DirectoriesConfig(rootDirectory, Enum.GetNames<DirectoryType>());
 
@@ -96,9 +95,9 @@ await ConsoleApp.RunAsync(
                 // This must run before AddNightRavenConfig so plugin config sections are bound at boot.
                 container.AddNightRavenPlugins(directoriesConfig);
 
-                // Load config.toml once and register every section as a DI instance. Must run after
+                // Load the root TOML config once and register every section as a DI instance. Must run after
                 // all RegisterConfigSection calls (each module helper declares its section).
-                container.AddNightRavenConfig(Path.Combine(directoriesConfig[DirectoryType.Config], "nightraven.toml"));
+                container.AddNightRavenConfig(RuntimePaths.ResolveConfigPath(directoriesConfig));
             }
         );
 
