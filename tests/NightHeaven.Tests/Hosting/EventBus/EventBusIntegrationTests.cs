@@ -1,9 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using global::DryIoc;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
 using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Server.Extensions;
+using NightHeaven.Server.Extensions.DryIoc;
 using NightHeaven.Tests.Hosting.EventBus.Support;
+using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Hosting.EventBus;
 
@@ -51,14 +51,13 @@ public class EventBusIntegrationTests
     public async Task FullHost_PublishAsyncEvent_HandlerInvokedWithoutGameLoop()
     {
         var timeline = new List<string>();
-        var services = new ServiceCollection();
-        services.AddSingleton(timeline);
-        services.AddNightHeavenEventBus();
-        services.AddAsyncEventHandler<IntegrationAsyncHandler, TestAsyncEvent>();
+        var container = new Container();
+        container.RegisterInstance(timeline);
+        container.AddNightHeavenEventBus();
+        container.AddAsyncEventHandler<IntegrationAsyncHandler, TestAsyncEvent>();
 
-        var sp = services.BuildServiceProvider();
-        var orchestrator = sp.GetRequiredService<IEnumerable<IHostedService>>().Single();
-        var bus = sp.GetRequiredService<IEventBusService>();
+        var orchestrator = container.Orchestrator();
+        var bus = container.Resolve<IEventBusService>();
 
         await orchestrator.StartAsync(CancellationToken.None);
 
@@ -73,14 +72,13 @@ public class EventBusIntegrationTests
     public async Task FullHost_PublishTickEvent_HandlerInvokedThroughGameLoop()
     {
         var timeline = new List<string>();
-        var services = new ServiceCollection();
-        services.AddSingleton(timeline);
-        services.AddNightHeavenEventBus();
-        services.AddTickEventHandler<IntegrationTickHandler, TestTickEvent>();
+        var container = new Container();
+        container.RegisterInstance(timeline);
+        container.AddNightHeavenEventBus();
+        container.AddTickEventHandler<IntegrationTickHandler, TestTickEvent>();
 
-        var sp = services.BuildServiceProvider();
-        var orchestrator = sp.GetRequiredService<IEnumerable<IHostedService>>().Single();
-        var bus = sp.GetRequiredService<IEventBusService>();
+        var orchestrator = container.Orchestrator();
+        var bus = container.Resolve<IEventBusService>();
 
         await orchestrator.StartAsync(CancellationToken.None);
 

@@ -15,4 +15,10 @@
         <ProjectReference Include="..\NightHeaven.Core\NightHeaven.Core.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- The Server registers the orchestrator/descriptor natively on DryIoc; they stay internal. -->
+        <InternalsVisibleTo Include="NightHeaven.Server"/>
+        <InternalsVisibleTo Include="NightHeaven.Tests"/>
+    </ItemGroup>
+
 </Project>

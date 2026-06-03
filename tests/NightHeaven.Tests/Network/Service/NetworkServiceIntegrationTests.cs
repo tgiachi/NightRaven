@@ -1,13 +1,13 @@
 using System.Net;
 using System.Net.Sockets;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using global::DryIoc;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
 using NightHeaven.Network.UO.Registry;
 using NightHeaven.Server.Data.Events;
-using NightHeaven.Server.Extensions;
+using NightHeaven.Server.Extensions.DryIoc;
 using NightHeaven.Server.Interfaces.Network;
 using NightHeaven.Server.Services.Network;
+using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Network.Service;
 
@@ -80,27 +80,26 @@ public class NetworkServiceIntegrationTests
         var port = GetFreeTcpPort();
         var capture = new PacketCapture();
 
-        var services = new ServiceCollection();
-        services.AddSingleton(capture);
-        services.AddNightHeavenEventBus();
+        var container = new Container();
+        container.RegisterInstance(capture);
+        container.AddNightHeavenEventBus();
 
         var packetRegistry = new PacketRegistry();
         PacketTable.Register(packetRegistry);
-        services.AddSingleton(packetRegistry);
+        container.RegisterInstance(packetRegistry);
 
-        services.AddNightHeavenNetwork(
+        container.AddNightHeavenNetwork(
             cfg =>
             {
                 cfg.Port = port;
                 cfg.PingServerEnabled = false;
             }
         );
-        services.AddTickEventHandler<CapturePacketHandler, PacketReceivedEvent>();
-        services.AddTickEventHandler<CaptureConnectHandler, PlayerConnectedEvent>();
+        container.AddTickEventHandler<CapturePacketHandler, PacketReceivedEvent>();
+        container.AddTickEventHandler<CaptureConnectHandler, PlayerConnectedEvent>();
 
-        var sp = services.BuildServiceProvider();
-        var orchestrator = sp.GetRequiredService<IEnumerable<IHostedService>>().Single();
-        var network = (NetworkService)sp.GetRequiredService<INetworkService>();
+        var orchestrator = container.Orchestrator();
+        var network = (NetworkService)container.Resolve<INetworkService>();
 
         await orchestrator.StartAsync(CancellationToken.None);
 
@@ -148,26 +147,25 @@ public class NetworkServiceIntegrationTests
         var port = GetFreeTcpPort();
         var capture = new PacketCapture();
 
-        var services = new ServiceCollection();
-        services.AddSingleton(capture);
-        services.AddNightHeavenEventBus();
+        var container = new Container();
+        container.RegisterInstance(capture);
+        container.AddNightHeavenEventBus();
 
         var packetRegistry = new PacketRegistry();
         PacketTable.Register(packetRegistry);
-        services.AddSingleton(packetRegistry);
+        container.RegisterInstance(packetRegistry);
 
-        services.AddNightHeavenNetwork(
+        container.AddNightHeavenNetwork(
             cfg =>
             {
                 cfg.Port = port;
                 cfg.PingServerEnabled = false;
             }
         );
-        services.AddTickEventHandler<CaptureDisconnectHandler, PlayerDisconnectedEvent>();
+        container.AddTickEventHandler<CaptureDisconnectHandler, PlayerDisconnectedEvent>();
 
-        var sp = services.BuildServiceProvider();
-        var orchestrator = sp.GetRequiredService<IEnumerable<IHostedService>>().Single();
-        var network = (NetworkService)sp.GetRequiredService<INetworkService>();
+        var orchestrator = container.Orchestrator();
+        var network = (NetworkService)container.Resolve<INetworkService>();
 
         await orchestrator.StartAsync(CancellationToken.None);
 

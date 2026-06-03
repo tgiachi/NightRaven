@@ -1,11 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using global::DryIoc;
 using NightHeaven.Hosting.Interfaces.Metrics;
-using NightHeaven.Server.Extensions;
+using NightHeaven.Server.Extensions.DryIoc;
 using NightHeaven.Server.Services.EventBus;
 using NightHeaven.Server.Services.GameLoop;
 using NightHeaven.Server.Services.Metrics;
 using NightHeaven.Server.Services.Timing;
+using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Hosting.Metrics;
 
@@ -14,18 +14,17 @@ public class MetricsIntegrationTests
     [Fact]
     public async Task FullHost_AllProvidersAggregatedAndFormatted()
     {
-        var services = new ServiceCollection();
-        services.AddNightHeavenEventBus();
-        services.AddNightHeavenTimerWheel();
-        services.AddNightHeavenMetrics(cfg => cfg.RefreshInterval = TimeSpan.FromMilliseconds(50));
+        var container = new Container();
+        container.AddNightHeavenEventBus();
+        container.AddNightHeavenTimerWheel();
+        container.AddNightHeavenMetrics(cfg => cfg.RefreshInterval = TimeSpan.FromMilliseconds(50));
 
-        services.AddMetricProvider<EventBusService>();
-        services.AddMetricProvider<GameLoopService>();
-        services.AddMetricProvider<TimerWheelService>();
+        container.AddMetricProvider<EventBusService>();
+        container.AddMetricProvider<GameLoopService>();
+        container.AddMetricProvider<TimerWheelService>();
 
-        var sp = services.BuildServiceProvider();
-        var orchestrator = sp.GetRequiredService<IEnumerable<IHostedService>>().Single();
-        var metrics = sp.GetRequiredService<IMetricsService>();
+        var orchestrator = container.Orchestrator();
+        var metrics = container.Resolve<IMetricsService>();
 
         await orchestrator.StartAsync(CancellationToken.None);
 

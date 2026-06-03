@@ -1,7 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using global::DryIoc;
 using NightHeaven.Hosting.Interfaces.Timing;
-using NightHeaven.Server.Extensions;
+using NightHeaven.Server.Extensions.DryIoc;
+using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Hosting.Timing;
 
@@ -10,13 +10,12 @@ public class TimerWheelIntegrationTests
     [Fact]
     public async Task FullHost_TimerRegisteredAfterStart_FiresThroughGameLoop()
     {
-        var services = new ServiceCollection();
-        services.AddNightHeavenEventBus();
-        services.AddNightHeavenTimerWheel();
+        var container = new Container();
+        container.AddNightHeavenEventBus();
+        container.AddNightHeavenTimerWheel();
 
-        var sp = services.BuildServiceProvider();
-        var orchestrator = sp.GetRequiredService<IEnumerable<IHostedService>>().Single();
-        var timers = sp.GetRequiredService<ITimerService>();
+        var orchestrator = container.Orchestrator();
+        var timers = container.Resolve<ITimerService>();
 
         await orchestrator.StartAsync(CancellationToken.None);
 

@@ -1,9 +1,8 @@
-using DryIoc.Microsoft.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using global::DryIoc;
 using NightHeaven.Core.Data.Directories;
 using NightHeaven.Scripting.Lua.Interfaces;
-using NightHeaven.Server.Extensions;
+using NightHeaven.Server.Extensions.DryIoc;
+using NightHeaven.Tests.Support;
 
 namespace NightHeaven.Tests.Scripting.Lua;
 
@@ -27,17 +26,11 @@ public class LuaScriptingIntegrationTests
 
             var directoriesConfig = new DirectoriesConfig(scriptsDir, Array.Empty<string>());
 
-            var services = new ServiceCollection();
-            services.AddNightHeavenLuaScripting(directoriesConfig);
+            var container = new Container();
+            container.AddNightHeavenLuaScripting(directoriesConfig);
 
-            // Back the provider with DryIoc, exactly like the host does, so the engine can
-            // resolve DryIoc.IContainer at runtime.
-            var provider = new DryIocServiceProviderFactory()
-                           .CreateBuilder(services)
-                           .BuildServiceProvider();
-
-            var orchestrator = provider.GetRequiredService<IEnumerable<IHostedService>>().Single();
-            var engine = provider.GetRequiredService<IScriptEngineService>();
+            var orchestrator = container.Orchestrator();
+            var engine = container.Resolve<IScriptEngineService>();
 
             await orchestrator.StartAsync(CancellationToken.None);
 
@@ -74,15 +67,11 @@ public class LuaScriptingIntegrationTests
         {
             var directoriesConfig = new DirectoriesConfig(scriptsDir, Array.Empty<string>());
 
-            var services = new ServiceCollection();
-            services.AddNightHeavenLuaScripting(directoriesConfig);
+            var container = new Container();
+            container.AddNightHeavenLuaScripting(directoriesConfig);
 
-            var provider = new DryIocServiceProviderFactory()
-                           .CreateBuilder(services)
-                           .BuildServiceProvider();
-
-            Assert.NotNull(provider.GetService<IScriptEngineService>());
-            Assert.NotEmpty(provider.GetServices<IHostedService>());
+            Assert.NotNull(container.Resolve<IScriptEngineService>());
+            Assert.NotNull(container.Orchestrator());
         }
         finally
         {

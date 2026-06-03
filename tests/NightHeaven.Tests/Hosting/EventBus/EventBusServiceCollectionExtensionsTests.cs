@@ -1,9 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using global::DryIoc;
 using NightHeaven.Hosting.Data;
 using NightHeaven.Hosting.Interfaces.EventHandlers;
 using NightHeaven.Hosting.Interfaces.Services;
-using NightHeaven.Server.Extensions;
+using NightHeaven.Server.Extensions.DryIoc;
 using NightHeaven.Tests.Hosting.EventBus.Support;
 
 namespace NightHeaven.Tests.Hosting.EventBus;
@@ -52,13 +51,12 @@ public class EventBusServiceCollectionExtensionsTests
     public async Task AddAsyncEventHandler_RegistersHandlerAndItIsInvokedByBus()
     {
         var timeline = new List<string>();
-        var services = new ServiceCollection();
-        services.AddSingleton(timeline);
-        services.AddNightHeavenEventBus();
-        services.AddAsyncEventHandler<NamedAsyncHandler, TestAsyncEvent>();
+        var container = new Container();
+        container.RegisterInstance(timeline);
+        container.AddNightHeavenEventBus();
+        container.AddAsyncEventHandler<NamedAsyncHandler, TestAsyncEvent>();
 
-        var sp = services.BuildServiceProvider();
-        await sp.GetRequiredService<IEventBusService>().PublishAsync(new TestAsyncEvent("hello"));
+        await container.Resolve<IEventBusService>().PublishAsync(new TestAsyncEvent("hello"));
 
         Assert.Equal(new[] { "async:Named:hello" }, timeline);
     }
@@ -66,9 +64,9 @@ public class EventBusServiceCollectionExtensionsTests
     [Fact]
     public void AddNightHeavenEventBus_CustomConfig_AppliesConfig()
     {
-        var services = new ServiceCollection();
+        var container = new Container();
 
-        services.AddNightHeavenEventBus(
+        container.AddNightHeavenEventBus(
             cfg =>
             {
                 cfg.IdleSleepMs = 7;
@@ -76,8 +74,7 @@ public class EventBusServiceCollectionExtensionsTests
             }
         );
 
-        var sp = services.BuildServiceProvider();
-        var cfg = sp.GetRequiredService<GameLoopConfig>();
+        var cfg = container.Resolve<GameLoopConfig>();
 
         Assert.Equal(7, cfg.IdleSleepMs);
         Assert.False(cfg.IdleCpuEnabled);
@@ -86,45 +83,37 @@ public class EventBusServiceCollectionExtensionsTests
     [Fact]
     public void AddNightHeavenEventBus_NoCustomConfig_AppliesDefaults()
     {
-        var services = new ServiceCollection();
+        var container = new Container();
 
-        services.AddNightHeavenEventBus();
+        container.AddNightHeavenEventBus();
 
-        var cfg = services.BuildServiceProvider().GetRequiredService<GameLoopConfig>();
+        var cfg = container.Resolve<GameLoopConfig>();
 
         Assert.True(cfg.IdleCpuEnabled);
         Assert.Equal(1, cfg.IdleSleepMs);
     }
 
     [Fact]
-    public void AddNightHeavenEventBus_RegistersBusAndGameLoopAsHostedServices()
+    public void AddNightHeavenEventBus_RegistersBusAndGameLoop()
     {
-        var services = new ServiceCollection();
+        var container = new Container();
 
-        services.AddNightHeavenEventBus();
+        container.AddNightHeavenEventBus();
 
-        var sp = services.BuildServiceProvider();
-        var hosted = sp.GetServices<IHostedService>().ToArray();
-
-        // Orchestrator from AddNightHeavenHosting is the single hosted service.
-        Assert.Single(hosted);
-
-        // Bus and game loop are resolvable through their interfaces.
-        Assert.NotNull(sp.GetService<IEventBusService>());
-        Assert.NotNull(sp.GetService<IGameLoopService>());
+        Assert.NotNull(container.Resolve<IEventBusService>());
+        Assert.NotNull(container.Resolve<IGameLoopService>());
     }
 
     [Fact]
     public void AddTickEventHandler_RegistersHandlerAndDrainInvokesIt()
     {
         var timeline = new List<string>();
-        var services = new ServiceCollection();
-        services.AddSingleton(timeline);
-        services.AddNightHeavenEventBus();
-        services.AddTickEventHandler<NamedTickHandler, TestTickEvent>();
+        var container = new Container();
+        container.RegisterInstance(timeline);
+        container.AddNightHeavenEventBus();
+        container.AddTickEventHandler<NamedTickHandler, TestTickEvent>();
 
-        var sp = services.BuildServiceProvider();
-        var bus = sp.GetRequiredService<IEventBusService>();
+        var bus = container.Resolve<IEventBusService>();
         bus.Publish(new TestTickEvent(11));
 
         var processed = bus.DrainTickEvents(10);
