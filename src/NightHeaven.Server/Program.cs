@@ -1,4 +1,5 @@
 using ConsoleAppFramework;
+using DryIoc.Microsoft.DependencyInjection;
 using NightHeaven.Core.Data.Directories;
 using NightHeaven.Core.Types;
 using NightHeaven.Core.Utils;
@@ -33,6 +34,10 @@ await ConsoleApp.RunAsync(
                 EnvironmentName = debug ? Environments.Development : null
             }
         );
+
+        // Back the whole host (REST included) with DryIoc so the Lua scripting engine can
+        // register and resolve script-module types at runtime, which MEDI cannot do.
+        builder.Host.UseServiceProviderFactory(new DryIocServiceProviderFactory());
 
         Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
