@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj"/>
+        <ProjectReference Include="..\NightRaven.Network.UO\NightRaven.Network.UO.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

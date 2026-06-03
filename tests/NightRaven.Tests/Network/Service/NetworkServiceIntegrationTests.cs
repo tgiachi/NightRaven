@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Sockets;
 using DryIoc;
 using NightRaven.Hosting.Interfaces.EventHandlers;
+using NightRaven.Network.Spans;
+using NightRaven.Network.UO.Base;
 using NightRaven.Network.UO.Registry;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Extensions.DryIoc;
@@ -208,6 +210,96 @@ public class NetworkServiceIntegrationTests : IDisposable
         }
     }
 
+    [Fact]
+    public async Task FullHost_QueuedOutboundPacket_ClientReceivesBytes()
+    {
+        var port = GetFreeTcpPort();
+        var configPath = WriteNetworkConfig(port);
+
+        var container = new Container();
+        container.AddNightRavenEventBus();
+
+        var packetRegistry = new PacketRegistry();
+        PacketTable.Register(packetRegistry);
+        container.RegisterInstance(packetRegistry);
+
+        container.AddNightRavenNetwork();
+        container.AddNightRavenConfig(configPath);
+
+        var orchestrator = container.Orchestrator();
+        var network = (NetworkService)container.Resolve<INetworkService>();
+        var sessions = container.Resolve<ISessionService>();
+        var outgoing = container.Resolve<IOutgoingPacketQueue>();
+
+        await orchestrator.StartAsync(CancellationToken.None);
+
+        try
+        {
+            using var client = new TcpClient();
+            await client.ConnectAsync(IPAddress.Loopback, port);
+
+            await WaitForAsync(() => network.ConnectedSessionCount >= 1, TimeSpan.FromSeconds(5));
+            var sessionId = sessions.GetAll().Single().SessionId;
+
+            outgoing.Enqueue(sessionId, new TestOutgoingPacket());
+
+            var buffer = new byte[3];
+            using var readCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var read = await client.GetStream().ReadAsync(buffer, readCts.Token);
+
+            Assert.Equal(3, read);
+            Assert.Equal(new byte[] { 0xAA, 0x01, 0x02 }, buffer);
+
+            var samples = network.Collect().ToDictionary(s => s.Name, s => s.Value);
+            Assert.True(samples["sent_packets_total"] >= 1);
+            Assert.Equal(0, samples["outgoing_queue_depth"]);
+        }
+        finally
+        {
+            await orchestrator.StopAsync(CancellationToken.None);
+        }
+    }
+
+    [Fact]
+    public async Task FullHost_QueuedOutboundPacket_MissingSessionDropsPacket()
+    {
+        var port = GetFreeTcpPort();
+        var configPath = WriteNetworkConfig(port);
+
+        var container = new Container();
+        container.AddNightRavenEventBus();
+
+        var packetRegistry = new PacketRegistry();
+        PacketTable.Register(packetRegistry);
+        container.RegisterInstance(packetRegistry);
+
+        container.AddNightRavenNetwork();
+        container.AddNightRavenConfig(configPath);
+
+        var orchestrator = container.Orchestrator();
+        var network = (NetworkService)container.Resolve<INetworkService>();
+        var outgoing = container.Resolve<IOutgoingPacketQueue>();
+
+        await orchestrator.StartAsync(CancellationToken.None);
+
+        try
+        {
+            outgoing.Enqueue(123456, new TestOutgoingPacket());
+
+            await WaitForAsync(
+                () => network.Collect().Any(s => s.Name == "dropped_outgoing_packets_total" && s.Value >= 1),
+                TimeSpan.FromSeconds(5)
+            );
+
+            var samples = network.Collect().ToDictionary(s => s.Name, s => s.Value);
+            Assert.True(samples["dropped_outgoing_packets_total"] >= 1);
+        }
+        finally
+        {
+            await orchestrator.StopAsync(CancellationToken.None);
+        }
+    }
+
     private static int GetFreeTcpPort()
     {
         var listener = new TcpListener(IPAddress.Loopback, 0);
@@ -242,5 +334,21 @@ public class NetworkServiceIntegrationTests : IDisposable
         File.WriteAllText(path, $"[network]\nport = {port}\nping_server_enabled = false\n");
 
         return path;
+    }
+
+    private sealed class TestOutgoingPacket : BaseGameNetworkPacket
+    {
+        public TestOutgoingPacket()
+            : base(0xAA, 3) { }
+
+        public override void Write(ref SpanWriter writer)
+        {
+            writer.Write(OpCode);
+            writer.Write((byte)0x01);
+            writer.Write((byte)0x02);
+        }
+
+        protected override bool ParsePayload(ref SpanReader reader)
+            => true;
     }
 }

@@ -35,4 +35,9 @@ public sealed class NetworkConfig
     /// Maximum number of pending client data items drained from the ingress queue per loop wake-up.
     /// </summary>
     public int MaxPacketsPerDrain { get; set; } = 256;
+
+    /// <summary>
+    /// Maximum number of queued outbound packets drained per outbound loop wake-up.
+    /// </summary>
+    public int MaxOutgoingPacketsPerDrain { get; set; } = 256;
 }

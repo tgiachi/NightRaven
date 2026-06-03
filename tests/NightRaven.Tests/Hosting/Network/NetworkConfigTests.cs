@@ -15,5 +15,6 @@ public class NetworkConfigTests
         Assert.Equal(64 * 1024, config.MaxPendingBufferBytes);
         Assert.Equal(16 * 1024, config.MaxDeclaredPacketLength);
         Assert.Equal(256, config.MaxPacketsPerDrain);
+        Assert.Equal(256, config.MaxOutgoingPacketsPerDrain);
     }
 }

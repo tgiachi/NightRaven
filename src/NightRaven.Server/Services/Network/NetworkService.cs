@@ -10,7 +10,9 @@ using NightRaven.Hosting.Interfaces.Services;
 using NightRaven.Hosting.Types.Metrics;
 using NightRaven.Network.Events;
 using NightRaven.Network.Server;
+using NightRaven.Network.UO.Interfaces;
 using NightRaven.Network.UO.Registry;
+using NightRaven.Server.Data.Network;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Interfaces.Network;
 using NightRaven.Server.Services.Network.Internal;
@@ -27,10 +29,12 @@ namespace NightRaven.Server.Services.Network;
 public sealed class NetworkService : INetworkService, IMetricProvider, IDisposable
 {
     private const int IngressIdleWaitMs = 5;
+    private const int OutboundIdleWaitMs = 5;
 
     private readonly ILogger _logger = Log.ForContext<NetworkService>();
     private readonly IEventBusService _eventBus;
     private readonly ISessionService _sessions;
+    private readonly IOutgoingPacketQueue _outgoingPackets;
     private readonly NetworkConfig _config;
     private readonly LoggerConfig _loggerConfig;
     private readonly PacketParser _parser;
@@ -42,12 +46,18 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
 
     private NightRavenUDPServer? _pingServer;
     private Thread? _ingressThread;
+    private Thread? _outboundThread;
     private volatile bool _ingressStopRequested;
+    private volatile bool _outboundStopRequested;
     private long _ingressQueueDepth;
+    private long _sentPackets;
+    private long _droppedOutgoingPackets;
+    private long _outgoingSendErrors;
 
     public NetworkService(
         IEventBusService eventBus,
         ISessionService sessions,
+        IOutgoingPacketQueue outgoingPackets,
         PacketRegistry packetRegistry,
         NetworkConfig config,
         LoggerConfig? loggerConfig = null
@@ -55,6 +65,7 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
     {
         _eventBus = eventBus;
         _sessions = sessions;
+        _outgoingPackets = outgoingPackets;
         _config = config;
         _loggerConfig = loggerConfig ?? new();
         _parser = new(packetRegistry, config.MaxPendingBufferBytes, config.MaxDeclaredPacketLength);
@@ -119,6 +130,29 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
                 parserErrors,
                 MetricType.Counter,
                 Help: "Total parser errors across sessions"
+            ),
+            new(
+                "outgoing_queue_depth",
+                _outgoingPackets.Count,
+                Help: "Pending outbound packets awaiting delivery"
+            ),
+            new(
+                "sent_packets_total",
+                Interlocked.Read(ref _sentPackets),
+                MetricType.Counter,
+                Help: "Total outbound packets sent"
+            ),
+            new(
+                "dropped_outgoing_packets_total",
+                Interlocked.Read(ref _droppedOutgoingPackets),
+                MetricType.Counter,
+                Help: "Total outbound packets dropped before send"
+            ),
+            new(
+                "outgoing_send_errors_total",
+                Interlocked.Read(ref _outgoingSendErrors),
+                MetricType.Counter,
+                Help: "Total outbound packet send errors"
             )
         ];
     }
@@ -126,12 +160,14 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
     public void Dispose()
     {
         StopIngressLoop();
+        StopOutboundLoop();
         _pendingClientDataSignal.Dispose();
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         StartIngressLoop();
+        StartOutboundLoop();
         StartPingServer(cancellationToken);
         StartTcpServers(cancellationToken);
 
@@ -156,6 +192,7 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         }
 
         StopIngressLoop();
+        StopOutboundLoop();
 
         _sessions.Clear();
         _parserMetrics.Clear();
@@ -164,6 +201,8 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         {
             Interlocked.Decrement(ref _ingressQueueDepth);
         }
+
+        _outgoingPackets.Clear(static envelope => DisposePacket(envelope.Packet));
     }
 
     private void OnClientConnected(object? sender, NightRavenTCPClientEventArgs e)
@@ -326,6 +365,68 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         }
     }
 
+    private void RunOutboundLoop()
+    {
+        var maxPacketsPerDrain = Math.Max(1, _config.MaxOutgoingPacketsPerDrain);
+
+        while (!_outboundStopRequested)
+        {
+            var processed = _outgoingPackets.Drain(maxPacketsPerDrain, SendQueuedPacket);
+
+            if (processed == 0)
+            {
+                Thread.Sleep(OutboundIdleWaitMs);
+            }
+        }
+    }
+
+    private bool SendQueuedPacket(OutgoingPacketEnvelope envelope)
+    {
+        if (!_sessions.TryGet(envelope.SessionId, out var session))
+        {
+            DisposePacket(envelope.Packet);
+            Interlocked.Increment(ref _droppedOutgoingPackets);
+
+            return true;
+        }
+
+        try
+        {
+            if (_loggerConfig.LogPackets)
+            {
+                session.SendPacket(envelope.Packet, payload => LogOutgoingPacket(envelope, payload))
+                       .GetAwaiter()
+                       .GetResult();
+            }
+            else
+            {
+                session.SendPacket(envelope.Packet).GetAwaiter().GetResult();
+            }
+
+            Interlocked.Increment(ref _sentPackets);
+        }
+        catch (Exception ex)
+        {
+            Interlocked.Increment(ref _outgoingSendErrors);
+            _logger.Error(ex, "Unhandled exception in network outbound loop");
+        }
+
+        return true;
+    }
+
+    private void LogOutgoingPacket(OutgoingPacketEnvelope envelope, byte[] payload)
+    {
+        _logger.Information(
+            ">> packet Session={SessionId} OpCode=0x{OpCode:X2} Name={PacketName} Length={Length}{NewLine}{Dump}",
+            envelope.SessionId,
+            envelope.Packet.OpCode,
+            envelope.Packet.GetType().Name,
+            payload.Length,
+            Environment.NewLine,
+            BuildHexDump(payload)
+        );
+    }
+
     private void StartIngressLoop()
     {
         if (_ingressThread is not null)
@@ -340,6 +441,22 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
             Name = "NightRaven-NetworkIngress"
         };
         _ingressThread.Start();
+    }
+
+    private void StartOutboundLoop()
+    {
+        if (_outboundThread is not null)
+        {
+            return;
+        }
+
+        _outboundStopRequested = false;
+        _outboundThread = new(RunOutboundLoop)
+        {
+            IsBackground = true,
+            Name = "NightRaven-NetworkOutbound"
+        };
+        _outboundThread.Start();
     }
 
     private void StartPingServer(CancellationToken cancellationToken)
@@ -380,5 +497,25 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
         _pendingClientDataSignal.Set();
         _ingressThread.Join(TimeSpan.FromSeconds(2));
         _ingressThread = null;
+    }
+
+    private void StopOutboundLoop()
+    {
+        if (_outboundThread is null)
+        {
+            return;
+        }
+
+        _outboundStopRequested = true;
+        _outboundThread.Join(TimeSpan.FromSeconds(2));
+        _outboundThread = null;
+    }
+
+    private static void DisposePacket(IGameNetworkPacket packet)
+    {
+        if (packet is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 }

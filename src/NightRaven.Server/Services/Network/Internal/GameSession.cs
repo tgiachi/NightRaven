@@ -1,4 +1,6 @@
 using NightRaven.Network.Client;
+using NightRaven.Network.Spans;
+using NightRaven.Network.UO.Interfaces;
 
 namespace NightRaven.Server.Services.Network.Internal;
 
@@ -40,6 +42,84 @@ public sealed class GameSession
         lock (_pendingBytesSync)
         {
             action(_pendingBytes);
+        }
+    }
+
+    /// <summary>
+    /// Serializes and sends a packet to the owning client.
+    /// </summary>
+    public Task SendPacket<TPacket>(TPacket packet, CancellationToken cancellationToken = default)
+        where TPacket : IGameNetworkPacket
+        => SendPacketAsync(packet, cancellationToken);
+
+    /// <summary>
+    /// Creates, serializes and sends a packet to the owning client.
+    /// </summary>
+    public Task SendPacket<TPacket>(CancellationToken cancellationToken = default)
+        where TPacket : IGameNetworkPacket, new()
+        => SendPacketAsync<TPacket>(cancellationToken);
+
+    /// <summary>
+    /// Serializes and sends a packet to the owning client.
+    /// </summary>
+    public Task SendPacketAsync<TPacket>(TPacket packet, CancellationToken cancellationToken = default)
+        where TPacket : IGameNetworkPacket
+        => SendPacketAsync(packet, null, cancellationToken);
+
+    internal Task SendPacket<TPacket>(
+        TPacket packet,
+        Action<byte[]>? onSerialized,
+        CancellationToken cancellationToken = default
+    )
+        where TPacket : IGameNetworkPacket
+        => SendPacketAsync(packet, onSerialized, cancellationToken);
+
+    internal Task SendPacketAsync<TPacket>(
+        TPacket packet,
+        Action<byte[]>? onSerialized,
+        CancellationToken cancellationToken = default
+    )
+        where TPacket : IGameNetworkPacket
+    {
+        ArgumentNullException.ThrowIfNull(packet);
+
+        try
+        {
+            var payload = SerializePacket(packet);
+            onSerialized?.Invoke(payload);
+
+            return Client.SendAsync(payload, cancellationToken);
+        }
+        finally
+        {
+            if (packet is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates, serializes and sends a packet to the owning client.
+    /// </summary>
+    public Task SendPacketAsync<TPacket>(CancellationToken cancellationToken = default)
+        where TPacket : IGameNetworkPacket, new()
+        => SendPacketAsync(new TPacket(), cancellationToken);
+
+    private static byte[] SerializePacket(IGameNetworkPacket packet)
+    {
+        var initialCapacity = packet.Length > 0 ? packet.Length : 256;
+        var writer = new SpanWriter(initialCapacity, true);
+
+        try
+        {
+            packet.Write(ref writer);
+
+            return writer.ToArray();
+        }
+        finally
+        {
+            writer.Dispose();
         }
     }
 }

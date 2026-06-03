@@ -1,5 +1,8 @@
+using System.Net;
 using System.Net.Sockets;
 using NightRaven.Network.Client;
+using NightRaven.Network.Spans;
+using NightRaven.Network.UO.Base;
 using NightRaven.Server.Services.Network.Internal;
 
 namespace NightRaven.Tests.Network.Service;
@@ -44,6 +47,57 @@ public class GameSessionTests
         Assert.Equal(new byte[] { 1, 2, 3 }, observed);
     }
 
+    [Fact]
+    public async Task SendPacket_NullPacket_Throws()
+    {
+        using var client = NewClient();
+        var session = new GameSession(client);
+
+        await Assert.ThrowsAsync<ArgumentNullException>(
+            async () => await session.SendPacket<TestOutgoingPacket>(null!)
+        );
+    }
+
+    [Fact]
+    public async Task SendPacket_WritesPacketToClient()
+    {
+        using var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+
+        using var receiver = new TcpClient();
+        var connectTask = receiver.ConnectAsync(IPAddress.Loopback, port);
+        using var senderSocket = await listener.AcceptSocketAsync();
+        await connectTask;
+
+        await using var sender = new NightRavenTCPClient(senderSocket);
+        var session = new GameSession(sender);
+
+        await session.SendPacket(new TestOutgoingPacket());
+
+        var buffer = new byte[3];
+        var read = await receiver.GetStream().ReadAsync(buffer);
+
+        Assert.Equal(3, read);
+        Assert.Equal(new byte[] { 0xAA, 0x01, 0x02 }, buffer);
+    }
+
     private static NightRavenTCPClient NewClient()
         => new(new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp));
+
+    private sealed class TestOutgoingPacket : BaseGameNetworkPacket
+    {
+        public TestOutgoingPacket()
+            : base(0xAA, 3) { }
+
+        public override void Write(ref SpanWriter writer)
+        {
+            writer.Write(OpCode);
+            writer.Write((byte)0x01);
+            writer.Write((byte)0x02);
+        }
+
+        protected override bool ParsePayload(ref SpanReader reader)
+            => true;
+    }
 }

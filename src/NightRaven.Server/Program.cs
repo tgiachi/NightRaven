@@ -103,6 +103,7 @@ await ConsoleApp.RunAsync(
 
                 // Network: TCP game listeners + UDP ping server + packet parser (priority 20).
                 container.AddNightRavenNetwork();
+                container.AddNightRavenPacketHandlers();
                 container.AddMetricProvider<NetworkService>();
 
                 // Lua scripting engine (priority 30).

@@ -25,6 +25,7 @@ public static class NetworkContainerExtensions
         container.RegisterConfigSection("network", () => new NetworkConfig());
 
         container.Register<ISessionService, SessionService>(Reuse.Singleton);
+        container.Register<IOutgoingPacketQueue, OutgoingPacketQueue>(Reuse.Singleton);
         container.AddNightRavenService<INetworkService, NetworkService>(NetworkServicePriority);
 
         return container;
