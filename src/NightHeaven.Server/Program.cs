@@ -34,6 +34,9 @@ await ConsoleApp.RunAsync(
         Console.WriteLine($"NightHeaven UO Server v{VersionUtils.GetVersion()}");
         Console.WriteLine($"Root Directory: {directoriesConfig.Root}");
 
+
+
+
         var builder = WebApplication.CreateBuilder(
             new WebApplicationOptions
             {
