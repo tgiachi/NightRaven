@@ -100,6 +100,10 @@ await ConsoleApp.RunAsync(
 
                 container.RegisterScriptModule<LogModule>();
 
+                // Plugins can declare config sections, services, Lua modules, persistence entities, and handlers.
+                // This must run before AddNightHeavenConfig so plugin config sections are bound at boot.
+                container.AddNightHeavenPlugins(directoriesConfig);
+
                 // Load config.toml once and register every section as a DI instance. Must run after
                 // all RegisterConfigSection calls (each module helper declares its section).
                 container.AddNightHeavenConfig(
