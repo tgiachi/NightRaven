@@ -5,7 +5,7 @@ using NightRaven.Server.Services.Users;
 using NightRaven.UO.Domain.Entities;
 using NightRaven.UO.Domain.Interfaces.Services;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Users;
 
 /// <summary>
 /// DryIoc-native registration helpers for UO user services.

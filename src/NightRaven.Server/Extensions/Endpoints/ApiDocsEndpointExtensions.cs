@@ -1,6 +1,6 @@
 using Scalar.AspNetCore;
 
-namespace NightRaven.Server.Extensions;
+namespace NightRaven.Server.Extensions.Endpoints;
 
 public static class ApiDocsEndpointExtensions
 {

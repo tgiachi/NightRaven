@@ -3,7 +3,7 @@ using NightRaven.Core.Data.Directories;
 using NightRaven.Core.Types;
 using NightRaven.Plugins.Services;
 using NightRaven.Scripting.Lua.Data.Internal;
-using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Extensions.Scripting;
 using NightRaven.Tests.Plugins.Support;
 
 namespace NightRaven.Tests.Plugins;

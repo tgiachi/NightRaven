@@ -3,7 +3,7 @@ using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Services.Network;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Network;
 
 /// <summary>
 /// DryIoc-native registration helpers for the server packet dispatcher.

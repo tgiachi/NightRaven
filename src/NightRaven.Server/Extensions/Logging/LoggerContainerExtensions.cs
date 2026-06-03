@@ -2,7 +2,7 @@ using DryIoc;
 using NightRaven.Abstractions.Data.Logging;
 using NightRaven.Abstractions.Extensions.DryIoc;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Logging;
 
 /// <summary>
 /// DryIoc-native registration helpers for logging configuration.

@@ -2,7 +2,8 @@ using DryIoc;
 using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Abstractions.Interfaces.Services;
-using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Extensions.Configuration;
+using NightRaven.Server.Extensions.EventBus;
 using NightRaven.Tests.Hosting.EventBus.Support;
 using NightRaven.Tests.Support;
 

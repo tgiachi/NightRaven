@@ -1,8 +1,9 @@
 using DryIoc;
 using NightRaven.Core.Data.Directories;
+using NightRaven.Server.Extensions.Configuration;
 using NightRaven.Plugins.Services;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Plugins;
 
 /// <summary>
 /// DryIoc-native registration helper for boot-time .NET plugins.

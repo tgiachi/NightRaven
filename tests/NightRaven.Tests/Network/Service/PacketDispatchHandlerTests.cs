@@ -8,7 +8,8 @@ using NightRaven.Network.Spans;
 using NightRaven.Network.UO.Base;
 using NightRaven.Network.UO.Registry;
 using NightRaven.Server.Data.Events;
-using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Extensions.EventBus;
+using NightRaven.Server.Extensions.Network;
 using NightRaven.Server.Interfaces.Network;
 using NightRaven.Server.Services.Network;
 

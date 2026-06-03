@@ -2,10 +2,11 @@ using DryIoc;
 using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Abstractions.Data;
 using NightRaven.Abstractions.Interfaces.Services;
+using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Services.EventBus;
 using NightRaven.Server.Services.GameLoop;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.EventBus;
 
 /// <summary>
 /// DryIoc-native bootstrap helpers for the NightRaven event bus + game loop.

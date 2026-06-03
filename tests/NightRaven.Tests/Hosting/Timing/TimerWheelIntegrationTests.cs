@@ -1,6 +1,8 @@
 using DryIoc;
 using NightRaven.Abstractions.Interfaces.Timing;
-using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Extensions.Configuration;
+using NightRaven.Server.Extensions.EventBus;
+using NightRaven.Server.Extensions.Timing;
 using NightRaven.Tests.Support;
 
 namespace NightRaven.Tests.Hosting.Timing;

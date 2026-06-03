@@ -2,7 +2,9 @@ using DryIoc;
 using NightRaven.Abstractions.Data.Metrics;
 using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Abstractions.Interfaces.Metrics;
-using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Extensions.Configuration;
+using NightRaven.Server.Extensions.Metrics;
+using NightRaven.Server.Extensions.Timing;
 
 namespace NightRaven.Tests.Hosting.Metrics;
 

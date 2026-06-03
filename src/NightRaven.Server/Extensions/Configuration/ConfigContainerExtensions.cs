@@ -2,7 +2,7 @@ using DryIoc;
 using NightRaven.Abstractions.Configuration;
 using NightRaven.Abstractions.Data.Internal;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Configuration;
 
 /// <summary>
 /// DryIoc-native bootstrap helpers for the NightRaven TOML config system.

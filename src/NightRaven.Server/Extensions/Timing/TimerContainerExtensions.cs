@@ -2,9 +2,10 @@ using DryIoc;
 using NightRaven.Abstractions.Data.Timing;
 using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Abstractions.Interfaces.Timing;
+using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Services.Timing;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Timing;
 
 /// <summary>
 /// DryIoc-native registration helpers for the NightRaven timer wheel.

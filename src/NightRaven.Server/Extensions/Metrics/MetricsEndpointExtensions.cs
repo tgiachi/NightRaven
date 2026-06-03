@@ -1,7 +1,7 @@
 using NightRaven.Abstractions.Interfaces.Metrics;
 using NightRaven.Server.Services.Metrics;
 
-namespace NightRaven.Server.Extensions;
+namespace NightRaven.Server.Extensions.Metrics;
 
 public static class MetricsEndpointExtensions
 {

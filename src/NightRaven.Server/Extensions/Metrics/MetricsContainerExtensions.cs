@@ -2,9 +2,10 @@ using DryIoc;
 using NightRaven.Abstractions.Data.Metrics;
 using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Abstractions.Interfaces.Metrics;
+using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Services.Metrics;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Metrics;
 
 /// <summary>
 /// DryIoc-native bootstrap helpers for the NightRaven metrics service.

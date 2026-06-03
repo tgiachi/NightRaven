@@ -1,6 +1,6 @@
 using DryIoc;
 using NightRaven.Network.UO.Registry;
-using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Extensions.Network;
 using NightRaven.Server.Interfaces.Network;
 
 namespace NightRaven.Tests.Network.Service;

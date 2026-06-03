@@ -1,7 +1,7 @@
 using NightRaven.Core.Utils;
 using NightRaven.Server.Data;
 
-namespace NightRaven.Server.Extensions;
+namespace NightRaven.Server.Extensions.Endpoints;
 
 public static class VersionEndpointExtensions
 {

@@ -6,9 +6,10 @@ using NightRaven.Scripting.Lua.Data.Config;
 using NightRaven.Scripting.Lua.Data.Internal;
 using NightRaven.Scripting.Lua.Interfaces;
 using NightRaven.Scripting.Lua.Services;
+using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Services.Scripting;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Scripting;
 
 /// <summary>
 /// DryIoc-native registration helpers for the NightRaven Lua scripting engine.

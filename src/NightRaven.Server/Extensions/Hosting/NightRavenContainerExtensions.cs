@@ -2,7 +2,7 @@ using DryIoc;
 using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Abstractions.Internal;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Hosting;
 
 /// <summary>
 /// DryIoc-native registration helpers for NightRaven services and the hosting orchestrator.

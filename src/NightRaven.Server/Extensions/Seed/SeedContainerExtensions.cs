@@ -7,7 +7,7 @@ using NightRaven.UO.Domain.Interfaces.Services;
 using NightRaven.UO.Domain.Types;
 using Serilog;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Seed;
 
 /// <summary>
 /// DryIoc-native bootstrap helpers for boot-time seed actions.

@@ -8,8 +8,9 @@ using NightRaven.Abstractions.Internal;
 using NightRaven.Persistence.Data;
 using NightRaven.Persistence.Interfaces.Persistence;
 using NightRaven.Persistence.Services.Persistence;
+using NightRaven.Server.Extensions.Hosting;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Persistence;
 
 /// <summary>
 /// DryIoc-native bootstrap helpers for the NightRaven persistence engine.

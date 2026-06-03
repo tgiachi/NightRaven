@@ -1,7 +1,8 @@
 using DryIoc;
 using NightRaven.Abstractions.Data.Timing;
 using NightRaven.Abstractions.Interfaces.Timing;
-using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Extensions.Configuration;
+using NightRaven.Server.Extensions.Timing;
 
 namespace NightRaven.Tests.Hosting.Timing;
 

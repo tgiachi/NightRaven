@@ -3,7 +3,8 @@ using NightRaven.Core.Ids;
 using NightRaven.Persistence.Extensions.DryIoc;
 using NightRaven.Persistence.Interfaces.Persistence;
 using NightRaven.Persistence.Services.Persistence;
-using NightRaven.Server.Extensions.DryIoc;
+using NightRaven.Server.Extensions.Configuration;
+using NightRaven.Server.Extensions.Persistence;
 using NightRaven.Tests.Persistence.Support;
 using NightRaven.Tests.Support;
 

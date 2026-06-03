@@ -1,10 +1,11 @@
 using DryIoc;
 using NightRaven.Abstractions.Data.Network;
 using NightRaven.Abstractions.Extensions.DryIoc;
+using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Interfaces.Network;
 using NightRaven.Server.Services.Network;
 
-namespace NightRaven.Server.Extensions.DryIoc;
+namespace NightRaven.Server.Extensions.Network;
 
 /// <summary>
 /// DryIoc-native registration helpers for the NightRaven network service.
