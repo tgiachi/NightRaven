@@ -31,7 +31,7 @@ public class BodyDataStoreTests
             Assert.Equal(UoBodyType.Human, store.GetBodyType(400));
             Assert.Equal(UoBodyType.Empty, store.GetBodyType(9999));
             Assert.Equal(UoBodyType.Empty, store.GetBodyType(-1));
-            Assert.Equal(7, store.Count);
+            Assert.Equal(8, store.Count);
         }
         finally
         {
