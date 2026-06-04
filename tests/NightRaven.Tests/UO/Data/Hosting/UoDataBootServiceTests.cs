@@ -9,6 +9,7 @@ using NightRaven.UO.Data.Maps;
 using NightRaven.UO.Data.Multi;
 using NightRaven.UO.Data.Races;
 using NightRaven.UO.Data.Skills;
+using NightRaven.UO.Data.Textures;
 using NightRaven.UO.Data.Tiles;
 
 namespace NightRaven.Tests.UO.Data.Hosting;
@@ -39,7 +40,8 @@ public class UoDataBootServiceTests
                 new RaceStore(dir.FullName),
                 new BodyDataStore(dir.FullName),
                 new HueStore(resolver),
-                new RadarColorStore(resolver)
+                new RadarColorStore(resolver),
+                new TextureStore(resolver)
             );
 
             await service.StartAsync(CancellationToken.None);

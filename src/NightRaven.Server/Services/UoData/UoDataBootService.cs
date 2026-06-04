@@ -7,6 +7,7 @@ using NightRaven.UO.Data.Interfaces.Maps;
 using NightRaven.UO.Data.Interfaces.Multi;
 using NightRaven.UO.Data.Interfaces.Races;
 using NightRaven.UO.Data.Interfaces.Skills;
+using NightRaven.UO.Data.Interfaces.Textures;
 using NightRaven.UO.Data.Interfaces.Tiles;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -32,6 +33,7 @@ public sealed class UoDataBootService : INightRavenService
     private readonly IBodyDataStore _bodies;
     private readonly IHueStore _hues;
     private readonly IRadarColorStore _radarColors;
+    private readonly ITextureStore _textures;
 
     public UoDataBootService(
         ITileDataStore tileData,
@@ -43,7 +45,8 @@ public sealed class UoDataBootService : INightRavenService
         IRaceStore races,
         IBodyDataStore bodies,
         IHueStore hues,
-        IRadarColorStore radarColors
+        IRadarColorStore radarColors,
+        ITextureStore textures
     )
     {
         _tileData = tileData;
@@ -56,6 +59,7 @@ public sealed class UoDataBootService : INightRavenService
         _bodies = bodies;
         _hues = hues;
         _radarColors = radarColors;
+        _textures = textures;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -63,7 +67,7 @@ public sealed class UoDataBootService : INightRavenService
         _logger.Information(
             "UO data ready: {Land} land tiles, {Item} item tiles, {Maps} maps, {Multis} multis, " +
             "{Cliloc} localized strings, {Skills} skills, {Races} races, {Bodies} bodies, art {Art}, " +
-            "{Hues} hues, {RadarColors} radar colours",
+            "{Hues} hues, {RadarColors} radar colours, textures {Textures}",
             _tileData.LandTable.Count,
             _tileData.ItemTable.Count,
             _maps.Maps.Count,
@@ -74,7 +78,8 @@ public sealed class UoDataBootService : INightRavenService
             _bodies.Count,
             _art.IsValidArt(0) ? "available" : "absent",
             _hues.Count,
-            _radarColors.Count
+            _radarColors.Count,
+            _textures.IsValidTexture(0) ? "available" : "absent"
         );
 
         return Task.CompletedTask;

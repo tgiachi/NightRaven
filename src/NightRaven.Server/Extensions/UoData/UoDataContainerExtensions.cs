@@ -17,12 +17,14 @@ using NightRaven.UO.Data.Interfaces.Maps;
 using NightRaven.UO.Data.Interfaces.Multi;
 using NightRaven.UO.Data.Interfaces.Races;
 using NightRaven.UO.Data.Interfaces.Skills;
+using NightRaven.UO.Data.Interfaces.Textures;
 using NightRaven.UO.Data.Interfaces.Tiles;
 using NightRaven.UO.Data.Localization;
 using NightRaven.UO.Data.Maps;
 using NightRaven.UO.Data.Multi;
 using NightRaven.UO.Data.Races;
 using NightRaven.UO.Data.Skills;
+using NightRaven.UO.Data.Textures;
 using NightRaven.UO.Data.Tiles;
 
 namespace NightRaven.Server.Extensions.UoData;
@@ -87,6 +89,10 @@ public static class UoDataContainerExtensions
         );
         container.RegisterDelegate<IRadarColorStore>(
             resolver => new RadarColorStore(resolver.Resolve<IUoFileResolver>()),
+            Reuse.Singleton
+        );
+        container.RegisterDelegate<ITextureStore>(
+            resolver => new TextureStore(resolver.Resolve<IUoFileResolver>()),
             Reuse.Singleton
         );
 
