@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+    <PropertyGroup>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj"/>
         <ProjectReference Include="..\NightRaven.Abstractions\NightRaven.Abstractions.csproj"/>
