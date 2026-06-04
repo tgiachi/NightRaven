@@ -56,7 +56,8 @@ public static class ClilocReader
             var flag = reader.ReadByte();
             var length = (int)reader.ReadUInt16();
 
-            if (length <= 0 || length > MaxEntryLength)
+            // A zero-length entry is a valid empty string; only a negative or oversized length is corrupt.
+            if (length < 0 || length > MaxEntryLength)
             {
                 break;
             }

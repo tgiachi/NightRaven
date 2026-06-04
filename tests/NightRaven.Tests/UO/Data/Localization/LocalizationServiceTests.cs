@@ -32,6 +32,31 @@ public class LocalizationServiceTests
     }
 
     [Fact]
+    public void Load_EmptyTextEntry_DoesNotTruncateTable()
+    {
+        var dir = Directory.CreateTempSubdirectory("nr-uo-");
+
+        try
+        {
+            ClilocFixture.Write(dir.FullName,
+            [
+                new ClilocFixture.Entry(1, 0, "first"),
+                new ClilocFixture.Entry(2, 0, ""),
+                new ClilocFixture.Entry(3, 0, "third")
+            ]);
+            var service = new LocalizationService(new UoFileResolver(dir.FullName));
+
+            Assert.Equal(3, service.Count);
+            Assert.Equal("", service.GetText(2));
+            Assert.Equal("third", service.GetText(3));
+        }
+        finally
+        {
+            dir.Delete(true);
+        }
+    }
+
+    [Fact]
     public void MissingFile_YieldsEmptyTable_NoThrow()
     {
         var dir = Directory.CreateTempSubdirectory("nr-uo-");
