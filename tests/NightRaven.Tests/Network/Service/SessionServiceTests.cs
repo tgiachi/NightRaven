@@ -1,11 +1,45 @@
 using System.Net.Sockets;
+using NightRaven.Abstractions.Interfaces.Events;
+using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Network.Client;
+using NightRaven.Server.Data.Events;
 using NightRaven.Server.Services.Network;
+using ZLinq;
 
 namespace NightRaven.Tests.Network.Service;
 
 public class SessionServiceTests
 {
+    private sealed class CapturingEventBusService : IEventBusService
+    {
+        public List<INightRavenEvent> Events { get; } = [];
+        public Action<Type, Exception, INightRavenEvent>? OnEventError { get; set; }
+        public int CurrentTickQueueDepth => 0;
+
+        public int DrainTickEvents(int maxItems)
+            => 0;
+
+        public void Publish<TEvent>(TEvent evt)
+            where TEvent : ITickEvent
+        {
+            Events.Add(evt);
+        }
+
+        public Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
+            where TEvent : IAsyncEvent
+        {
+            Events.Add(evt);
+
+            return Task.CompletedTask;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+            => Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken)
+            => Task.CompletedTask;
+    }
+
     [Fact]
     public void Clear_RemovesEverySession()
     {
@@ -36,6 +70,44 @@ public class SessionServiceTests
     }
 
     [Fact]
+    public void GetOrCreate_NewSession_PublishesConnectedEventOnce()
+    {
+        var bus = new CapturingEventBusService();
+        var service = new SessionService(bus);
+        using var client = NewClient();
+
+        var session = service.GetOrCreate(client);
+        var existing = service.GetOrCreate(client);
+
+        Assert.Same(session, existing);
+        var evt = Assert.Single(bus.Events.OfType<PlayerConnectedEvent>());
+        Assert.Equal(session.SessionId, evt.SessionId);
+        Assert.Equal(client.RemoteEndPoint?.ToString(), evt.RemoteEndPoint);
+    }
+
+    [Fact]
+    public void QuerySessionIds_ReturnsZLinqQueryOverSessionIds()
+    {
+        var service = new SessionService();
+        using var a = NewClient();
+        using var b = NewClient();
+        var first = service.GetOrCreate(a);
+        var second = service.GetOrCreate(b);
+
+        var evenIds = service.QuerySessionIds()
+                             .Where(static sessionId => sessionId % 2 == 0)
+                             .ToArray();
+
+        var expected = new[] { first.SessionId, second.SessionId }
+                       .AsValueEnumerable()
+                       .Where(static sessionId => sessionId % 2 == 0)
+                       .Order()
+                       .ToArray();
+
+        Assert.Equal(expected, evenIds.AsValueEnumerable().Order().ToArray());
+    }
+
+    [Fact]
     public void Remove_ExistingSession_ReturnsTrueAndDecrementsCount()
     {
         var service = new SessionService();
@@ -45,6 +117,23 @@ public class SessionServiceTests
         Assert.True(service.Remove(client.SessionId));
         Assert.Equal(0, service.Count);
         Assert.False(service.Remove(client.SessionId));
+    }
+
+    [Fact]
+    public void Remove_ExistingSession_PublishesDisconnectedEventOnce()
+    {
+        var bus = new CapturingEventBusService();
+        var service = new SessionService(bus);
+        using var client = NewClient();
+        var session = service.GetOrCreate(client);
+        bus.Events.Clear();
+
+        Assert.True(service.Remove(client.SessionId));
+        Assert.False(service.Remove(client.SessionId));
+
+        var evt = Assert.Single(bus.Events.OfType<PlayerDisconnectedEvent>());
+        Assert.Equal(session.SessionId, evt.SessionId);
+        Assert.Equal(client.RemoteEndPoint?.ToString(), evt.RemoteEndPoint);
     }
 
     [Fact]

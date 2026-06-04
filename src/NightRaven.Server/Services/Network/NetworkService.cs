@@ -298,9 +298,6 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
             e.Client.RemoteEndPoint
         );
 
-        _eventBus.Publish(
-            new PlayerConnectedEvent(session.SessionId, e.Client.RemoteEndPoint?.ToString(), DateTimeOffset.UtcNow)
-        );
     }
 
     private void OnClientData(object? sender, NightRavenTCPDataReceivedEventArgs e)
@@ -326,8 +323,6 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
             e.Client.SessionId,
             remoteEndPoint
         );
-
-        _eventBus.Publish(new PlayerDisconnectedEvent(e.Client.SessionId, remoteEndPoint, DateTimeOffset.UtcNow));
     }
 
     private void OnClientException(object? sender, NightRavenTCPExceptionEventArgs e)

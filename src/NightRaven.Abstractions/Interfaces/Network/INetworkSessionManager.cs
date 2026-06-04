@@ -1,3 +1,6 @@
+using ZLinq;
+using ZLinq.Linq;
+
 namespace NightRaven.Abstractions.Interfaces.Network;
 
 /// <summary>
@@ -14,4 +17,9 @@ public interface INetworkSessionManager
     /// Returns a snapshot of active session identifiers.
     /// </summary>
     IReadOnlyCollection<long> GetSessionIds();
+
+    /// <summary>
+    /// Returns a ZLinq query over a snapshot of active session identifiers.
+    /// </summary>
+    ValueEnumerable<FromArray<long>, long> QuerySessionIds();
 }
