@@ -1,3 +1,4 @@
+using NightRaven.Core.Ids;
 using NightRaven.Network.Spans;
 using NightRaven.Network.UO.Attributes;
 using NightRaven.Network.UO.Base;
@@ -12,7 +13,7 @@ namespace NightRaven.Network.UO.Packets.Incoming.Interaction;
 /// </summary>
 public class RequestAttackPacket : BaseGameNetworkPacket
 {
-    public uint TargetId { get; private set; }
+    public Serial TargetSerial { get; private set; }
 
     public RequestAttackPacket()
         : base(0x05, 5) { }
@@ -24,7 +25,7 @@ public class RequestAttackPacket : BaseGameNetworkPacket
             return false;
         }
 
-        TargetId = reader.ReadUInt32();
+        TargetSerial = (Serial)reader.ReadUInt32();
 
         return reader.Remaining == 0;
     }

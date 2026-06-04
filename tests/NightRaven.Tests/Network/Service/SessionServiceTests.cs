@@ -21,9 +21,7 @@ public class SessionServiceTests
 
         public void Publish<TEvent>(TEvent evt)
             where TEvent : ITickEvent
-        {
-            Events.Add(evt);
-        }
+            => Events.Add(evt);
 
         public Task PublishAsync<TEvent>(TEvent evt, CancellationToken cancellationToken = default)
             where TEvent : IAsyncEvent
@@ -56,20 +54,6 @@ public class SessionServiceTests
     }
 
     [Fact]
-    public void GetOrCreate_SameClient_ReturnsSameSession()
-    {
-        var service = new SessionService();
-        using var client = NewClient();
-
-        var first = service.GetOrCreate(client);
-        var second = service.GetOrCreate(client);
-
-        Assert.Same(first, second);
-        Assert.Equal(1, service.Count);
-        Assert.Equal(client.SessionId, first.SessionId);
-    }
-
-    [Fact]
     public void GetOrCreate_NewSession_PublishesConnectedEventOnce()
     {
         var bus = new CapturingEventBusService();
@@ -83,6 +67,20 @@ public class SessionServiceTests
         var evt = Assert.Single(bus.Events.OfType<PlayerConnectedEvent>());
         Assert.Equal(session.SessionId, evt.SessionId);
         Assert.Equal(client.RemoteEndPoint?.ToString(), evt.RemoteEndPoint);
+    }
+
+    [Fact]
+    public void GetOrCreate_SameClient_ReturnsSameSession()
+    {
+        var service = new SessionService();
+        using var client = NewClient();
+
+        var first = service.GetOrCreate(client);
+        var second = service.GetOrCreate(client);
+
+        Assert.Same(first, second);
+        Assert.Equal(1, service.Count);
+        Assert.Equal(client.SessionId, first.SessionId);
     }
 
     [Fact]
@@ -108,18 +106,6 @@ public class SessionServiceTests
     }
 
     [Fact]
-    public void Remove_ExistingSession_ReturnsTrueAndDecrementsCount()
-    {
-        var service = new SessionService();
-        using var client = NewClient();
-        service.GetOrCreate(client);
-
-        Assert.True(service.Remove(client.SessionId));
-        Assert.Equal(0, service.Count);
-        Assert.False(service.Remove(client.SessionId));
-    }
-
-    [Fact]
     public void Remove_ExistingSession_PublishesDisconnectedEventOnce()
     {
         var bus = new CapturingEventBusService();
@@ -134,6 +120,18 @@ public class SessionServiceTests
         var evt = Assert.Single(bus.Events.OfType<PlayerDisconnectedEvent>());
         Assert.Equal(session.SessionId, evt.SessionId);
         Assert.Equal(client.RemoteEndPoint?.ToString(), evt.RemoteEndPoint);
+    }
+
+    [Fact]
+    public void Remove_ExistingSession_ReturnsTrueAndDecrementsCount()
+    {
+        var service = new SessionService();
+        using var client = NewClient();
+        service.GetOrCreate(client);
+
+        Assert.True(service.Remove(client.SessionId));
+        Assert.Equal(0, service.Count);
+        Assert.False(service.Remove(client.SessionId));
     }
 
     [Fact]

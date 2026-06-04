@@ -3,6 +3,7 @@ using NightRaven.Abstractions.Data.Network;
 using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Abstractions.Interfaces.Network;
+using NightRaven.Abstractions.Interfaces.Player;
 using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Abstractions.Network;
 using NightRaven.Network.Spans;
@@ -13,6 +14,7 @@ using NightRaven.Server.Extensions.EventBus;
 using NightRaven.Server.Extensions.Network;
 using NightRaven.Server.Interfaces.Network;
 using NightRaven.Server.Services.Network;
+using NightRaven.Server.Services.Player;
 
 namespace NightRaven.Tests.Network.Service;
 
@@ -166,6 +168,27 @@ public class PacketDispatchHandlerTests
     }
 
     [Fact]
+    public void AddPacketHandler_BaseClass_ReceivesEventBusAndSessions()
+    {
+        var container = new Container();
+        container.RegisterInstance(new PacketRegistry());
+        container.RegisterInstance(new BaseHandlerProbe());
+        container.AddNightRavenEventBus();
+        container.AddNightRavenNetwork();
+        container.AddNightRavenPacketHandlers();
+        container.AddPacketHandler<BaseHandler, TestPacket>();
+
+        var bus = container.Resolve<IEventBusService>();
+
+        bus.Publish(new PacketReceivedEvent(10, 0xA1, new TestPacket(0xA1), DateTimeOffset.UtcNow));
+        bus.DrainTickEvents(10);
+
+        var probe = container.Resolve<BaseHandlerProbe>();
+        Assert.Same(bus, probe.EventBus);
+        Assert.Same(container.Resolve<INetworkSessionManager>(), probe.Sessions);
+    }
+
+    [Fact]
     public void AddPacketHandler_RegistersHandlerMapping()
     {
         var container = new Container();
@@ -188,41 +211,6 @@ public class PacketDispatchHandlerTests
         var handlers = container.ResolveMany<IPacketHandler<ScanPacket>>().ToArray();
 
         Assert.Contains(handlers, static handler => handler.GetType() == typeof(ScannedHandler));
-    }
-
-    [Fact]
-    public void AddPacketHandler_BaseClass_ReceivesEventBusAndSessions()
-    {
-        var container = new Container();
-        container.RegisterInstance(new PacketRegistry());
-        container.RegisterInstance(new BaseHandlerProbe());
-        container.AddNightRavenEventBus();
-        container.AddNightRavenNetwork();
-        container.AddNightRavenPacketHandlers();
-        container.AddPacketHandler<BaseHandler, TestPacket>();
-
-        var bus = container.Resolve<IEventBusService>();
-
-        bus.Publish(new PacketReceivedEvent(10, 0xA1, new TestPacket(0xA1), DateTimeOffset.UtcNow));
-        bus.DrainTickEvents(10);
-
-        var probe = container.Resolve<BaseHandlerProbe>();
-        Assert.Same(bus, probe.EventBus);
-        Assert.Same(container.Resolve<INetworkSessionManager>(), probe.Sessions);
-    }
-
-    [Fact]
-    public void SessionService_ExposesNetworkSessionManager()
-    {
-        var container = new Container();
-        container.RegisterInstance(new PacketRegistry());
-
-        container.AddNightRavenNetwork();
-
-        Assert.Same(
-            container.Resolve<ISessionService>(),
-            container.Resolve<INetworkSessionManager>()
-        );
     }
 
     [Fact]
@@ -289,6 +277,42 @@ public class PacketDispatchHandlerTests
         dispatcher.Handle(new(10, 0xA2, new OtherPacket(), DateTimeOffset.UtcNow));
 
         Assert.Empty(handler.SessionIds);
+    }
+
+    [Fact]
+    public void SessionService_ExposesNetworkSessionManager()
+    {
+        var container = new Container();
+        container.RegisterInstance(new PacketRegistry());
+
+        container.AddNightRavenNetwork();
+
+        Assert.Same(
+            container.Resolve<ISessionService>(),
+            container.Resolve<INetworkSessionManager>()
+        );
+    }
+
+    [Fact]
+    public void AddNightRavenNetwork_RegistersPlayerSessionServiceAndEventHandlers()
+    {
+        var container = new Container();
+        container.RegisterInstance(new PacketRegistry());
+
+        container.AddNightRavenNetwork();
+
+        Assert.Same(
+            container.Resolve<IPlayerSessionService>(),
+            container.Resolve<PlayerSessionService>()
+        );
+        Assert.Contains(
+            container.ResolveMany<ITickEventHandler<PlayerConnectedEvent>>(),
+            static handler => handler is PlayerSessionService
+        );
+        Assert.Contains(
+            container.ResolveMany<ITickEventHandler<PlayerDisconnectedEvent>>(),
+            static handler => handler is PlayerSessionService
+        );
     }
 
     private static PacketDispatchHandler NewDispatcher(IReadOnlyList<IPacketHandler<TestPacket>> handlers)

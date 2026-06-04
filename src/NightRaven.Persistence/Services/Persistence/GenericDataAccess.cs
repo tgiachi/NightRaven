@@ -1,9 +1,7 @@
-using NightRaven.Core.Ids;
 using NightRaven.Core.Interfaces.Ids;
 using NightRaven.Persistence.Data;
 using NightRaven.Persistence.Interfaces.Persistence;
 using NightRaven.Persistence.Internal;
-using NightRaven.Persistence.Interfaces.Internal;
 using NightRaven.Persistence.Types;
 using ZLinq;
 

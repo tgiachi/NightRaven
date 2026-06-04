@@ -1,7 +1,7 @@
 using DryIoc;
 using NightRaven.Core.Data.Directories;
-using NightRaven.Server.Extensions.Configuration;
 using NightRaven.Plugins.Services;
+using NightRaven.Server.Extensions.Configuration;
 
 namespace NightRaven.Server.Extensions.Plugins;
 

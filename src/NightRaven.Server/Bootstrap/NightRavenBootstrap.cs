@@ -63,59 +63,6 @@ public static class NightRavenBootstrap
         await app.RunAsync(cancellationToken);
     }
 
-    internal static NightRavenBootstrapContext CreateContext(NightRavenBootstrapOptions options)
-    {
-        ArgumentNullException.ThrowIfNull(options);
-
-        var rootDirectory = RuntimePaths.ResolveRootDirectory(options.RootDirectory);
-        var directories = new DirectoriesConfig(rootDirectory, Enum.GetNames<DirectoryType>());
-        var packetRegistry = new PacketRegistry();
-        var registeredPacketCount = PacketTable.Register(packetRegistry);
-
-        return new(directories, packetRegistry, registeredPacketCount);
-    }
-
-    internal static WebApplicationBuilder CreateBuilder(
-        NightRavenBootstrapOptions options,
-        NightRavenBootstrapContext context
-    )
-    {
-        ArgumentNullException.ThrowIfNull(options);
-        ArgumentNullException.ThrowIfNull(context);
-
-        var builder = WebApplication.CreateBuilder(
-            new WebApplicationOptions
-            {
-                Args = options.Args,
-                EnvironmentName = options.Debug ? Environments.Development : null
-            }
-        );
-
-        // Back the whole host (REST included) with DryIoc so the Lua scripting engine can
-        // register and resolve script-module types at runtime, which MEDI cannot do.
-        builder.Host.UseServiceProviderFactory(new DryIocServiceProviderFactory());
-
-        Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-
-        builder.Logging.ClearProviders().AddSerilog();
-
-        // ASP.NET Core services (OpenAPI, Kestrel, routing, ...) register through IServiceCollection.
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
-
-        // The generic host collects hosted services from IServiceCollection, so bridge the
-        // DryIoc-registered orchestrator here; it resolves its descriptors from the unified provider.
-        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<NightRavenServiceOrchestrator>());
-
-        Log.Information("Registered {PacketCount} UO packets", context.RegisteredPacketCount);
-
-        // Every NightRaven service registers natively on the DryIoc container (ASP.NET stays on MEDI,
-        // which DryIoc imports). This runs after the IServiceCollection descriptors are populated.
-        builder.Host.ConfigureContainer<IContainer>(container => ConfigureContainer(container, context));
-
-        return builder;
-    }
-
     internal static void ConfigureContainer(IContainer container, NightRavenBootstrapContext context)
     {
         ArgumentNullException.ThrowIfNull(container);
@@ -166,6 +113,59 @@ public static class NightRavenBootstrap
             container.Resolve<LoggerConfig>(),
             directories[DirectoryType.Logs]
         );
+    }
+
+    internal static WebApplicationBuilder CreateBuilder(
+        NightRavenBootstrapOptions options,
+        NightRavenBootstrapContext context
+    )
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(context);
+
+        var builder = WebApplication.CreateBuilder(
+            new WebApplicationOptions
+            {
+                Args = options.Args,
+                EnvironmentName = options.Debug ? Environments.Development : null
+            }
+        );
+
+        // Back the whole host (REST included) with DryIoc so the Lua scripting engine can
+        // register and resolve script-module types at runtime, which MEDI cannot do.
+        builder.Host.UseServiceProviderFactory(new DryIocServiceProviderFactory());
+
+        Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+
+        builder.Logging.ClearProviders().AddSerilog();
+
+        // ASP.NET Core services (OpenAPI, Kestrel, routing, ...) register through IServiceCollection.
+        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        builder.Services.AddOpenApi();
+
+        // The generic host collects hosted services from IServiceCollection, so bridge the
+        // DryIoc-registered orchestrator here; it resolves its descriptors from the unified provider.
+        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<NightRavenServiceOrchestrator>());
+
+        Log.Information("Registered {PacketCount} UO packets", context.RegisteredPacketCount);
+
+        // Every NightRaven service registers natively on the DryIoc container (ASP.NET stays on MEDI,
+        // which DryIoc imports). This runs after the IServiceCollection descriptors are populated.
+        builder.Host.ConfigureContainer<IContainer>(container => ConfigureContainer(container, context));
+
+        return builder;
+    }
+
+    internal static NightRavenBootstrapContext CreateContext(NightRavenBootstrapOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+
+        var rootDirectory = RuntimePaths.ResolveRootDirectory(options.RootDirectory);
+        var directories = new DirectoriesConfig(rootDirectory, Enum.GetNames<DirectoryType>());
+        var packetRegistry = new PacketRegistry();
+        var registeredPacketCount = PacketTable.Register(packetRegistry);
+
+        return new(directories, packetRegistry, registeredPacketCount);
     }
 
     private static void ConfigurePipeline(WebApplication app)

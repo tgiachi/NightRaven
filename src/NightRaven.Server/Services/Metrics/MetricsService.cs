@@ -78,38 +78,6 @@ public sealed class MetricsService : IMetricsService
         return Task.CompletedTask;
     }
 
-    private void RefreshSnapshot()
-    {
-        var collectedAt = DateTimeOffset.UtcNow;
-        var samples = new List<MetricSample>(_providers.Count * 4);
-
-        for (var i = 0; i < _providers.Count; i++)
-        {
-            var provider = _providers[i];
-
-            try
-            {
-                var providerSamples = provider.Collect();
-
-                for (var s = 0; s < providerSamples.Count; s++)
-                {
-                    var sample = providerSamples[s];
-                    samples.Add(sample with { Name = $"{provider.Prefix}_{sample.Name}" });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(
-                    ex,
-                    "MetricProvider {Provider} failed to Collect; skipped",
-                    provider.GetType().Name
-                );
-            }
-        }
-
-        Volatile.Write(ref _latestSnapshot, new(collectedAt, samples));
-    }
-
     private void LogSnapshot()
     {
         var snapshot = GetSnapshot();
@@ -142,5 +110,37 @@ public sealed class MetricsService : IMetricsService
             snapshot.Samples.Count,
             values.ToString()
         );
+    }
+
+    private void RefreshSnapshot()
+    {
+        var collectedAt = DateTimeOffset.UtcNow;
+        var samples = new List<MetricSample>(_providers.Count * 4);
+
+        for (var i = 0; i < _providers.Count; i++)
+        {
+            var provider = _providers[i];
+
+            try
+            {
+                var providerSamples = provider.Collect();
+
+                for (var s = 0; s < providerSamples.Count; s++)
+                {
+                    var sample = providerSamples[s];
+                    samples.Add(sample with { Name = $"{provider.Prefix}_{sample.Name}" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(
+                    ex,
+                    "MetricProvider {Provider} failed to Collect; skipped",
+                    provider.GetType().Name
+                );
+            }
+        }
+
+        Volatile.Write(ref _latestSnapshot, new(collectedAt, samples));
     }
 }

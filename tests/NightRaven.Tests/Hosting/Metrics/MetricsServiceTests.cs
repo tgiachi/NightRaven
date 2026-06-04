@@ -138,18 +138,17 @@ public class MetricsServiceTests
     }
 
     [Fact]
-    public async Task StopAsync_UnregistersRefreshTimer()
+    public async Task StartAsync_WhenMetricsLoggingDisabled_RegistersOnlyRefreshTimer()
     {
         var timer = NewTimer();
-        var svc = new MetricsService(Array.Empty<IMetricProvider>(), timer, new());
+        var cfg = new MetricsConfig { LogEnabled = false };
+        var svc = new MetricsService(Array.Empty<IMetricProvider>(), timer, cfg);
 
         await svc.StartAsync(CancellationToken.None);
-        var activeBefore = ActiveCount(timer);
-        await svc.StopAsync(CancellationToken.None);
-        var activeAfter = ActiveCount(timer);
 
-        Assert.True(activeBefore >= 1, "expected MetricsService to register at least one timer");
-        Assert.Equal(0, activeAfter);
+        Assert.Equal(1, ActiveCount(timer));
+
+        await svc.StopAsync(CancellationToken.None);
     }
 
     [Fact]
@@ -171,17 +170,18 @@ public class MetricsServiceTests
     }
 
     [Fact]
-    public async Task StartAsync_WhenMetricsLoggingDisabled_RegistersOnlyRefreshTimer()
+    public async Task StopAsync_UnregistersRefreshTimer()
     {
         var timer = NewTimer();
-        var cfg = new MetricsConfig { LogEnabled = false };
-        var svc = new MetricsService(Array.Empty<IMetricProvider>(), timer, cfg);
+        var svc = new MetricsService(Array.Empty<IMetricProvider>(), timer, new());
 
         await svc.StartAsync(CancellationToken.None);
-
-        Assert.Equal(1, ActiveCount(timer));
-
+        var activeBefore = ActiveCount(timer);
         await svc.StopAsync(CancellationToken.None);
+        var activeAfter = ActiveCount(timer);
+
+        Assert.True(activeBefore >= 1, "expected MetricsService to register at least one timer");
+        Assert.Equal(0, activeAfter);
     }
 
     private static int ActiveCount(TimerWheelService timer)

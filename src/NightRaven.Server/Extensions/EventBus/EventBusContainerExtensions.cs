@@ -1,6 +1,6 @@
 using DryIoc;
-using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Abstractions.Data;
+using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Services.EventBus;

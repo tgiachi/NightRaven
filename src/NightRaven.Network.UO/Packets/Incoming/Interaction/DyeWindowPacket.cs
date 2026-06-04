@@ -1,3 +1,4 @@
+using NightRaven.Core.Ids;
 using NightRaven.Network.Spans;
 using NightRaven.Network.UO.Attributes;
 using NightRaven.Network.UO.Base;
@@ -12,7 +13,7 @@ namespace NightRaven.Network.UO.Packets.Incoming.Interaction;
 /// </summary>
 public class DyeWindowPacket : BaseGameNetworkPacket
 {
-    public uint TargetSerial { get; set; }
+    public Serial TargetSerial { get; set; }
 
     public ushort Model { get; set; }
 
@@ -28,7 +29,7 @@ public class DyeWindowPacket : BaseGameNetworkPacket
             return false;
         }
 
-        TargetSerial = reader.ReadUInt32();
+        TargetSerial = (Serial)reader.ReadUInt32();
         Model = reader.ReadUInt16();
         Hue = reader.ReadUInt16();
 

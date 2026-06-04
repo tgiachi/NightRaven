@@ -53,11 +53,21 @@ public sealed class TimersModule : IDisposable
 
     [ScriptFunction("every", "Registers a repeating timer.")]
     public string Every(string name, string interval, Closure callback)
-        => Register(name, interval, callback, repeat: true);
+        => Register(name, interval, callback, true);
 
     [ScriptFunction("once", "Registers a one-shot timer.")]
     public string Once(string name, string interval, Closure callback)
-        => Register(name, interval, callback, repeat: false);
+        => Register(name, interval, callback, false);
+
+    private static TimeSpan ParseInterval(string interval)
+    {
+        if (TimeSpan.TryParse(interval, CultureInfo.InvariantCulture, out var parsed) && parsed > TimeSpan.Zero)
+        {
+            return parsed;
+        }
+
+        throw new ScriptRuntimeException($"Invalid timer interval '{interval}'.");
+    }
 
     private string Register(string name, string interval, Closure callback, bool repeat)
     {
@@ -88,15 +98,5 @@ public sealed class TimersModule : IDisposable
         _timers[name] = timerId;
 
         return timerId;
-    }
-
-    private static TimeSpan ParseInterval(string interval)
-    {
-        if (TimeSpan.TryParse(interval, CultureInfo.InvariantCulture, out var parsed) && parsed > TimeSpan.Zero)
-        {
-            return parsed;
-        }
-
-        throw new ScriptRuntimeException($"Invalid timer interval '{interval}'.");
     }
 }

@@ -710,6 +710,12 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
         return false;
     }
 
+    private void AttachLuaEventBridge()
+    {
+        var eventBridge = _serviceProvider.Resolve<ILuaEventBridge>(IfUnresolved.ReturnDefault);
+        eventBridge?.Attach(LuaScript);
+    }
+
     private static object?[] ConvertArgumentsToArray(CallbackArguments args)
     {
         if (args.Count == 0)
@@ -1036,12 +1042,6 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
 
     private void ExecuteBootFunction()
         => ExecuteFunctionFromBootstrap(OnReadyFunctionName);
-
-    private void AttachLuaEventBridge()
-    {
-        var eventBridge = _serviceProvider.Resolve<ILuaEventBridge>(IfUnresolved.ReturnDefault);
-        eventBridge?.Attach(LuaScript);
-    }
 
     private void ExecuteBootstrap()
     {

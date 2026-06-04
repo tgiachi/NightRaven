@@ -1,11 +1,15 @@
 using DryIoc;
 using NightRaven.Abstractions.Data.Network;
 using NightRaven.Abstractions.Extensions.DryIoc;
+using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Abstractions.Interfaces.Network;
+using NightRaven.Abstractions.Interfaces.Player;
 using NightRaven.Abstractions.Interfaces.Services;
+using NightRaven.Server.Data.Events;
 using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Interfaces.Network;
 using NightRaven.Server.Services.Network;
+using NightRaven.Server.Services.Player;
 
 namespace NightRaven.Server.Extensions.Network;
 
@@ -34,6 +38,10 @@ public static class NetworkContainerExtensions
         );
         container.RegisterMapping<ISessionService, SessionService>();
         container.RegisterMapping<INetworkSessionManager, SessionService>();
+        container.Register<PlayerSessionService>(Reuse.Singleton);
+        container.RegisterMapping<IPlayerSessionService, PlayerSessionService>();
+        container.RegisterMapping<ITickEventHandler<PlayerConnectedEvent>, PlayerSessionService>();
+        container.RegisterMapping<ITickEventHandler<PlayerDisconnectedEvent>, PlayerSessionService>();
         container.Register<IOutgoingPacketQueue, OutgoingPacketQueue>(Reuse.Singleton);
         container.AddNightRavenService<INetworkService, NetworkService>(NetworkServicePriority);
 

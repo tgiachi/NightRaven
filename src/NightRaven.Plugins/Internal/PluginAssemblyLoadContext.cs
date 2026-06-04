@@ -8,7 +8,7 @@ internal sealed class PluginAssemblyLoadContext : AssemblyLoadContext
     private readonly AssemblyDependencyResolver _resolver;
 
     public PluginAssemblyLoadContext(string pluginAssemblyPath)
-        : base($"NightRaven.Plugin:{Path.GetFileNameWithoutExtension(pluginAssemblyPath)}", false)
+        : base($"NightRaven.Plugin:{Path.GetFileNameWithoutExtension(pluginAssemblyPath)}")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginAssemblyPath);
         _resolver = new(pluginAssemblyPath);

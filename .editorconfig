@@ -144,6 +144,7 @@ dotnet_diagnostic.IDE0290.severity = none
 
 # ReSharper properties
 resharper_apply_auto_detected_rules = false
+resharper_convert_to_primary_constructor_highlighting = none
 resharper_braces_redundant = true
 resharper_case_block_braces = next_line_shifted_2
 resharper_constructor_or_destructor_body = method

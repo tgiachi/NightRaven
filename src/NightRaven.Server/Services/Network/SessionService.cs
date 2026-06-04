@@ -31,12 +31,6 @@ public sealed class SessionService : ISessionService, INetworkSessionManager
     public IReadOnlyCollection<GameSession> GetAll()
         => _sessions.Values.ToArray();
 
-    public IReadOnlyCollection<long> GetSessionIds()
-        => _sessions.Keys.ToArray();
-
-    public ValueEnumerable<FromArray<long>, long> QuerySessionIds()
-        => _sessions.Keys.ToArray().AsValueEnumerable();
-
     public GameSession GetOrCreate(NightRavenTCPClient client)
     {
         ArgumentNullException.ThrowIfNull(client);
@@ -56,8 +50,15 @@ public sealed class SessionService : ISessionService, INetworkSessionManager
         _eventBus?.Publish(
             new PlayerConnectedEvent(session.SessionId, client.RemoteEndPoint?.ToString(), DateTimeOffset.UtcNow)
         );
+
         return session;
     }
+
+    public IReadOnlyCollection<long> GetSessionIds()
+        => _sessions.Keys.ToArray();
+
+    public ValueEnumerable<FromArray<long>, long> QuerySessionIds()
+        => _sessions.Keys.ToArray().AsValueEnumerable();
 
     public bool Remove(long sessionId)
     {

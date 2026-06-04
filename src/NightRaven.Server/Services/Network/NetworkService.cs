@@ -297,7 +297,6 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
             session.SessionId,
             e.Client.RemoteEndPoint
         );
-
     }
 
     private void OnClientData(object? sender, NightRavenTCPDataReceivedEventArgs e)

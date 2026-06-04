@@ -43,7 +43,8 @@ public static class PacketHandlerContainerExtensions
                                                    .Where(
                                                        static interfaceType =>
                                                            interfaceType.IsGenericType &&
-                                                           interfaceType.GetGenericTypeDefinition() == typeof(IPacketHandler<>)
+                                                           interfaceType.GetGenericTypeDefinition() ==
+                                                           typeof(IPacketHandler<>)
                                                    )
                                                    .ToArray();
 
