@@ -1,6 +1,8 @@
 using DryIoc;
 using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Core.Extensions.Directories;
+using NightRaven.Server.Extensions.Hosting;
+using NightRaven.Server.Services.UoData;
 using NightRaven.UO.Data.Art;
 using NightRaven.UO.Data.Bodies;
 using NightRaven.UO.Data.Data;
@@ -28,6 +30,8 @@ namespace NightRaven.Server.Extensions.UoData;
 /// </summary>
 public static class UoDataContainerExtensions
 {
+    private const int UoDataBootPriority = 10;
+
     /// <summary>
     /// Registers the <c>uo</c> config section, the client-file resolver, the verdata patch source
     /// and the tile-data store.
@@ -74,6 +78,10 @@ public static class UoDataContainerExtensions
         container.RegisterDelegate<ISkillDataStore>(_ => new SkillDataStore(dataDirectory), Reuse.Singleton);
         container.RegisterDelegate<IRaceStore>(_ => new RaceStore(dataDirectory), Reuse.Singleton);
         container.RegisterDelegate<IBodyDataStore>(_ => new BodyDataStore(dataDirectory), Reuse.Singleton);
+
+        // Eager-load all UO data at boot (priority 10, before the network service at 20).
+        container.AddNightRavenHosting();
+        container.AddNightRavenService<UoDataBootService>(UoDataBootPriority);
 
         return container;
     }
