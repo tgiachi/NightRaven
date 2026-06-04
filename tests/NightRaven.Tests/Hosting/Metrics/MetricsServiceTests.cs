@@ -152,6 +152,38 @@ public class MetricsServiceTests
         Assert.Equal(0, activeAfter);
     }
 
+    [Fact]
+    public async Task StartAsync_WhenMetricsLoggingEnabled_RegistersLogTimer()
+    {
+        var timer = NewTimer();
+        var cfg = new MetricsConfig
+        {
+            LogEnabled = true,
+            LogInterval = TimeSpan.FromMilliseconds(16)
+        };
+        var svc = new MetricsService(Array.Empty<IMetricProvider>(), timer, cfg);
+
+        await svc.StartAsync(CancellationToken.None);
+
+        Assert.Equal(2, ActiveCount(timer));
+
+        await svc.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task StartAsync_WhenMetricsLoggingDisabled_RegistersOnlyRefreshTimer()
+    {
+        var timer = NewTimer();
+        var cfg = new MetricsConfig { LogEnabled = false };
+        var svc = new MetricsService(Array.Empty<IMetricProvider>(), timer, cfg);
+
+        await svc.StartAsync(CancellationToken.None);
+
+        Assert.Equal(1, ActiveCount(timer));
+
+        await svc.StopAsync(CancellationToken.None);
+    }
+
     private static int ActiveCount(TimerWheelService timer)
         => (int)timer.Collect().Single(s => s.Name == "active").Value;
 

@@ -18,6 +18,7 @@ using NightRaven.Scripting.Lua.Data.Config;
 using NightRaven.Scripting.Lua.Data.Internal;
 using NightRaven.Scripting.Lua.Data.Luarc;
 using NightRaven.Scripting.Lua.Data.Scripts;
+using NightRaven.Scripting.Lua.Interfaces.Events;
 using NightRaven.Scripting.Lua.Interfaces.Scripts;
 using NightRaven.Scripting.Lua.Loaders;
 using NightRaven.Scripting.Lua.Utils;
@@ -633,6 +634,7 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
         try
         {
             await RegisterScriptModulesAsync(CancellationToken.None);
+            AttachLuaEventBridge();
 
             // Hook for engine-side consumers to install UserData types, globals, and per-feature
             // scanners (e.g. LuaComponentLoader) once the script is ready but before bootstrap runs.
@@ -1034,6 +1036,12 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
 
     private void ExecuteBootFunction()
         => ExecuteFunctionFromBootstrap(OnReadyFunctionName);
+
+    private void AttachLuaEventBridge()
+    {
+        var eventBridge = _serviceProvider.Resolve<ILuaEventBridge>(IfUnresolved.ReturnDefault);
+        eventBridge?.Attach(LuaScript);
+    }
 
     private void ExecuteBootstrap()
     {

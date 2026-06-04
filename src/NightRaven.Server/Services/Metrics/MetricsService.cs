@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text;
 using NightRaven.Abstractions.Data.Metrics;
 using NightRaven.Abstractions.Interfaces.Metrics;
 using NightRaven.Abstractions.Interfaces.Timing;
@@ -14,6 +16,7 @@ namespace NightRaven.Server.Services.Metrics;
 public sealed class MetricsService : IMetricsService
 {
     private const string RefreshTimerName = "metrics-refresh";
+    private const string LogTimerName = "metrics-log";
 
     private readonly ILogger _logger = Log.ForContext<MetricsService>();
     private readonly IReadOnlyList<IMetricProvider> _providers;
@@ -21,6 +24,7 @@ public sealed class MetricsService : IMetricsService
     private readonly MetricsConfig _config;
 
     private MetricsSnapshot _latestSnapshot;
+    private string? _logTimerId;
     private string? _timerId;
 
     public MetricsService(IEnumerable<IMetricProvider> providers, ITimerService timer, MetricsConfig config)
@@ -44,11 +48,27 @@ public sealed class MetricsService : IMetricsService
             repeat: true
         );
 
+        if (_config.LogEnabled)
+        {
+            _logTimerId = _timer.RegisterTimer(
+                LogTimerName,
+                _config.LogInterval,
+                LogSnapshot,
+                repeat: true
+            );
+        }
+
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
+        if (_logTimerId is not null)
+        {
+            _timer.UnregisterTimer(_logTimerId);
+            _logTimerId = null;
+        }
+
         if (_timerId is not null)
         {
             _timer.UnregisterTimer(_timerId);
@@ -88,5 +108,39 @@ public sealed class MetricsService : IMetricsService
         }
 
         Volatile.Write(ref _latestSnapshot, new(collectedAt, samples));
+    }
+
+    private void LogSnapshot()
+    {
+        var snapshot = GetSnapshot();
+
+        if (snapshot.Samples.Count == 0)
+        {
+            _logger.Information("Metrics snapshot is empty");
+
+            return;
+        }
+
+        var values = new StringBuilder(snapshot.Samples.Count * 24);
+
+        for (var i = 0; i < snapshot.Samples.Count; i++)
+        {
+            if (i > 0)
+            {
+                values.Append(", ");
+            }
+
+            var sample = snapshot.Samples[i];
+            values.Append(sample.Name);
+            values.Append('=');
+            values.Append(sample.Value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        _logger.Information(
+            "Metrics snapshot at {CollectedAt}: {MetricCount} metrics [{Metrics}]",
+            snapshot.CollectedAt,
+            snapshot.Samples.Count,
+            values.ToString()
+        );
     }
 }

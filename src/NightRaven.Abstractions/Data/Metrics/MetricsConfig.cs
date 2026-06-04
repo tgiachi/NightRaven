@@ -10,4 +10,15 @@ public sealed class MetricsConfig
     /// Default 5 s.
     /// </summary>
     public TimeSpan RefreshInterval { get; set; } = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// Enables periodic metrics logging.
+    /// </summary>
+    public bool LogEnabled { get; set; } = true;
+
+    /// <summary>
+    /// How often the latest metrics snapshot is written to the logger.
+    /// Default 1 min.
+    /// </summary>
+    public TimeSpan LogInterval { get; set; } = TimeSpan.FromMinutes(1);
 }

@@ -10,8 +10,6 @@ using NightRaven.Core.Data.Directories;
 using NightRaven.Core.Types;
 using NightRaven.Core.Utils;
 using NightRaven.Network.UO.Registry;
-using NightRaven.Scripting.Lua.Extensions.Scripts;
-using NightRaven.Scripting.Lua.Modules;
 using NightRaven.Server.Data;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Extensions.Configuration;
@@ -41,6 +39,7 @@ await ConsoleApp.RunAsync(
         rootDirectory = RuntimePaths.ResolveRootDirectory(rootDirectory);
 
         var directoriesConfig = new DirectoriesConfig(rootDirectory, Enum.GetNames<DirectoryType>());
+        using var pidFileGuard = PidFileGuard.Acquire(directoriesConfig);
 
         if (header)
         {
@@ -120,8 +119,6 @@ await ConsoleApp.RunAsync(
 
                 // Lua scripting engine (priority 30).
                 container.AddNightRavenLuaScripting(directoriesConfig);
-
-                container.RegisterScriptModule<LogModule>();
 
                 // Plugins can declare config sections, services, Lua modules, persistence entities, and handlers.
                 // This must run before AddNightRavenConfig so plugin config sections are bound at boot.

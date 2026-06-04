@@ -1,11 +1,16 @@
 using DryIoc;
+using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Core.Data.Directories;
 using NightRaven.Core.Types;
 using NightRaven.Core.Utils;
 using NightRaven.Scripting.Lua.Data.Config;
 using NightRaven.Scripting.Lua.Data.Internal;
+using NightRaven.Scripting.Lua.Extensions.Scripts;
+using NightRaven.Scripting.Lua.Interfaces.Events;
 using NightRaven.Scripting.Lua.Interfaces.Scripts;
+using NightRaven.Scripting.Lua.Modules;
 using NightRaven.Scripting.Lua.Services;
+using NightRaven.Server.Data.Events;
 using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Services.Scripting;
 
@@ -44,8 +49,19 @@ public static class LuaScriptingContainerExtensions
         container.RegisterInstance(new List<ScriptModuleData>(), IfAlreadyRegistered.Keep);
         container.RegisterInstance(new List<ScriptUserData>(), IfAlreadyRegistered.Keep);
 
+        container.Register<ILuaEventBridge, LuaEventBridge>(Reuse.Singleton);
+
         container.Register<IScriptEngineService, LuaScriptEngineService>(Reuse.Singleton);
         container.AddNightRavenService<LuaScriptHostedService>(LuaScriptingPriority);
+
+        container.RegisterScriptModule<EventsModule>();
+        container.RegisterScriptModule<LogModule>();
+        container.RegisterScriptModule<RandomModule>();
+        container.RegisterScriptModule<TimersModule>();
+
+        container.AddTickEventHandler<LuaServerStartedEventHandler, ServerStartedEvent>();
+        container.AddTickEventHandler<LuaPlayerConnectedEventHandler, PlayerConnectedEvent>();
+        container.AddTickEventHandler<LuaPlayerDisconnectedEventHandler, PlayerDisconnectedEvent>();
 
         return container;
     }

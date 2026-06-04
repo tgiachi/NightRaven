@@ -14,12 +14,13 @@ internal sealed class LuaEngineFixture : IDisposable
 {
     private readonly Container _container;
 
-    public LuaEngineFixture(IEnumerable<ScriptModuleData>? modules = null)
+    public LuaEngineFixture(IEnumerable<ScriptModuleData>? modules = null, Action<IContainer>? configure = null)
     {
         ScriptsDirectory = Path.Combine(Path.GetTempPath(), $"nh-lua-{Guid.NewGuid():N}");
         Directory.CreateDirectory(ScriptsDirectory);
 
         _container = new();
+        configure?.Invoke(_container);
 
         var directoriesConfig = new DirectoriesConfig(ScriptsDirectory, Array.Empty<string>());
         var config = new LuaEngineConfig(ScriptsDirectory, ScriptsDirectory, "test");
@@ -34,6 +35,8 @@ internal sealed class LuaEngineFixture : IDisposable
     }
 
     public LuaScriptEngineService Engine { get; }
+
+    public IContainer Container => _container;
 
     public string ScriptsDirectory { get; }
 

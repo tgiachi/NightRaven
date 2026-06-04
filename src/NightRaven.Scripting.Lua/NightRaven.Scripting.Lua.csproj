@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj"/>
+        <ProjectReference Include="..\NightRaven.Abstractions\NightRaven.Abstractions.csproj"/>
     </ItemGroup>
 
 </Project>
