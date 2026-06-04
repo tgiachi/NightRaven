@@ -4,7 +4,9 @@ using NightRaven.Core.Extensions.Directories;
 using NightRaven.UO.Data.Data;
 using NightRaven.UO.Data.Files;
 using NightRaven.UO.Data.Interfaces.Files;
+using NightRaven.UO.Data.Interfaces.Maps;
 using NightRaven.UO.Data.Interfaces.Tiles;
+using NightRaven.UO.Data.Maps;
 using NightRaven.UO.Data.Tiles;
 
 namespace NightRaven.Server.Extensions.UoData;
@@ -32,6 +34,11 @@ public static class UoDataContainerExtensions
 
         container.RegisterDelegate<ITileDataStore>(
             resolver => new TileDataStore(resolver.Resolve<IUoFileResolver>()),
+            Reuse.Singleton
+        );
+
+        container.RegisterDelegate<IMapService>(
+            resolver => new MapService(resolver.Resolve<IUoFileResolver>()),
             Reuse.Singleton
         );
 
