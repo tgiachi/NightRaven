@@ -12,7 +12,7 @@ public class ShippedUoDataTests
 
         for (var i = 0; i < 8 && dir is not null; i++)
         {
-            var candidate = Path.Combine(dir.FullName, "src", "NightRaven.Server", "uo_files");
+            var candidate = Path.Combine(dir.FullName, "src", "NightRaven.Server", "Assets", "uo_files");
 
             if (Directory.Exists(candidate))
             {

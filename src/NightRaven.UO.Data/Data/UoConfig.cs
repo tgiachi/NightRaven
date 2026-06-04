@@ -15,9 +15,29 @@ public sealed class UoConfig : IValidatableConfig
     /// </summary>
     public string ClientFilesDirectory { get; set; } = "~/uo";
 
+    /// <summary>Facet id new characters start on (0 = Felucca, 1 = Trammel, ...). Default 1.</summary>
+    public int StartingMapId { get; set; } = 1;
+
+    /// <summary>Starting world X coordinate. Default 1496 (Britain).</summary>
+    public int StartingX { get; set; } = 1496;
+
+    /// <summary>Starting world Y coordinate. Default 1628 (Britain).</summary>
+    public int StartingY { get; set; } = 1628;
+
+    /// <summary>Starting world Z coordinate. Default 10 (Britain).</summary>
+    public int StartingZ { get; set; } = 10;
+
+    /// <summary>Display name of the starting city. Default "Britain".</summary>
+    public string StartingCity { get; set; } = "Britain";
+
     /// <inheritdoc />
     public IEnumerable<string> Validate()
     {
+        if (StartingMapId is < 0 or > 5)
+        {
+            yield return $"starting map id {StartingMapId} must be between 0 and 5";
+        }
+
         var directory = ClientFilesDirectory?.ResolvePathAndEnvs();
 
         if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))

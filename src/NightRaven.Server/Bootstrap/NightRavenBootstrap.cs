@@ -97,7 +97,7 @@ public static class NightRavenBootstrap
 
         // UO static data: seed bundled reference data, then register client-file + reference stores.
         UoDataAssetsBootstrapper.EnsureDataAssets(
-            Path.Combine(AppContext.BaseDirectory, "uo_files"),
+            Path.Combine(AppContext.BaseDirectory, "Assets", "uo_files"),
             directories[DirectoryType.Data],
             Log.Logger
         );
