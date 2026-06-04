@@ -4,8 +4,10 @@ using NightRaven.Core.Extensions.Directories;
 using NightRaven.UO.Data.Data;
 using NightRaven.UO.Data.Files;
 using NightRaven.UO.Data.Interfaces.Files;
+using NightRaven.UO.Data.Interfaces.Localization;
 using NightRaven.UO.Data.Interfaces.Maps;
 using NightRaven.UO.Data.Interfaces.Tiles;
+using NightRaven.UO.Data.Localization;
 using NightRaven.UO.Data.Maps;
 using NightRaven.UO.Data.Tiles;
 
@@ -39,6 +41,11 @@ public static class UoDataContainerExtensions
 
         container.RegisterDelegate<IMapService>(
             resolver => new MapService(resolver.Resolve<IUoFileResolver>()),
+            Reuse.Singleton
+        );
+
+        container.RegisterDelegate<ILocalizationService>(
+            resolver => new LocalizationService(resolver.Resolve<IUoFileResolver>()),
             Reuse.Singleton
         );
 
