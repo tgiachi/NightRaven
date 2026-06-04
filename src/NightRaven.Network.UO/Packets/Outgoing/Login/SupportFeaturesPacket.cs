@@ -1,7 +1,7 @@
 using NightRaven.Network.Spans;
 using NightRaven.Network.UO.Attributes;
 using NightRaven.Network.UO.Base;
-using NightRaven.Network.UO.Types.Login;
+using NightRaven.Abstractions.Types.Expansions;
 using NightRaven.Network.UO.Types.Packets;
 
 namespace NightRaven.Network.UO.Packets.Outgoing.Login;

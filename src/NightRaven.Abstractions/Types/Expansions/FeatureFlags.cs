@@ -1,4 +1,4 @@
-namespace NightRaven.UO.Data.Types.Expansions;
+namespace NightRaven.Abstractions.Types.Expansions;
 
 /// <summary>
 /// Defines feature flags sent to unlock client capabilities.
