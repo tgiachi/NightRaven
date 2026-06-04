@@ -2,6 +2,7 @@ using NightRaven.Server.Services.UoData;
 using NightRaven.Tests.UO.Data.Support;
 using NightRaven.UO.Data.Art;
 using NightRaven.UO.Data.Bodies;
+using NightRaven.UO.Data.Expansions;
 using NightRaven.UO.Data.Files;
 using NightRaven.UO.Data.Hues;
 using NightRaven.UO.Data.Localization;
@@ -41,7 +42,8 @@ public class UoDataBootServiceTests
                 new BodyDataStore(dir.FullName),
                 new HueStore(resolver),
                 new RadarColorStore(resolver),
-                new TextureStore(resolver)
+                new TextureStore(resolver),
+                new ExpansionStore(dir.FullName)
             );
 
             await service.StartAsync(CancellationToken.None);

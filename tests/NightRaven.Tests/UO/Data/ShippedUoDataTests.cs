@@ -50,4 +50,13 @@ public class ShippedUoDataTests
 
         Assert.True(store.Count > 1000);
     }
+
+    [Fact]
+    public void ShippedExpansions_ParseToTwelve()
+    {
+        var store = new NightRaven.UO.Data.Expansions.ExpansionStore(UoFilesDirectory());
+
+        Assert.Equal(12, store.Count);
+        Assert.Equal("Age of Shadows", store.GetInfo(5)!.Name);
+    }
 }
