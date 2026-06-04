@@ -1,6 +1,7 @@
 using NightRaven.Abstractions.Interfaces.Services;
 using NightRaven.UO.Data.Interfaces.Art;
 using NightRaven.UO.Data.Interfaces.Bodies;
+using NightRaven.UO.Data.Interfaces.Hues;
 using NightRaven.UO.Data.Interfaces.Localization;
 using NightRaven.UO.Data.Interfaces.Maps;
 using NightRaven.UO.Data.Interfaces.Multi;
@@ -29,6 +30,8 @@ public sealed class UoDataBootService : INightRavenService
     private readonly ISkillDataStore _skills;
     private readonly IRaceStore _races;
     private readonly IBodyDataStore _bodies;
+    private readonly IHueStore _hues;
+    private readonly IRadarColorStore _radarColors;
 
     public UoDataBootService(
         ITileDataStore tileData,
@@ -38,7 +41,9 @@ public sealed class UoDataBootService : INightRavenService
         IArtService art,
         ISkillDataStore skills,
         IRaceStore races,
-        IBodyDataStore bodies
+        IBodyDataStore bodies,
+        IHueStore hues,
+        IRadarColorStore radarColors
     )
     {
         _tileData = tileData;
@@ -49,13 +54,16 @@ public sealed class UoDataBootService : INightRavenService
         _skills = skills;
         _races = races;
         _bodies = bodies;
+        _hues = hues;
+        _radarColors = radarColors;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.Information(
             "UO data ready: {Land} land tiles, {Item} item tiles, {Maps} maps, {Multis} multis, " +
-            "{Cliloc} localized strings, {Skills} skills, {Races} races, {Bodies} bodies, art {Art}",
+            "{Cliloc} localized strings, {Skills} skills, {Races} races, {Bodies} bodies, art {Art}, " +
+            "{Hues} hues, {RadarColors} radar colours",
             _tileData.LandTable.Count,
             _tileData.ItemTable.Count,
             _maps.Maps.Count,
@@ -64,7 +72,9 @@ public sealed class UoDataBootService : INightRavenService
             _skills.Count,
             _races.Races.Count,
             _bodies.Count,
-            _art.IsValidArt(0) ? "available" : "absent"
+            _art.IsValidArt(0) ? "available" : "absent",
+            _hues.Count,
+            _radarColors.Count
         );
 
         return Task.CompletedTask;

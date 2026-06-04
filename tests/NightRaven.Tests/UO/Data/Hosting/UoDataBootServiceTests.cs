@@ -3,6 +3,7 @@ using NightRaven.Tests.UO.Data.Support;
 using NightRaven.UO.Data.Art;
 using NightRaven.UO.Data.Bodies;
 using NightRaven.UO.Data.Files;
+using NightRaven.UO.Data.Hues;
 using NightRaven.UO.Data.Localization;
 using NightRaven.UO.Data.Maps;
 using NightRaven.UO.Data.Multi;
@@ -36,7 +37,9 @@ public class UoDataBootServiceTests
                 new ArtService(resolver),
                 new SkillDataStore(dir.FullName),
                 new RaceStore(dir.FullName),
-                new BodyDataStore(dir.FullName)
+                new BodyDataStore(dir.FullName),
+                new HueStore(resolver),
+                new RadarColorStore(resolver)
             );
 
             await service.StartAsync(CancellationToken.None);
