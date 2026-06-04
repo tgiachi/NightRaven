@@ -1,7 +1,7 @@
 namespace NightRaven.Scripting.Lua.Data.Scripts;
 
 /// <summary>
-/// Detailed information about a JavaScript execution error
+/// Detailed information about a Lua execution error.
 /// </summary>
 public class ScriptErrorInfo
 {
@@ -41,17 +41,17 @@ public class ScriptErrorInfo
     public string? SourceCode { get; set; }
 
     /// <summary>
-    /// Original TypeScript file name if source maps are available
+    /// Original source file name when a mapped source is available.
     /// </summary>
     public string? OriginalFileName { get; set; }
 
     /// <summary>
-    /// Original line number in TypeScript if source maps are available
+    /// Original line number when a mapped source is available.
     /// </summary>
     public int? OriginalLineNumber { get; set; }
 
     /// <summary>
-    /// Original column number in TypeScript if source maps are available
+    /// Original column number when a mapped source is available.
     /// </summary>
     public int? OriginalColumnNumber { get; set; }
 

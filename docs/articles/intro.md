@@ -1,8 +1,8 @@
 # Introduction
 
 NightRaven is an event-driven, modular **Ultima Online** server emulator built on **.NET 10**
-(standard JIT — no NativeAOT). It is the conceptual successor to Moongate, rebuilt to keep the
-core ignorant of gameplay so that shard operators can add or remove systems without touching it.
+(standard JIT — no NativeAOT). It is rebuilt from scratch to keep the core ignorant of gameplay
+so that shard operators can add or remove systems without touching it.
 
 ## Design principles
 

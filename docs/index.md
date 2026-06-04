@@ -4,8 +4,8 @@ _layout: landing
 
 # NightRaven
 
-Ultima Online server emulator written in modern C# (.NET 10). Conceptual successor to
-Moongate, redesigned from scratch around an **event-driven, modular architecture**.
+Ultima Online server emulator written in modern C# (.NET 10), redesigned from scratch around
+an **event-driven, modular architecture**.
 
 NightRaven's goal is not "more features" — it is to address the structural problems no
 emulator has seriously tackled: true modularity, modern developer experience, and

@@ -3,7 +3,7 @@ using NightRaven.Scripting.Lua.Data.Scripts;
 namespace NightRaven.Scripting.Lua.Interfaces.Scripts;
 
 /// <summary>
-/// Interface for the script engine service that manages JavaScript execution.
+/// Interface for the script engine service that manages Lua execution.
 /// </summary>
 public interface IScriptEngineService
 {
@@ -41,23 +41,23 @@ public interface IScriptEngineService
     event Action<string>? OnComponentFileChanged;
 
     /// <summary>
-    /// Adds a callback function that can be called from JavaScript.
+    /// Adds a callback function that can be called from Lua.
     /// </summary>
-    /// <param name="name">The name of the callback function in JavaScript.</param>
+    /// <param name="name">The name of the callback function in Lua.</param>
     /// <param name="callback">The C# action to execute when the callback is invoked.</param>
     void AddCallback(string name, Action<object[]> callback);
 
     /// <summary>
-    /// Adds a constant value accessible from JavaScript.
+    /// Adds a constant value accessible from Lua.
     /// </summary>
-    /// <param name="name">The name of the constant in JavaScript.</param>
+    /// <param name="name">The name of the constant in Lua.</param>
     /// <param name="value">The value of the constant.</param>
     void AddConstant(string name, object value);
 
     /// <summary>
     /// Adds a script to be executed during engine initialization.
     /// </summary>
-    /// <param name="script">The JavaScript code to execute on startup.</param>
+    /// <param name="script">The Lua code to execute on startup.</param>
     void AddInitScript(string script);
 
     /// <summary>
@@ -83,7 +83,7 @@ public interface IScriptEngineService
     );
 
     /// <summary>
-    /// Adds a .NET type as a module accessible from JavaScript.
+    /// Adds a .NET type as a module accessible from Lua.
     /// </summary>
     /// <param name="type">The type to register as a script module.</param>
     void AddScriptModule(Type type);
@@ -112,16 +112,16 @@ public interface IScriptEngineService
     void ExecuteEngineReady();
 
     /// <summary>
-    /// Executes a JavaScript function and returns the result.
+    /// Executes a Lua function or expression and returns the result.
     /// </summary>
-    /// <param name="command">The JavaScript function call to execute.</param>
+    /// <param name="command">The Lua function call or expression to execute.</param>
     /// <returns>A ScriptResult containing the execution outcome.</returns>
     ScriptResult ExecuteFunction(string command);
 
     /// <summary>
-    /// Asynchronously executes a JavaScript function and returns the result.
+    /// Asynchronously executes a Lua function or expression and returns the result.
     /// </summary>
-    /// <param name="command">The JavaScript function call to execute.</param>
+    /// <param name="command">The Lua function call or expression to execute.</param>
     /// <returns>A task containing a ScriptResult with the execution outcome.</returns>
     Task<ScriptResult> ExecuteFunctionAsync(string command);
 
@@ -132,15 +132,15 @@ public interface IScriptEngineService
     void ExecuteFunctionFromBootstrap(string name);
 
     /// <summary>
-    /// Executes a JavaScript script string.
+    /// Executes a Lua script string.
     /// </summary>
-    /// <param name="script">The JavaScript code to execute.</param>
+    /// <param name="script">The Lua code to execute.</param>
     void ExecuteScript(string script);
 
     /// <summary>
-    /// Executes a JavaScript file.
+    /// Executes a Lua file.
     /// </summary>
-    /// <param name="scriptFile">The path to the JavaScript file to execute.</param>
+    /// <param name="scriptFile">The path to the Lua file to execute.</param>
     void ExecuteScriptFile(string scriptFile);
 
     /// <summary>
@@ -170,10 +170,10 @@ public interface IScriptEngineService
     Task StartAsync();
 
     /// <summary>
-    /// Converts a .NET method name to a JavaScript-compatible function name.
+    /// Converts a .NET method name to a Lua-compatible function name.
     /// </summary>
     /// <param name="name">The .NET method name to convert.</param>
-    /// <returns>The JavaScript-compatible function name.</returns>
+    /// <returns>The Lua-compatible function name.</returns>
     string ToScriptEngineFunctionName(string name);
 
     /// <summary>

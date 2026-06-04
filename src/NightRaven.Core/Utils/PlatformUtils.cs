@@ -31,7 +31,7 @@ public static class PlatformUtils
     /// </summary>
     /// <returns></returns>
     public static bool IsRunningFromDocker()
-        => Environment.GetEnvironmentVariable("MOONGATE_IS_DOCKER") == "true";
+        => Environment.GetEnvironmentVariable("NIGHTRAVEN_IS_DOCKER") == "true";
 
     /// <summary>
     /// Checks if the application is running on Linux.

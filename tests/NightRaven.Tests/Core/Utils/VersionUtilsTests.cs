@@ -97,4 +97,20 @@ public class VersionUtilsTests
 
         Assert.False(string.IsNullOrWhiteSpace(result));
     }
+
+    [Fact]
+    public void IsRunningFromDocker_UsesNightRavenEnvironmentVariable()
+    {
+        var oldDockerValue = Environment.GetEnvironmentVariable("NIGHTRAVEN_IS_DOCKER");
+        Environment.SetEnvironmentVariable("NIGHTRAVEN_IS_DOCKER", "true");
+
+        try
+        {
+            Assert.True(PlatformUtils.IsRunningFromDocker());
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("NIGHTRAVEN_IS_DOCKER", oldDockerValue);
+        }
+    }
 }

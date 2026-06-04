@@ -1169,7 +1169,7 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
             );
 
             var documentation = LuaDocumentationGenerator.GenerateDocumentation(
-                "LillyQuest",
+                "NightRaven",
                 _engineConfig.EngineVersion,
                 _scriptModules,
                 new(_constants),
