@@ -37,6 +37,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="uo_files\**\*.toml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\NightRaven.Core\NightRaven.Core.csproj" />
         <ProjectReference Include="..\NightRaven.UO.Domain\NightRaven.UO.Domain.csproj" />
         <ProjectReference Include="..\NightRaven.Abstractions\NightRaven.Abstractions.csproj" />
