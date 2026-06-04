@@ -1,6 +1,6 @@
 using DryIoc;
 using NightRaven.Plugins.Data;
-using NightRaven.Plugins.Interfaces;
+using NightRaven.Plugins.Interfaces.Plugins;
 
 namespace NightRaven.PluginFixtures.Multiple;
 

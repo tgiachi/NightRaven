@@ -6,7 +6,7 @@ namespace NightRaven.Scripting.Lua.Data.Scripts;
 public class ScriptResultBuilder
 {
     private object? _data;
-    private string _message = string.Empty;
+    private string _message = "";
     private bool _success;
 
     /// <summary>

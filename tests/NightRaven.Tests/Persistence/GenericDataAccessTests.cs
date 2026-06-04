@@ -1,6 +1,7 @@
 using NightRaven.Core.Ids;
 using NightRaven.Persistence.Data;
 using NightRaven.Persistence.Internal;
+using NightRaven.Persistence.Interfaces.Internal;
 using NightRaven.Persistence.Services.Persistence;
 using NightRaven.Persistence.Types;
 using NightRaven.Tests.Persistence.Support;

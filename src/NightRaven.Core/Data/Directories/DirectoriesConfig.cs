@@ -115,7 +115,7 @@ public class DirectoriesConfig
     {
         if (string.IsNullOrWhiteSpace(directoryType))
         {
-            return string.Empty;
+            return "";
         }
 
         if (string.Equals(directoryType, "WebRoot", StringComparison.OrdinalIgnoreCase))

@@ -6,4 +6,16 @@ namespace NightRaven.Abstractions.Internal;
 /// Pairs a registered <see cref="INightRavenService" /> with its start priority.
 /// Lower priorities start first; stop happens in reverse order.
 /// </summary>
-internal sealed record NightRavenServiceDescriptor(INightRavenService Service, int Priority);
+internal sealed record NightRavenServiceDescriptor
+{
+    public INightRavenService Service { get; }
+    public int Priority { get; }
+
+    public NightRavenServiceDescriptor(INightRavenService service, int priority)
+    {
+        ArgumentNullException.ThrowIfNull(service);
+
+        Service = service;
+        Priority = priority;
+    }
+}

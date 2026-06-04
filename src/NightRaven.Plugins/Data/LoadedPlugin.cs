@@ -1,5 +1,5 @@
 using System.Reflection;
-using NightRaven.Plugins.Interfaces;
+using NightRaven.Plugins.Interfaces.Plugins;
 
 namespace NightRaven.Plugins.Data;
 

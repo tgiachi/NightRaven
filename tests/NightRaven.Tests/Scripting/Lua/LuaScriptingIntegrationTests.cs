@@ -1,6 +1,6 @@
 using DryIoc;
 using NightRaven.Core.Data.Directories;
-using NightRaven.Scripting.Lua.Interfaces;
+using NightRaven.Scripting.Lua.Interfaces.Scripts;
 using NightRaven.Server.Extensions.Scripting;
 using NightRaven.Tests.Support;
 

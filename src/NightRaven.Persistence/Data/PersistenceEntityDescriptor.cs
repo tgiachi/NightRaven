@@ -2,9 +2,11 @@ using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
 using NightRaven.Core.Ids;
+using NightRaven.Core.Interfaces.Ids;
 using NightRaven.Persistence.Formatters;
 using NightRaven.Persistence.Interfaces.Persistence;
 using NightRaven.Persistence.Internal;
+using NightRaven.Persistence.Interfaces.Internal;
 
 namespace NightRaven.Persistence.Data;
 

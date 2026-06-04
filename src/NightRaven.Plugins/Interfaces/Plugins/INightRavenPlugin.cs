@@ -1,7 +1,7 @@
 using DryIoc;
 using NightRaven.Plugins.Data;
 
-namespace NightRaven.Plugins.Interfaces;
+namespace NightRaven.Plugins.Interfaces.Plugins;
 
 /// <summary>
 /// Implemented by trusted .NET plugins loaded by NightRaven during server startup.

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using NightRaven.Core.Interfaces.Ids;
 
 namespace NightRaven.Core.Ids;
 

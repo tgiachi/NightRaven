@@ -4,6 +4,7 @@ using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Abstractions.Interfaces.Services;
+using NightRaven.Abstractions.Network;
 using NightRaven.Network.Spans;
 using NightRaven.Network.UO.Base;
 using NightRaven.Network.UO.Registry;
@@ -66,6 +67,35 @@ public class PacketDispatchHandlerTests
         public List<long> SessionIds { get; } = [];
     }
 
+    private sealed class BaseHandlerProbe
+    {
+        public IEventBusService? EventBus { get; set; }
+        public INetworkSessionManager? Sessions { get; set; }
+    }
+
+    private sealed class BaseHandler : PacketHandlerBase<TestPacket>
+    {
+        private readonly BaseHandlerProbe _probe;
+
+        public BaseHandler(
+            IEventBusService eventBus,
+            INetworkSessionManager sessions,
+            BaseHandlerProbe probe
+        )
+            : base(eventBus, sessions)
+        {
+            _probe = probe;
+        }
+
+        public override Task HandleAsync(PacketContext<TestPacket> context, CancellationToken cancellationToken = default)
+        {
+            _probe.EventBus = EventBus;
+            _probe.Sessions = Sessions;
+
+            return Task.CompletedTask;
+        }
+    }
+
     private sealed class IntegrationHandler : IPacketHandler<TestPacket>
     {
         private readonly IntegrationCapture _capture;
@@ -124,7 +154,9 @@ public class PacketDispatchHandlerTests
     {
         var container = new Container();
         container.Register<IOutgoingPacketQueue, OutgoingPacketQueue>(Reuse.Singleton);
-        container.Register<ISessionService, SessionService>(Reuse.Singleton);
+        container.Register<SessionService>(Reuse.Singleton);
+        container.RegisterMapping<ISessionService, SessionService>();
+        container.RegisterMapping<INetworkSessionManager, SessionService>();
 
         container.AddNightRavenPacketHandlers();
 
@@ -156,6 +188,41 @@ public class PacketDispatchHandlerTests
         var handlers = container.ResolveMany<IPacketHandler<ScanPacket>>().ToArray();
 
         Assert.Contains(handlers, static handler => handler.GetType() == typeof(ScannedHandler));
+    }
+
+    [Fact]
+    public void AddPacketHandler_BaseClass_ReceivesEventBusAndSessions()
+    {
+        var container = new Container();
+        container.RegisterInstance(new PacketRegistry());
+        container.RegisterInstance(new BaseHandlerProbe());
+        container.AddNightRavenEventBus();
+        container.AddNightRavenNetwork();
+        container.AddNightRavenPacketHandlers();
+        container.AddPacketHandler<BaseHandler, TestPacket>();
+
+        var bus = container.Resolve<IEventBusService>();
+
+        bus.Publish(new PacketReceivedEvent(10, 0xA1, new TestPacket(0xA1), DateTimeOffset.UtcNow));
+        bus.DrainTickEvents(10);
+
+        var probe = container.Resolve<BaseHandlerProbe>();
+        Assert.Same(bus, probe.EventBus);
+        Assert.Same(container.Resolve<INetworkSessionManager>(), probe.Sessions);
+    }
+
+    [Fact]
+    public void SessionService_ExposesNetworkSessionManager()
+    {
+        var container = new Container();
+        container.RegisterInstance(new PacketRegistry());
+
+        container.AddNightRavenNetwork();
+
+        Assert.Same(
+            container.Resolve<ISessionService>(),
+            container.Resolve<INetworkSessionManager>()
+        );
     }
 
     [Fact]

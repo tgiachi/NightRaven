@@ -1,3 +1,5 @@
+using NightRaven.Core.Interfaces.Ids;
+
 namespace NightRaven.Core.Ids;
 
 /// <summary>

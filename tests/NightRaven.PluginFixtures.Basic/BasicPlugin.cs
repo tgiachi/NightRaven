@@ -1,7 +1,7 @@
 using DryIoc;
 using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Plugins.Data;
-using NightRaven.Plugins.Interfaces;
+using NightRaven.Plugins.Interfaces.Plugins;
 using NightRaven.Scripting.Lua.Attributes.Scripts;
 using NightRaven.Scripting.Lua.Extensions.Scripts;
 

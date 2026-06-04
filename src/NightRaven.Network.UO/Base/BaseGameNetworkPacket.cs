@@ -1,5 +1,5 @@
 using NightRaven.Network.Spans;
-using NightRaven.Network.UO.Interfaces;
+using NightRaven.Network.UO.Interfaces.Packets;
 
 namespace NightRaven.Network.UO.Base;
 

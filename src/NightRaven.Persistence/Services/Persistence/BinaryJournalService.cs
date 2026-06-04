@@ -4,6 +4,7 @@ using MessagePack.Resolvers;
 using NightRaven.Persistence.Data;
 using NightRaven.Persistence.Interfaces.Persistence;
 using NightRaven.Persistence.Internal;
+using NightRaven.Persistence.Interfaces.Internal;
 using Serilog;
 using ILogger = Serilog.ILogger;
 

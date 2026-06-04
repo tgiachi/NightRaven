@@ -1,5 +1,6 @@
 using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Server.Data.Events;
+using NightRaven.Server.Interfaces.Seed;
 using Serilog;
 using ILogger = Serilog.ILogger;
 

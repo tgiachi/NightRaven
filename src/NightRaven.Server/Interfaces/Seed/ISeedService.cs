@@ -1,4 +1,4 @@
-namespace NightRaven.Server.Services.Seed;
+namespace NightRaven.Server.Interfaces.Seed;
 
 /// <summary>
 /// Runs boot-time seed actions once after the server has started.

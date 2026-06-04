@@ -1,6 +1,7 @@
 using DryIoc;
 using NightRaven.Abstractions.Data.Network;
 using NightRaven.Abstractions.Extensions.DryIoc;
+using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Interfaces.Network;
 using NightRaven.Server.Services.Network;
@@ -26,7 +27,9 @@ public static class NetworkContainerExtensions
 
         container.RegisterConfigSection("network", () => new NetworkConfig());
 
-        container.Register<ISessionService, SessionService>(Reuse.Singleton);
+        container.Register<SessionService>(Reuse.Singleton);
+        container.RegisterMapping<ISessionService, SessionService>();
+        container.RegisterMapping<INetworkSessionManager, SessionService>();
         container.Register<IOutgoingPacketQueue, OutgoingPacketQueue>(Reuse.Singleton);
         container.AddNightRavenService<INetworkService, NetworkService>(NetworkServicePriority);
 

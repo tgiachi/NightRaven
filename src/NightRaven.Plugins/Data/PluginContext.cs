@@ -6,7 +6,7 @@ using Tomlyn;
 namespace NightRaven.Plugins.Data;
 
 /// <summary>
-/// Per-plugin startup context passed to <see cref="NightRaven.Plugins.Interfaces.INightRavenPlugin" />.
+/// Per-plugin startup context passed to <see cref="NightRaven.Plugins.Interfaces.Plugins.INightRavenPlugin" />.
 /// </summary>
 public sealed class PluginContext
 {

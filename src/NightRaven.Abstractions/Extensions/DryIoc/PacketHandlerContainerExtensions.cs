@@ -1,7 +1,7 @@
 using System.Reflection;
 using DryIoc;
 using NightRaven.Abstractions.Interfaces.Network;
-using NightRaven.Network.UO.Interfaces;
+using NightRaven.Network.UO.Interfaces.Packets;
 
 namespace NightRaven.Abstractions.Extensions.DryIoc;
 

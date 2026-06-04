@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Network.Client;
 using NightRaven.Server.Interfaces.Network;
 using NightRaven.Server.Services.Network.Internal;
@@ -8,7 +9,7 @@ namespace NightRaven.Server.Services.Network;
 /// <summary>
 /// Thread-safe in-memory <see cref="ISessionService" /> backed by a concurrent dictionary.
 /// </summary>
-public sealed class SessionService : ISessionService
+public sealed class SessionService : ISessionService, INetworkSessionManager
 {
     private readonly ConcurrentDictionary<long, GameSession> _sessions = new();
 
@@ -19,6 +20,9 @@ public sealed class SessionService : ISessionService
 
     public IReadOnlyCollection<GameSession> GetAll()
         => _sessions.Values.ToArray();
+
+    public IReadOnlyCollection<long> GetSessionIds()
+        => _sessions.Keys.ToArray();
 
     public GameSession GetOrCreate(NightRavenTCPClient client)
     {

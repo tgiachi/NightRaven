@@ -10,7 +10,7 @@ using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Core.Utils;
 using NightRaven.Network.Events;
 using NightRaven.Network.Server;
-using NightRaven.Network.UO.Interfaces;
+using NightRaven.Network.UO.Interfaces.Packets;
 using NightRaven.Network.UO.Registry;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Data.Network;
@@ -75,7 +75,19 @@ public sealed class NetworkService : INetworkService, IMetricProvider, IDisposab
 
     public string Prefix => "network";
 
-    private readonly record struct PendingClientData(long SessionId, byte[] Data);
+    private readonly struct PendingClientData
+    {
+        public long SessionId { get; }
+        public byte[] Data { get; }
+
+        public PendingClientData(long sessionId, byte[] data)
+        {
+            ArgumentNullException.ThrowIfNull(data);
+
+            SessionId = sessionId;
+            Data = data;
+        }
+    }
 
     public IReadOnlyList<MetricSample> Collect()
     {

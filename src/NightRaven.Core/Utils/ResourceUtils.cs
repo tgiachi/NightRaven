@@ -111,7 +111,7 @@ public static partial class ResourceUtils
 
         if (lastDotIndex == -1)
         {
-            return string.Empty; // No extension, no directory
+            return ""; // No extension, no directory
         }
 
         // Find the second-to-last dot that separates the filename from the path
@@ -119,7 +119,7 @@ public static partial class ResourceUtils
 
         if (secondLastDotIndex == -1)
         {
-            return string.Empty; // Only one dot, no directory
+            return ""; // Only one dot, no directory
         }
 
         // Extract directory path and convert dots to path separators

@@ -3,7 +3,7 @@ using System.Reflection;
 using NightRaven.Abstractions.Data.Network;
 using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Abstractions.Interfaces.Network;
-using NightRaven.Network.UO.Interfaces;
+using NightRaven.Network.UO.Interfaces.Packets;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Interfaces.Network;
 using Serilog;
@@ -24,13 +24,13 @@ public sealed class PacketDispatchHandler : ITickEventHandler<PacketReceivedEven
     private readonly ILogger _logger = Log.ForContext<PacketDispatchHandler>();
     private readonly IServiceProvider _serviceProvider;
     private readonly IOutgoingPacketQueue _outgoingPackets;
-    private readonly ISessionService _sessions;
+    private readonly INetworkSessionManager _sessions;
     private readonly ConcurrentDictionary<Type, Action<PacketDispatchHandler, PacketReceivedEvent>> _dispatchers = new();
 
     public PacketDispatchHandler(
         IServiceProvider serviceProvider,
         IOutgoingPacketQueue outgoingPackets,
-        ISessionService sessions
+        INetworkSessionManager sessions
     )
     {
         _serviceProvider = serviceProvider;
@@ -97,5 +97,5 @@ public sealed class PacketDispatchHandler : ITickEventHandler<PacketReceivedEven
     }
 
     private IReadOnlyCollection<long> GetSessionIds()
-        => _sessions.GetAll().Select(static session => session.SessionId).ToArray();
+        => _sessions.GetSessionIds();
 }

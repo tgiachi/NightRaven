@@ -207,7 +207,7 @@ public ref struct SpanReader : IDisposable
     {
         if (fixedLength == 0)
         {
-            return string.Empty;
+            return "";
         }
 
         var terminatorWidth = GetTerminatorWidth(encoding);

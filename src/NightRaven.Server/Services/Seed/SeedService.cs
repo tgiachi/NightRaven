@@ -1,4 +1,5 @@
 using NightRaven.Abstractions.Data.Seed;
+using NightRaven.Server.Interfaces.Seed;
 using Serilog;
 using ILogger = Serilog.ILogger;
 

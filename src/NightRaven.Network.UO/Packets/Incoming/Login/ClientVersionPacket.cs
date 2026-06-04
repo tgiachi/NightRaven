@@ -44,7 +44,7 @@ public class ClientVersionPacket : BaseGameNetworkPacket
             return false;
         }
 
-        Version = payloadLength == 0 ? string.Empty : reader.ReadAscii(payloadLength);
+        Version = payloadLength == 0 ? "" : reader.ReadAscii(payloadLength);
 
         return true;
     }

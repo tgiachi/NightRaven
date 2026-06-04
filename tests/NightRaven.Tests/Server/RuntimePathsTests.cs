@@ -28,8 +28,8 @@ public sealed class RuntimePathsTests : IDisposable
     {
         var directories = Directories();
         Directory.CreateDirectory(directories[DirectoryType.Config]);
-        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightheaven.toml"), string.Empty);
-        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightraven.toml"), string.Empty);
+        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightheaven.toml"), "");
+        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightraven.toml"), "");
 
         var configPath = RuntimePaths.ResolveConfigPath(directories);
 
@@ -41,7 +41,7 @@ public sealed class RuntimePathsTests : IDisposable
     {
         var directories = Directories();
         Directory.CreateDirectory(directories[DirectoryType.Config]);
-        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightheaven.toml"), string.Empty);
+        File.WriteAllText(Path.Combine(directories[DirectoryType.Config], "nightheaven.toml"), "");
 
         var configPath = RuntimePaths.ResolveConfigPath(directories);
 

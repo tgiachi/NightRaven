@@ -22,7 +22,15 @@ public sealed class SeedServiceTests : IDisposable
     private readonly string _dir = Path.Combine(Path.GetTempPath(), $"nr-seed-{Guid.NewGuid():N}");
     private string ConfigPath => Path.Combine(_dir, "nightraven.toml");
 
-    private sealed record SeedProbe(string Value);
+    private sealed class SeedProbe
+    {
+        public string Value { get; }
+
+        public SeedProbe(string value)
+        {
+            Value = value;
+        }
+    }
 
     [Fact]
     public async Task AddNightRavenSeeds_RegistersHandlerThatRunsSeedsOnServerStartedEvent()

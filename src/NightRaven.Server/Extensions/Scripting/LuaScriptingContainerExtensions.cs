@@ -4,7 +4,7 @@ using NightRaven.Core.Types;
 using NightRaven.Core.Utils;
 using NightRaven.Scripting.Lua.Data.Config;
 using NightRaven.Scripting.Lua.Data.Internal;
-using NightRaven.Scripting.Lua.Interfaces;
+using NightRaven.Scripting.Lua.Interfaces.Scripts;
 using NightRaven.Scripting.Lua.Services;
 using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Server.Services.Scripting;

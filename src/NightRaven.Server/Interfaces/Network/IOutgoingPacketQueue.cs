@@ -1,4 +1,4 @@
-using NightRaven.Network.UO.Interfaces;
+using NightRaven.Network.UO.Interfaces.Packets;
 using NightRaven.Server.Data.Network;
 
 namespace NightRaven.Server.Interfaces.Network;

@@ -1,5 +1,5 @@
 using NightRaven.Abstractions.Interfaces.Services;
-using NightRaven.Scripting.Lua.Interfaces;
+using NightRaven.Scripting.Lua.Interfaces.Scripts;
 
 namespace NightRaven.Server.Services.Scripting;
 

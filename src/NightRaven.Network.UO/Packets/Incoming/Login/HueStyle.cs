@@ -1,6 +1,16 @@
 namespace NightRaven.Network.UO.Packets.Incoming.Login;
 
 /// <summary>
-/// Represents struct.
+/// Hue/style pair selected during character login.
 /// </summary>
-public readonly record struct HueStyle(short Style, short Hue);
+public readonly record struct HueStyle
+{
+    public short Style { get; }
+    public short Hue { get; }
+
+    public HueStyle(short style, short hue)
+    {
+        Style = style;
+        Hue = hue;
+    }
+}

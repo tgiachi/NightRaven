@@ -1,4 +1,5 @@
 using NightRaven.Persistence.Internal;
+using NightRaven.Persistence.Interfaces.Internal;
 
 namespace NightRaven.Tests.Persistence;
 

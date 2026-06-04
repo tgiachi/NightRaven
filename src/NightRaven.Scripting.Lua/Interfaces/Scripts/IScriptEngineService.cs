@@ -1,6 +1,6 @@
 using NightRaven.Scripting.Lua.Data.Scripts;
 
-namespace NightRaven.Scripting.Lua.Interfaces;
+namespace NightRaven.Scripting.Lua.Interfaces.Scripts;
 
 /// <summary>
 /// Interface for the script engine service that manages JavaScript execution.

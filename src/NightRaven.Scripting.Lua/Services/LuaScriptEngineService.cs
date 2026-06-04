@@ -18,7 +18,7 @@ using NightRaven.Scripting.Lua.Data.Config;
 using NightRaven.Scripting.Lua.Data.Internal;
 using NightRaven.Scripting.Lua.Data.Luarc;
 using NightRaven.Scripting.Lua.Data.Scripts;
-using NightRaven.Scripting.Lua.Interfaces;
+using NightRaven.Scripting.Lua.Interfaces.Scripts;
 using NightRaven.Scripting.Lua.Loaders;
 using NightRaven.Scripting.Lua.Utils;
 using Serilog;

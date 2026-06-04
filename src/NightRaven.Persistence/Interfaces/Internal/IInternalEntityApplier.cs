@@ -1,6 +1,7 @@
 using NightRaven.Persistence.Data;
+using NightRaven.Persistence.Internal;
 
-namespace NightRaven.Persistence.Internal;
+namespace NightRaven.Persistence.Interfaces.Internal;
 
 /// <summary>
 /// Type-erased hook implemented by the typed descriptor so the persistence service can apply journal

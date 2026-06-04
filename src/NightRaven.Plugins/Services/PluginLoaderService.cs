@@ -4,7 +4,7 @@ using DryIoc;
 using NightRaven.Core.Data.Directories;
 using NightRaven.Core.Types;
 using NightRaven.Plugins.Data;
-using NightRaven.Plugins.Interfaces;
+using NightRaven.Plugins.Interfaces.Plugins;
 using NightRaven.Plugins.Internal;
 using Serilog;
 

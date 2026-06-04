@@ -2,6 +2,7 @@ using DryIoc;
 using NightRaven.Abstractions.Data.Seed;
 using NightRaven.Abstractions.Extensions.DryIoc;
 using NightRaven.Server.Data.Events;
+using NightRaven.Server.Interfaces.Seed;
 using NightRaven.Server.Services.Seed;
 using NightRaven.UO.Domain.Interfaces.Services;
 using NightRaven.UO.Domain.Types;
