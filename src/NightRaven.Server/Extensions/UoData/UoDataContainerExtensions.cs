@@ -7,8 +7,10 @@ using NightRaven.UO.Data.Art;
 using NightRaven.UO.Data.Bodies;
 using NightRaven.UO.Data.Data;
 using NightRaven.UO.Data.Files;
+using NightRaven.UO.Data.Hues;
 using NightRaven.UO.Data.Interfaces.Art;
 using NightRaven.UO.Data.Interfaces.Bodies;
+using NightRaven.UO.Data.Interfaces.Hues;
 using NightRaven.UO.Data.Interfaces.Files;
 using NightRaven.UO.Data.Interfaces.Localization;
 using NightRaven.UO.Data.Interfaces.Maps;
@@ -78,6 +80,15 @@ public static class UoDataContainerExtensions
         container.RegisterDelegate<ISkillDataStore>(_ => new SkillDataStore(dataDirectory), Reuse.Singleton);
         container.RegisterDelegate<IRaceStore>(_ => new RaceStore(dataDirectory), Reuse.Singleton);
         container.RegisterDelegate<IBodyDataStore>(_ => new BodyDataStore(dataDirectory), Reuse.Singleton);
+
+        container.RegisterDelegate<IHueStore>(
+            resolver => new HueStore(resolver.Resolve<IUoFileResolver>()),
+            Reuse.Singleton
+        );
+        container.RegisterDelegate<IRadarColorStore>(
+            resolver => new RadarColorStore(resolver.Resolve<IUoFileResolver>()),
+            Reuse.Singleton
+        );
 
         // Eager-load all UO data at boot (priority 10, before the network service at 20).
         container.AddNightRavenHosting();
