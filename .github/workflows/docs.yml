@@ -1,13 +1,13 @@
 name: docs
 
+# Docs are rebuilt after a release: in the GitFlow, main only receives the
+# develop -> main release merge, so any push to main (and any published
+# GitHub Release) triggers a fresh docs deployment.
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'docs/**'
-      - 'src/**'
-      - '.github/workflows/docs.yml'
-      - 'global.json'
+  release:
+    types: [ published ]
   workflow_dispatch:
 
 # Allow the workflow to publish to GitHub Pages.
