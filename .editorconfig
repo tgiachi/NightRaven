@@ -258,6 +258,20 @@ resharper_enforce_lock_statement_braces_highlighting = hint
 resharper_enforce_using_statement_braces_highlighting = hint
 resharper_enforce_while_statement_braces_highlighting = hint
 
+# --- NightRaven enforced rules (surfaced report-only in CI via ReSharper inspectcode) ---
+# Prefer collection expressions: [] and [.. source] over Array.Empty<T>(), new T[0], .ToArray(), .ToList()
+dotnet_style_prefer_collection_expression = when_types_loosely_match
+dotnet_diagnostic.IDE0300.severity = warning
+dotnet_diagnostic.IDE0301.severity = warning
+dotnet_diagnostic.IDE0302.severity = warning
+dotnet_diagnostic.IDE0303.severity = warning
+dotnet_diagnostic.IDE0304.severity = warning
+dotnet_diagnostic.IDE0305.severity = warning
+
+# Prefer System.Threading.Lock over a plain object used as a lock target.
+# No Roslyn analyzer exists for this; it is a ReSharper inspection (surfaced by jb inspectcode in CI).
+resharper_use_system_threading_lock_highlighting = warning
+
 [*.{sln,csproj,bat}]
 end_of_line = crlf
 

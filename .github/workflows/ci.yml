@@ -1,0 +1,106 @@
+name: ci
+
+# GitFlow:
+#   feature/*  --PR-->  develop   (CI runs on the PR)
+#   merge into develop            (CI runs on push)
+#   develop    --PR-->  main      (release PR; CI runs on the PR)
+on:
+  pull_request:
+    branches: [ develop, main ]
+  push:
+    branches: [ develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write   # for ReSharper SARIF upload (report-only)
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: Build & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore NightRaven.slnx
+
+      - name: Build
+        run: dotnet build NightRaven.slnx -c Release --no-restore
+
+      - name: Test with coverage
+        run: >
+          dotnet test NightRaven.slnx -c Release --no-build
+          --collect:"XPlat Code Coverage"
+          --results-directory ./coverage
+          --logger "trx;LogFileName=test-results.trx"
+
+      - name: Generate coverage summary
+        if: always()
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          export PATH="${HOME}/.dotnet/tools:${PATH}"
+          reportgenerator \
+            -reports:"coverage/**/coverage.cobertura.xml" \
+            -targetdir:"coverage-report" \
+            -reporttypes:"MarkdownSummaryGithub;TextSummary" \
+            -title:"NightRaven coverage"
+          cat coverage-report/SummaryGithub.md >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
+
+  inspect:
+    name: ReSharper inspect (report-only)
+    runs-on: ubuntu-latest
+    # Report-only: surfaces style/quality issues (collection expressions, Lock, …)
+    # but never blocks the pipeline.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Install ReSharper CLI
+        run: |
+          dotnet tool install -g JetBrains.ReSharper.GlobalTools
+          echo "${HOME}/.dotnet/tools" >> "${GITHUB_PATH}"
+
+      - name: Inspect code
+        run: |
+          jb inspectcode NightRaven.slnx \
+            --output=inspect.sarif \
+            --format=Sarif \
+            --severity=WARNING \
+            --build || true
+
+      - name: Upload SARIF to code scanning
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: inspect.sarif
+          category: resharper
+
+      - name: Upload inspection report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resharper-inspection
+          path: inspect.sarif
