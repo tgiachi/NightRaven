@@ -1,4 +1,5 @@
 using NightRaven.Network.UO.Packets.Incoming.Login;
+using NightRaven.Abstractions.Data.Version;
 using NightRaven.Network.UO.Registry;
 
 namespace NightRaven.Tests.Network.Packets;

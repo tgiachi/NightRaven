@@ -1,5 +1,5 @@
 using NightRaven.Abstractions.Data.Network;
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 
 namespace NightRaven.Abstractions.Interfaces.Network;
 

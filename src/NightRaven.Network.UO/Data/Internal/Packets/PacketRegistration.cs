@@ -1,5 +1,5 @@
 using NightRaven.Network.UO.Data.Packets;
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 
 namespace NightRaven.Network.UO.Data.Internal.Packets;
 

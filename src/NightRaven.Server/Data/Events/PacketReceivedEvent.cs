@@ -1,5 +1,5 @@
 using NightRaven.Abstractions.Interfaces.Events;
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 
 namespace NightRaven.Server.Data.Events;
 

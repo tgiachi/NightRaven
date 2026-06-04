@@ -1,3 +1,4 @@
+using NightRaven.Abstractions.Data.Version;
 using NightRaven.Network.Spans;
 using NightRaven.Network.UO.Attributes;
 using NightRaven.Network.UO.Base;

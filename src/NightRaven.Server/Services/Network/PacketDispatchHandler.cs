@@ -3,7 +3,7 @@ using System.Reflection;
 using NightRaven.Abstractions.Data.Network;
 using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Abstractions.Interfaces.Network;
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Interfaces.Network;
 using Serilog;

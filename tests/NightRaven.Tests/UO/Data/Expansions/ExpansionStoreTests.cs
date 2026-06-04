@@ -1,3 +1,4 @@
+using NightRaven.Abstractions.Types.Expansions;
 using NightRaven.UO.Data.Expansions;
 using NightRaven.UO.Data.Types.Expansions;
 

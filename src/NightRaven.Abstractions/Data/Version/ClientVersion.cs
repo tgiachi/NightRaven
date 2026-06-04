@@ -1,4 +1,4 @@
-namespace NightRaven.UO.Data.Version;
+namespace NightRaven.Abstractions.Data.Version;
 
 /// <summary>
 /// A parsed Ultima Online client version (<c>Major.Minor.Revision.Patch</c>), comparable by
@@ -39,6 +39,15 @@ public sealed class ClientVersion : IComparable<ClientVersion>, IEquatable<Clien
         {
             Patch = ParseLeadingInt(segments[3]);
         }
+    }
+
+    public ClientVersion(int major, int minor, int revision, int patch)
+    {
+        Major = major;
+        Minor = minor;
+        Revision = revision;
+        Patch = patch;
+        SourceString = $"{major}.{minor}.{revision}.{patch}";
     }
 
     public int Major { get; }

@@ -1,6 +1,6 @@
 using NightRaven.Abstractions.Data.Player;
 using NightRaven.Core.Ids;
-using NightRaven.Network.UO.Packets.Incoming.Login;
+using NightRaven.Abstractions.Data.Version;
 using ZLinq;
 using ZLinq.Linq;
 

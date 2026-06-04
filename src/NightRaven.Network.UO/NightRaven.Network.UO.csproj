@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\NightRaven.Network\NightRaven.Network.csproj" />
+        <ProjectReference Include="..\NightRaven.Abstractions\NightRaven.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup>

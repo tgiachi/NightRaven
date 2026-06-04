@@ -1,6 +1,7 @@
 using NightRaven.Abstractions.Types.Player;
 using NightRaven.Core.Ids;
 using NightRaven.Network.UO.Packets.Incoming.Login;
+using NightRaven.Abstractions.Data.Version;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Services.Player;
 
