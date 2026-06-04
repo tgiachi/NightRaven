@@ -21,6 +21,7 @@ using NightRaven.Server.Extensions.Plugins;
 using NightRaven.Server.Extensions.Scripting;
 using NightRaven.Server.Extensions.Seed;
 using NightRaven.Server.Extensions.Timing;
+using NightRaven.Server.Extensions.UoData;
 using NightRaven.Server.Extensions.Users;
 using NightRaven.Server.Services.Diagnostics;
 using NightRaven.Server.Services.EventBus;
@@ -93,6 +94,9 @@ public static class NightRavenBootstrap
 
         // Persistence (priority 15): snapshot + journal.
         container.AddNightRavenPersistence(directories[DirectoryType.Save]);
+
+        // UO static data: client-file resolver + tiledata store (fail-fast on missing client files).
+        container.AddNightRavenUoData();
 
         // Network: TCP game listeners + UDP ping server + packet parser (priority 20).
         container.AddNightRavenNetwork();
