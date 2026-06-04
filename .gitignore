@@ -579,7 +579,8 @@ coverage/*
 # DocFX generated documentation
 docs/_site/
 docs/obj/
-docs/api/
+docs/api/*
+!docs/api/index.md
 docs/log.txt
 **/.manifest
 .tools
