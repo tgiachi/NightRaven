@@ -95,8 +95,13 @@ public static class NightRavenBootstrap
         // Persistence (priority 15): snapshot + journal.
         container.AddNightRavenPersistence(directories[DirectoryType.Save]);
 
-        // UO static data: client-file resolver + tiledata store (fail-fast on missing client files).
-        container.AddNightRavenUoData();
+        // UO static data: seed bundled reference data, then register client-file + reference stores.
+        UoDataAssetsBootstrapper.EnsureDataAssets(
+            Path.Combine(AppContext.BaseDirectory, "uo_files"),
+            directories[DirectoryType.Data],
+            Log.Logger
+        );
+        container.AddNightRavenUoData(directories[DirectoryType.Data]);
 
         // Network: TCP game listeners + UDP ping server + packet parser (priority 20).
         container.AddNightRavenNetwork();
