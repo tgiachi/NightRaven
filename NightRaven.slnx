@@ -1,21 +1,22 @@
 <Solution>
     <Folder Name="/src/">
-        <Project Path="src/NightRaven.Core/NightRaven.Core.csproj"/>
-        <Project Path="src/NightRaven.Abstractions/NightRaven.Abstractions.csproj"/>
-        <Project Path="src/NightRaven.Network/NightRaven.Network.csproj"/>
-        <Project Path="src/NightRaven.Network.UO/NightRaven.Network.UO.csproj"/>
-        <Project Path="src/NightRaven.Persistence/NightRaven.Persistence.csproj"/>
-        <Project Path="src/NightRaven.Plugins/NightRaven.Plugins.csproj"/>
-        <Project Path="src/NightRaven.Scripting.Lua/NightRaven.Scripting.Lua.csproj"/>
-        <Project Path="src/NightRaven.UO.Domain/NightRaven.UO.Domain.csproj"/>
-        <Project Path="src/NightRaven.Server/NightRaven.Server.csproj"/>
+        <Project Path="src/NightRaven.Core/NightRaven.Core.csproj" />
+        <Project Path="src/NightRaven.Abstractions/NightRaven.Abstractions.csproj" />
+        <Project Path="src/NightRaven.Network/NightRaven.Network.csproj" />
+        <Project Path="src/NightRaven.Network.UO/NightRaven.Network.UO.csproj" />
+        <Project Path="src/NightRaven.Persistence/NightRaven.Persistence.csproj" />
+        <Project Path="src/NightRaven.Plugins/NightRaven.Plugins.csproj" />
+        <Project Path="src/NightRaven.Scripting.Lua/NightRaven.Scripting.Lua.csproj" />
+        <Project Path="src/NightRaven.UO.Data/NightRaven.UO.Data.csproj" />
+        <Project Path="src/NightRaven.UO.Domain/NightRaven.UO.Domain.csproj" />
+        <Project Path="src/NightRaven.Server/NightRaven.Server.csproj" />
     </Folder>
     <Folder Name="/tests/">
-        <Project Path="tests/NightRaven.Tests/NightRaven.Tests.csproj"/>
+        <Project Path="tests/NightRaven.Tests/NightRaven.Tests.csproj" />
     </Folder>
     <Folder Name="/tests/Plugin Fixtures/">
-        <Project Path="tests/NightRaven.PluginFixtures.Basic/NightRaven.PluginFixtures.Basic.csproj"/>
-        <Project Path="tests/NightRaven.PluginFixtures.Empty/NightRaven.PluginFixtures.Empty.csproj"/>
-        <Project Path="tests/NightRaven.PluginFixtures.Multiple/NightRaven.PluginFixtures.Multiple.csproj"/>
+        <Project Path="tests/NightRaven.PluginFixtures.Basic/NightRaven.PluginFixtures.Basic.csproj" />
+        <Project Path="tests/NightRaven.PluginFixtures.Empty/NightRaven.PluginFixtures.Empty.csproj" />
+        <Project Path="tests/NightRaven.PluginFixtures.Multiple/NightRaven.PluginFixtures.Multiple.csproj" />
     </Folder>
 </Solution>

@@ -10,29 +10,30 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="10.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0"/>
-        <PackageReference Include="Tomlyn" Version="2.4.1"/>
-        <PackageReference Include="xunit" Version="2.9.3"/>
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5"/>
+        <PackageReference Include="coverlet.collector" Version="10.0.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+        <PackageReference Include="Tomlyn" Version="2.4.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
     </ItemGroup>
 
     <ItemGroup>
-        <Using Include="Xunit"/>
+        <Using Include="Xunit" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\NightRaven.Core\NightRaven.Core.csproj"/>
-        <ProjectReference Include="..\..\src\NightRaven.UO.Domain\NightRaven.UO.Domain.csproj"/>
-        <ProjectReference Include="..\..\src\NightRaven.Abstractions\NightRaven.Abstractions.csproj"/>
-        <ProjectReference Include="..\..\src\NightRaven.Network\NightRaven.Network.csproj"/>
-        <ProjectReference Include="..\..\src\NightRaven.Persistence\NightRaven.Persistence.csproj"/>
-        <ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj"/>
-        <ProjectReference Include="..\..\src\NightRaven.Server\NightRaven.Server.csproj"/>
-        <ProjectReference Include="..\NightRaven.PluginFixtures.Basic\NightRaven.PluginFixtures.Basic.csproj"/>
-        <ProjectReference Include="..\NightRaven.PluginFixtures.Empty\NightRaven.PluginFixtures.Empty.csproj"/>
-        <ProjectReference Include="..\NightRaven.PluginFixtures.Multiple\NightRaven.PluginFixtures.Multiple.csproj"/>
+        <ProjectReference Include="..\..\src\NightRaven.Core\NightRaven.Core.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.UO.Domain\NightRaven.UO.Domain.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.Abstractions\NightRaven.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.Network\NightRaven.Network.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.Persistence\NightRaven.Persistence.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.Plugins\NightRaven.Plugins.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.Server\NightRaven.Server.csproj" />
+        <ProjectReference Include="..\NightRaven.PluginFixtures.Basic\NightRaven.PluginFixtures.Basic.csproj" />
+        <ProjectReference Include="..\NightRaven.PluginFixtures.Empty\NightRaven.PluginFixtures.Empty.csproj" />
+        <ProjectReference Include="..\NightRaven.PluginFixtures.Multiple\NightRaven.PluginFixtures.Multiple.csproj" />
+        <ProjectReference Include="..\..\src\NightRaven.UO.Data\NightRaven.UO.Data.csproj" />
     </ItemGroup>
 
 </Project>
