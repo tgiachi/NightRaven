@@ -18,7 +18,7 @@ public class UoDataContainerExtensionsTests
 
             var container = new Container();
             container.RegisterInstance(new UoConfig { ClientFilesDirectory = dir.FullName });
-            container.AddNightRavenUoData();
+            container.AddNightRavenUoData(dir.FullName);
 
             var resolver = container.Resolve<IUoFileResolver>();
             var verdata = container.Resolve<IVerdataPatchSource>();
