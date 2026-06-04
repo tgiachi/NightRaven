@@ -9,7 +9,7 @@ namespace NightRaven.Core.Toml;
 /// </summary>
 public static class TomlUtils
 {
-    private static readonly ConcurrentBag<TomlSerializerContext> TomlSerializerContexts = new();
+    private static readonly ConcurrentBag<TomlSerializerContext> _tomlSerializerContexts = new();
 
     /// <summary>
     /// Deserializes TOML text using a source-generated serializer context.
@@ -73,8 +73,8 @@ public static class TomlUtils
     /// <returns>The registered TOML serializer contexts.</returns>
     public static IReadOnlyList<TomlSerializerContext> GetTomlContexts()
     {
-        var contexts = new TomlSerializerContext[TomlSerializerContexts.Count];
-        TomlSerializerContexts.CopyTo(contexts, 0);
+        var contexts = new TomlSerializerContext[_tomlSerializerContexts.Count];
+        _tomlSerializerContexts.CopyTo(contexts, 0);
 
         return Array.AsReadOnly(contexts);
     }
@@ -87,7 +87,7 @@ public static class TomlUtils
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        TomlSerializerContexts.Add(context);
+        _tomlSerializerContexts.Add(context);
     }
 
     /// <summary>

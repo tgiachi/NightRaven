@@ -1,5 +1,6 @@
 using NightRaven.Abstractions.Types.Player;
 using NightRaven.Core.Ids;
+using NightRaven.Network.UO.Packets.Incoming.Login;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Services.Player;
 
@@ -92,9 +93,11 @@ public sealed class PlayerSessionServiceTests
         var service = new PlayerSessionService();
         service.GetOrCreateConnected(10, null, DateTimeOffset.UtcNow);
 
-        var session = service.UpdateClient(10, "7.0.98.13", 18);
+        var clientVersion = new ClientVersion(7, 0, 98, 13);
 
-        Assert.Equal("7.0.98.13", session.ClientVersion);
-        Assert.Equal((byte)18, session.ViewRange);
+        var session = service.UpdateClient(10, clientVersion, 18);
+
+        Assert.Equal(clientVersion, session.ClientVersion);
+        Assert.Equal(18, session.ViewRange);
     }
 }

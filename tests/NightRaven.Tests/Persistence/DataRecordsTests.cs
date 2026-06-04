@@ -7,7 +7,7 @@ namespace NightRaven.Tests.Persistence;
 
 public class DataRecordsTests
 {
-    private static readonly MessagePackSerializerOptions Options =
+    private static readonly MessagePackSerializerOptions _options =
         ContractlessStandardResolver.Options;
 
     [Fact]
@@ -22,8 +22,8 @@ public class DataRecordsTests
             Payload = [1, 2, 3]
         };
 
-        var bytes = MessagePackSerializer.Serialize(entry, Options);
-        var back = MessagePackSerializer.Deserialize<JournalEntry>(bytes, Options);
+        var bytes = MessagePackSerializer.Serialize(entry, _options);
+        var back = MessagePackSerializer.Deserialize<JournalEntry>(bytes, _options);
 
         Assert.Equal(42, back.SequenceId);
         Assert.Equal(7, back.TypeId);
@@ -41,8 +41,8 @@ public class DataRecordsTests
             EntityBuckets = [new() { TypeId = 1, TypeName = "Test", SchemaVersion = 2, Payload = [9] }]
         };
 
-        var bytes = MessagePackSerializer.Serialize(snapshot, Options);
-        var back = MessagePackSerializer.Deserialize<WorldSnapshot>(bytes, Options);
+        var bytes = MessagePackSerializer.Serialize(snapshot, _options);
+        var back = MessagePackSerializer.Deserialize<WorldSnapshot>(bytes, _options);
 
         Assert.Equal(5, back.LastSequenceId);
         Assert.Single(back.EntityBuckets);

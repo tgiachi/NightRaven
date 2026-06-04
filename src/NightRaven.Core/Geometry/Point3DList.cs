@@ -1,34 +1,35 @@
-using NightRaven.Core.Geometry;
-
-namespace Moongate.UO.Data.Geometry;
+namespace NightRaven.Core.Geometry;
 
 /// <summary>
 /// Represents Point3DList.
 /// </summary>
 public class Point3DList
 {
-    private static readonly Point3D[] m_EmptyList = [];
-    private Point3D[] m_List;
+    private const int InitialCapacity = 16;
 
-    public Point3DList()
-    {
-        m_List = new Point3D[16];
-        Count = 0;
-    }
+    private static readonly Point3D[] _emptyList = [];
+
+    private Point3D[] _list;
 
     public int Count { get; private set; }
 
-    public Point3D Last => m_List[Count - 1];
+    public Point3D Last => _list[Count - 1];
 
-    public Point3D this[int index] => m_List[index];
+    public Point3D this[int index] => _list[index];
+
+    public Point3DList()
+    {
+        _list = new Point3D[InitialCapacity];
+        Count = 0;
+    }
 
     public void Add(int x, int y, int z)
     {
         EnsureCapacity(Count + 1);
 
-        m_List[Count].X = x;
-        m_List[Count].Y = y;
-        m_List[Count].Z = z;
+        _list[Count].X = x;
+        _list[Count].Y = y;
+        _list[Count].Z = z;
         ++Count;
     }
 
@@ -36,9 +37,9 @@ public class Point3DList
     {
         EnsureCapacity(Count + 1);
 
-        m_List[Count].X = p.X;
-        m_List[Count].Y = p.Y;
-        m_List[Count].Z = p.Z;
+        _list[Count].X = p.X;
+        _list[Count].Y = p.Y;
+        _list[Count].Z = p.Z;
         ++Count;
     }
 
@@ -49,14 +50,14 @@ public class Point3DList
     {
         if (Count == 0)
         {
-            return m_EmptyList;
+            return _emptyList;
         }
 
         var list = new Point3D[Count];
 
         for (var i = 0; i < Count; ++i)
         {
-            list[i] = m_List[i];
+            list[i] = _list[i];
         }
 
         Count = 0;
@@ -66,20 +67,20 @@ public class Point3DList
 
     private void EnsureCapacity(int requiredCount)
     {
-        if (requiredCount <= m_List.Length)
+        if (requiredCount <= _list.Length)
         {
             return;
         }
 
-        var newSize = m_List.Length * 2;
+        var newSize = _list.Length * 2;
 
         while (newSize < requiredCount)
         {
             newSize *= 2;
         }
 
-        var old = m_List;
-        m_List = new Point3D[newSize];
-        Array.Copy(old, m_List, old.Length);
+        var old = _list;
+        _list = new Point3D[newSize];
+        Array.Copy(old, _list, old.Length);
     }
 }

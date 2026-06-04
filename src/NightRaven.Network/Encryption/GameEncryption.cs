@@ -14,7 +14,7 @@ public sealed class GameEncryption : IClientEncryption
     private const int BlockSize = 16;
     private const int GameLoginPacketSize = 65;
 
-    private static readonly byte[] IdentityTable = CreateIdentityTable();
+    private static readonly byte[] _identityTable = CreateIdentityTable();
 
     private readonly TwofishEngine _twofish;
     private readonly byte[] _cipherTable;
@@ -32,7 +32,7 @@ public sealed class GameEncryption : IClientEncryption
 
         _twofish = new(key);
         _cipherTable = GC.AllocateUninitializedArray<byte>(CipherTableSize);
-        IdentityTable.CopyTo(_cipherTable, 0);
+        _identityTable.CopyTo(_cipherTable, 0);
         RefreshCipherTable();
         _xorKey = CreateXorKey(_cipherTable);
     }

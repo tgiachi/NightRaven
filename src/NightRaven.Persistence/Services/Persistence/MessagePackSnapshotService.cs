@@ -10,7 +10,7 @@ namespace NightRaven.Persistence.Services.Persistence;
 /// </summary>
 public sealed class MessagePackSnapshotService : ISnapshotService, IDisposable
 {
-    private static readonly MessagePackSerializerOptions Options = ContractlessStandardResolver.Options;
+    private static readonly MessagePackSerializerOptions _options = ContractlessStandardResolver.Options;
 
     private readonly SemaphoreSlim _ioLock = new(1, 1);
     private readonly string _path;
@@ -29,9 +29,6 @@ public sealed class MessagePackSnapshotService : ISnapshotService, IDisposable
         }
     }
 
-    public void Dispose()
-        => _ioLock.Dispose();
-
     public async ValueTask<WorldSnapshot?> LoadAsync(CancellationToken cancellationToken = default)
     {
         await _ioLock.WaitAsync(cancellationToken);
@@ -45,7 +42,7 @@ public sealed class MessagePackSnapshotService : ISnapshotService, IDisposable
 
             var bytes = await File.ReadAllBytesAsync(_path, cancellationToken);
 
-            return MessagePackSerializer.Deserialize<WorldSnapshot>(bytes, Options, cancellationToken);
+            return MessagePackSerializer.Deserialize<WorldSnapshot>(bytes, _options, cancellationToken);
         }
         finally
         {
@@ -62,7 +59,7 @@ public sealed class MessagePackSnapshotService : ISnapshotService, IDisposable
         try
         {
             var tempPath = _path + ".tmp";
-            var bytes = MessagePackSerializer.Serialize(snapshot, Options, cancellationToken);
+            var bytes = MessagePackSerializer.Serialize(snapshot, _options, cancellationToken);
 
             await using (var stream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
@@ -77,4 +74,7 @@ public sealed class MessagePackSnapshotService : ISnapshotService, IDisposable
             _ioLock.Release();
         }
     }
+
+    public void Dispose()
+        => _ioLock.Dispose();
 }

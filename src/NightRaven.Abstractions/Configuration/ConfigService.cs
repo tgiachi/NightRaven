@@ -14,7 +14,7 @@ namespace NightRaven.Abstractions.Configuration;
 /// </summary>
 public static class ConfigService
 {
-    private static readonly ILogger Logger = Log.ForContext(typeof(ConfigService));
+    private static readonly ILogger _logger = Log.ForContext(typeof(ConfigService));
 
     /// <summary>
     /// Loads (and self-heals) the config file for the given section registrations.
@@ -72,7 +72,7 @@ public static class ConfigService
         if (errors.Count > 0)
         {
             var message = "Invalid configuration:\n" + string.Join("\n", errors);
-            Logger.Fatal("{Message}", message);
+            _logger.Fatal("{Message}", message);
 
             throw new InvalidOperationException(message);
         }
@@ -80,7 +80,7 @@ public static class ConfigService
         if (dirty)
         {
             WriteFile(fullPath, results, sections);
-            Logger.Information(
+            _logger.Information(
                 fileExisted ? "Config healed at {Path}" : "Created default config at {Path}",
                 fullPath
             );
@@ -99,7 +99,7 @@ public static class ConfigService
         }
         catch (Exception ex)
         {
-            Logger.Fatal(ex, "Config section [{Section}] is invalid", section.Name);
+            _logger.Fatal(ex, "Config section [{Section}] is invalid", section.Name);
 
             throw new InvalidOperationException($"Config section [{section.Name}] could not be parsed.", ex);
         }
@@ -115,7 +115,7 @@ public static class ConfigService
         }
         catch (Exception ex)
         {
-            Logger.Fatal(ex, "Malformed config {Path}", fullPath);
+            _logger.Fatal(ex, "Malformed config {Path}", fullPath);
 
             throw new InvalidOperationException($"Malformed config file '{fullPath}'.", ex);
         }
@@ -132,7 +132,7 @@ public static class ConfigService
         {
             if (root[key] is TomlTable && !known.Contains(key))
             {
-                Logger.Warning("Ignoring unknown config section [{Section}]", key);
+                _logger.Warning("Ignoring unknown config section [{Section}]", key);
             }
         }
     }

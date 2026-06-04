@@ -16,7 +16,7 @@ namespace NightRaven.Server.Services.Network;
 /// </summary>
 public sealed class PacketDispatchHandler : ITickEventHandler<PacketReceivedEvent>
 {
-    private static readonly MethodInfo DispatchMethod = typeof(PacketDispatchHandler).GetMethod(
+    private static readonly MethodInfo _dispatchMethod = typeof(PacketDispatchHandler).GetMethod(
         nameof(Dispatch),
         BindingFlags.Instance | BindingFlags.NonPublic
     )!;
@@ -48,7 +48,7 @@ public sealed class PacketDispatchHandler : ITickEventHandler<PacketReceivedEven
 
     private static Action<PacketDispatchHandler, PacketReceivedEvent> CreateDispatcher(Type packetType)
     {
-        var closedMethod = DispatchMethod.MakeGenericMethod(packetType);
+        var closedMethod = _dispatchMethod.MakeGenericMethod(packetType);
 
         return (handler, evt) => closedMethod.Invoke(handler, [evt]);
     }

@@ -21,7 +21,7 @@ public sealed class TwofishEngine
     private const uint RsGfFdbk = 0x14D;
     private const int MdsGfFdbk = 0x169;
 
-    private static readonly byte[] P0 =
+    private static readonly byte[] _p0 =
     {
         0xA9, 0x67, 0xB3, 0xE8, 0x04, 0xFD, 0xA3, 0x76, 0x9A, 0x92, 0x80, 0x78, 0xE4, 0xDD, 0xD1, 0x38,
         0x0D, 0xC6, 0x35, 0x98, 0x18, 0xF7, 0xEC, 0x6C, 0x43, 0x75, 0x37, 0x26, 0xFA, 0x13, 0x94, 0x48,
@@ -41,7 +41,7 @@ public sealed class TwofishEngine
         0xCA, 0x10, 0x21, 0xF0, 0xD3, 0x5D, 0x0F, 0x00, 0x6F, 0x9D, 0x36, 0x42, 0x4A, 0x5E, 0xC1, 0xE0
     };
 
-    private static readonly byte[] P1 =
+    private static readonly byte[] _p1 =
     {
         0x75, 0xF3, 0xC6, 0xF4, 0xDB, 0x7B, 0xFB, 0xC8, 0x4A, 0xD3, 0xE6, 0x6B, 0x45, 0x7D, 0xE8, 0x4B,
         0xD6, 0x32, 0xD8, 0xFD, 0x37, 0x71, 0xF1, 0xE1, 0x30, 0x0F, 0xF8, 0x1B, 0x87, 0xFA, 0x06, 0x3F,
@@ -118,17 +118,17 @@ public sealed class TwofishEngine
         var b2 = (byte)(x >> 16);
         var b3 = (byte)(x >> 24);
 
-        b0 = (byte)(P0[b0] ^ (byte)k2);
-        b1 = (byte)(P1[b1] ^ (byte)(k2 >> 8));
-        b2 = (byte)(P0[b2] ^ (byte)(k2 >> 16));
-        b3 = (byte)(P1[b3] ^ (byte)(k2 >> 24));
+        b0 = (byte)(_p0[b0] ^ (byte)k2);
+        b1 = (byte)(_p1[b1] ^ (byte)(k2 >> 8));
+        b2 = (byte)(_p0[b2] ^ (byte)(k2 >> 16));
+        b3 = (byte)(_p1[b3] ^ (byte)(k2 >> 24));
 
-        b0 = (byte)(P0[b0] ^ (byte)k0);
-        b1 = (byte)(P0[b1] ^ (byte)(k0 >> 8));
-        b2 = (byte)(P1[b2] ^ (byte)(k0 >> 16));
-        b3 = (byte)(P1[b3] ^ (byte)(k0 >> 24));
+        b0 = (byte)(_p0[b0] ^ (byte)k0);
+        b1 = (byte)(_p0[b1] ^ (byte)(k0 >> 8));
+        b2 = (byte)(_p1[b2] ^ (byte)(k0 >> 16));
+        b3 = (byte)(_p1[b3] ^ (byte)(k0 >> 24));
 
-        return MdsMultiply(P1[b0], P0[b1], P1[b2], P0[b3]);
+        return MdsMultiply(_p1[b0], _p0[b1], _p1[b2], _p0[b3]);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -142,17 +142,17 @@ public sealed class TwofishEngine
         var k0 = _sboxKeys[0];
         var k1 = _sboxKeys[1];
 
-        b0 = (byte)(P0[b0] ^ (byte)k1);
-        b1 = (byte)(P1[b1] ^ (byte)(k1 >> 8));
-        b2 = (byte)(P0[b2] ^ (byte)(k1 >> 16));
-        b3 = (byte)(P1[b3] ^ (byte)(k1 >> 24));
+        b0 = (byte)(_p0[b0] ^ (byte)k1);
+        b1 = (byte)(_p1[b1] ^ (byte)(k1 >> 8));
+        b2 = (byte)(_p0[b2] ^ (byte)(k1 >> 16));
+        b3 = (byte)(_p1[b3] ^ (byte)(k1 >> 24));
 
-        b0 = (byte)(P0[b0] ^ (byte)k0);
-        b1 = (byte)(P0[b1] ^ (byte)(k0 >> 8));
-        b2 = (byte)(P1[b2] ^ (byte)(k0 >> 16));
-        b3 = (byte)(P1[b3] ^ (byte)(k0 >> 24));
+        b0 = (byte)(_p0[b0] ^ (byte)k0);
+        b1 = (byte)(_p0[b1] ^ (byte)(k0 >> 8));
+        b2 = (byte)(_p1[b2] ^ (byte)(k0 >> 16));
+        b3 = (byte)(_p1[b3] ^ (byte)(k0 >> 24));
 
-        return MdsMultiply(P1[b0], P0[b1], P1[b2], P0[b3]);
+        return MdsMultiply(_p1[b0], _p0[b1], _p1[b2], _p0[b3]);
     }
 
     private void GenerateSubkeys(ReadOnlySpan<uint> keyWords)

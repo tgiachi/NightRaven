@@ -17,7 +17,7 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
 {
     private const int HeaderSize = 8; // int length + uint checksum
 
-    private static readonly MessagePackSerializerOptions Options = ContractlessStandardResolver.Options;
+    private static readonly MessagePackSerializerOptions _options = ContractlessStandardResolver.Options;
 
     private readonly ILogger _logger = Log.ForContext<BinaryJournalService>();
     private readonly SemaphoreSlim _ioLock = new(1, 1);
@@ -173,7 +173,7 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
                 break;
             }
 
-            entries.Add(MessagePackSerializer.Deserialize<JournalEntry>(payload.ToArray(), Options));
+            entries.Add(MessagePackSerializer.Deserialize<JournalEntry>(payload.ToArray(), _options));
             offset += HeaderSize + length;
         }
 
@@ -203,7 +203,7 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
         CancellationToken cancellationToken
     )
     {
-        var payload = MessagePackSerializer.Serialize(entry, Options, cancellationToken);
+        var payload = MessagePackSerializer.Serialize(entry, _options, cancellationToken);
         var header = new byte[HeaderSize];
         BinaryPrimitives.WriteInt32LittleEndian(header, payload.Length);
         BinaryPrimitives.WriteUInt32LittleEndian(header.AsSpan(4), ChecksumUtils.Compute(payload));

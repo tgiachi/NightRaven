@@ -17,7 +17,7 @@ public ref struct PooledRefList<T>
     private readonly bool _mt;
 
 #pragma warning disable CA1825
-    private static readonly T[] s_emptyArray = new T[0];
+    private static readonly T[] _emptyArray = new T[0];
 #pragma warning restore CA1825
 
     private ArrayPool<T> ArrayPool
@@ -52,7 +52,7 @@ public ref struct PooledRefList<T>
 
         if (count == 0)
         {
-            _items = s_emptyArray;
+            _items = _emptyArray;
             _size = 0;
         }
         else
@@ -76,7 +76,7 @@ public ref struct PooledRefList<T>
 
             if (count == 0)
             {
-                _items = s_emptyArray;
+                _items = _emptyArray;
                 _size = 0;
             }
             else
@@ -89,7 +89,7 @@ public ref struct PooledRefList<T>
         else
         {
             _size = 0;
-            _items = s_emptyArray;
+            _items = _emptyArray;
             using var en = collection.GetEnumerator();
 
             while (en.MoveNext())
@@ -132,7 +132,7 @@ public ref struct PooledRefList<T>
                 {
                     Array.Clear(_items);
                     ArrayPool.Return(_items);
-                    _items = s_emptyArray;
+                    _items = _emptyArray;
                 }
             }
         }
@@ -862,7 +862,7 @@ public ref struct PooledRefList<T>
     {
         if (_size == 0)
         {
-            return s_emptyArray;
+            return _emptyArray;
         }
 
         var array = new T[_size];
@@ -875,7 +875,7 @@ public ref struct PooledRefList<T>
     {
         if (_size == 0)
         {
-            return s_emptyArray;
+            return _emptyArray;
         }
 
         var array = ArrayPool.Rent(_size);

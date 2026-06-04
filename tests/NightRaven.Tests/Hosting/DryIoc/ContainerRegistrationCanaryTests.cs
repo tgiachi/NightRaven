@@ -5,7 +5,7 @@ using NightRaven.Server.Extensions.EventBus;
 using NightRaven.Server.Extensions.Hosting;
 using NightRaven.Tests.Support;
 
-namespace NightRaven.Tests.Hosting.DryIocNative;
+namespace NightRaven.Tests.Hosting.DryIoc;
 
 public class ContainerRegistrationCanaryTests : IDisposable
 {

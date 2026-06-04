@@ -12,17 +12,17 @@ namespace NightRaven.Core.Json;
 /// </summary>
 public static class JsonUtils
 {
-    private static readonly ConcurrentBag<IJsonTypeInfoResolver> JsonSerializerContexts = new();
-    private static readonly ConcurrentBag<JsonConverter> JsonConverters = new();
+    private static readonly ConcurrentBag<IJsonTypeInfoResolver> _jsonSerializerContexts = new();
+    private static readonly ConcurrentBag<JsonConverter> _jsonConverters = new();
     private static readonly Lock _lockObject = new();
-    private static readonly ConcurrentDictionary<Type, JsonSerializerOptions> ContextOptionsCache = new();
+    private static readonly ConcurrentDictionary<Type, JsonSerializerOptions> _contextOptionsCache = new();
 
     private static volatile JsonSerializerOptions? _jsonSerializerOptions;
 
     static JsonUtils()
     {
         // Add default converters
-        JsonConverters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+        _jsonConverters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         RebuildJsonSerializerContexts();
     }
 
@@ -37,12 +37,12 @@ public static class JsonUtils
         // Check if converter type already exists
         var converterType = converter.GetType();
 
-        if (JsonConverters.Any(c => c.GetType() == converterType))
+        if (_jsonConverters.Any(c => c.GetType() == converterType))
         {
             return; // Prevent duplicates
         }
 
-        JsonConverters.Add(converter);
+        _jsonConverters.Add(converter);
         RebuildJsonSerializerContexts();
     }
 
@@ -314,8 +314,8 @@ public static class JsonUtils
     public static IReadOnlyList<JsonConverter> GetJsonConverters()
     {
         // Avoid ToList() allocation - JsonConverters is already thread-safe
-        var converters = new JsonConverter[JsonConverters.Count];
-        JsonConverters.CopyTo(converters, 0);
+        var converters = new JsonConverter[_jsonConverters.Count];
+        _jsonConverters.CopyTo(converters, 0);
 
         return Array.AsReadOnly(converters);
     }
@@ -333,7 +333,7 @@ public static class JsonUtils
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        return ContextOptionsCache.GetOrAdd(
+        return _contextOptionsCache.GetOrAdd(
             context.GetType(),
             _ =>
             {
@@ -454,7 +454,7 @@ public static class JsonUtils
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        JsonSerializerContexts.Add(context);
+        _jsonSerializerContexts.Add(context);
         RebuildJsonSerializerContexts();
     }
 
@@ -468,7 +468,7 @@ public static class JsonUtils
         var removed = false;
         var newConverters = new ConcurrentBag<JsonConverter>();
 
-        foreach (var converter in JsonConverters)
+        foreach (var converter in _jsonConverters)
         {
             if (converter is not T)
             {
@@ -483,11 +483,11 @@ public static class JsonUtils
         if (removed)
         {
             // Replace the collection - this is not atomic, but thread-safe enough for this use case
-            JsonConverters.Clear();
+            _jsonConverters.Clear();
 
             foreach (var converter in newConverters)
             {
-                JsonConverters.Add(converter);
+                _jsonConverters.Add(converter);
             }
 
             RebuildJsonSerializerContexts();
@@ -734,10 +734,10 @@ public static class JsonUtils
                 WriteIndented = true,
                 AllowTrailingCommas = true,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                TypeInfoResolver = JsonTypeInfoResolver.Combine(JsonSerializerContexts.ToArray())
+                TypeInfoResolver = JsonTypeInfoResolver.Combine(_jsonSerializerContexts.ToArray())
             };
 
-            foreach (var converter in JsonConverters)
+            foreach (var converter in _jsonConverters)
             {
                 options.Converters.Add(converter);
             }

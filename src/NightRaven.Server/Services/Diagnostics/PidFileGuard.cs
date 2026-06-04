@@ -9,7 +9,7 @@ namespace NightRaven.Server.Services.Diagnostics;
 /// </summary>
 public sealed class PidFileGuard : IDisposable
 {
-    private static readonly UTF8Encoding Utf8WithoutBom = new(false);
+    private static readonly UTF8Encoding _utf8WithoutBom = new(false);
 
     private readonly int _currentProcessId;
     private readonly string _pidFilePath;
@@ -99,7 +99,7 @@ public sealed class PidFileGuard : IDisposable
             }
         }
 
-        File.WriteAllText(pidFilePath, currentProcessId.ToString(), Utf8WithoutBom);
+        File.WriteAllText(pidFilePath, currentProcessId.ToString(), _utf8WithoutBom);
 
         return new(pidFilePath, currentProcessId);
     }

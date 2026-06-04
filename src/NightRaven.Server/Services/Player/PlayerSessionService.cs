@@ -3,6 +3,7 @@ using NightRaven.Abstractions.Interfaces.EventHandlers;
 using NightRaven.Abstractions.Interfaces.Player;
 using NightRaven.Abstractions.Types.Player;
 using NightRaven.Core.Ids;
+using NightRaven.Network.UO.Packets.Incoming.Login;
 using NightRaven.Server.Data.Events;
 using ZLinq;
 using ZLinq.Linq;
@@ -15,7 +16,7 @@ namespace NightRaven.Server.Services.Player;
 public sealed class PlayerSessionService
     : IPlayerSessionService, ITickEventHandler<PlayerConnectedEvent>, ITickEventHandler<PlayerDisconnectedEvent>
 {
-    private readonly object _sync = new();
+    private readonly Lock _sync = new();
     private readonly Dictionary<long, PlayerSession> _sessions = [];
     private readonly Dictionary<Serial, long> _sessionsByMobileSerial = [];
 
@@ -181,7 +182,7 @@ public sealed class PlayerSessionService
         }
     }
 
-    public PlayerSession UpdateClient(long sessionId, string? clientVersion = null, byte? viewRange = null)
+    public PlayerSession UpdateClient(long sessionId, ClientVersion? clientVersion = null, int? viewRange = null)
     {
         lock (_sync)
         {

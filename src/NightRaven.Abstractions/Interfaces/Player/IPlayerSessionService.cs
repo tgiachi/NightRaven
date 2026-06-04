@@ -1,5 +1,6 @@
 using NightRaven.Abstractions.Data.Player;
 using NightRaven.Core.Ids;
+using NightRaven.Network.UO.Packets.Incoming.Login;
 using ZLinq;
 using ZLinq.Linq;
 
@@ -53,10 +54,10 @@ public interface IPlayerSessionService
     /// Updates client metadata for a player session.
     /// </summary>
     /// <param name="sessionId">Network session identifier.</param>
-    /// <param name="clientVersion">Optional client version string.</param>
+    /// <param name="clientVersion">Optional client version.</param>
     /// <param name="viewRange">Optional client view range.</param>
     /// <returns>The updated player session.</returns>
-    PlayerSession UpdateClient(long sessionId, string? clientVersion = null, byte? viewRange = null);
+    PlayerSession UpdateClient(long sessionId, ClientVersion? clientVersion = null, int? viewRange = null);
 
     /// <summary>
     /// Marks a player session as disconnected and removes mobile indexes.

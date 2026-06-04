@@ -35,7 +35,7 @@ namespace NightRaven.Scripting.Lua.Services;
 /// </summary>
 public class LuaScriptEngineService : IScriptEngineService, IDisposable
 {
-    private static readonly string[] collection = ["delay", "toString"];
+    private static readonly string[] _completionExcludedGlobals = ["delay", "toString"];
 
     private readonly LuaEngineConfig _engineConfig;
 
@@ -1196,7 +1196,7 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
     private string GenerateLuarcJson()
     {
         var globalsList = _constants.Keys.ToList();
-        globalsList.AddRange(collection);
+        globalsList.AddRange(_completionExcludedGlobals);
 
         // Add registered user data types (Vector3, Vector2, Quaternion, etc.)
         foreach (var userData in _loadedUserData)

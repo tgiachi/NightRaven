@@ -1,5 +1,6 @@
 using NightRaven.Abstractions.Types.Player;
 using NightRaven.Core.Ids;
+using NightRaven.Network.UO.Packets.Incoming.Login;
 
 namespace NightRaven.Abstractions.Data.Player;
 
@@ -19,6 +20,6 @@ public sealed class PlayerSession
     public DateTimeOffset? AuthenticatedAt { get; set; }
     public DateTimeOffset? EnteredWorldAt { get; set; }
     public DateTimeOffset? DisconnectedAt { get; set; }
-    public byte? ViewRange { get; set; }
-    public string? ClientVersion { get; set; }
+    public int? ViewRange { get; set; }
+    public ClientVersion? ClientVersion { get; set; }
 }

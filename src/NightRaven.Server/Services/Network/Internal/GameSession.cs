@@ -10,16 +10,10 @@ namespace NightRaven.Server.Services.Network.Internal;
 /// </summary>
 public sealed class GameSession
 {
+    private const int DefaultPacketBufferCapacity = 256;
+
     private readonly Lock _pendingBytesSync = new();
     private readonly List<byte> _pendingBytes = [];
-
-    public GameSession(NightRavenTCPClient client)
-    {
-        ArgumentNullException.ThrowIfNull(client);
-
-        Client = client;
-        SessionId = client.SessionId;
-    }
 
     /// <summary>
     /// Unique identifier of the session, sourced from the owning client.
@@ -30,6 +24,14 @@ public sealed class GameSession
     /// Owning TCP client.
     /// </summary>
     public NightRavenTCPClient Client { get; }
+
+    public GameSession(NightRavenTCPClient client)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+
+        Client = client;
+        SessionId = client.SessionId;
+    }
 
     /// <summary>
     /// Serializes and sends a packet to the owning client.
@@ -108,7 +110,7 @@ public sealed class GameSession
 
     private static byte[] SerializePacket(IGameNetworkPacket packet)
     {
-        var initialCapacity = packet.Length > 0 ? packet.Length : 256;
+        var initialCapacity = packet.Length > 0 ? packet.Length : DefaultPacketBufferCapacity;
         var writer = new SpanWriter(initialCapacity, true);
 
         try
