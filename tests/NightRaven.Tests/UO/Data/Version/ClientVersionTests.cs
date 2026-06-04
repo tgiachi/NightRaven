@@ -1,4 +1,4 @@
-using NightRaven.UO.Data.Version;
+using NightRaven.Abstractions.Data.Version;
 
 namespace NightRaven.Tests.UO.Data.Version;
 

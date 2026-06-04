@@ -1,6 +1,6 @@
 using NightRaven.Abstractions.Types.Player;
 using NightRaven.Core.Ids;
-using NightRaven.Network.UO.Packets.Incoming.Login;
+using NightRaven.Abstractions.Data.Version;
 
 namespace NightRaven.Abstractions.Data.Player;
 

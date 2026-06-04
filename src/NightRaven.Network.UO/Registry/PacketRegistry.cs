@@ -2,7 +2,7 @@ using System.Reflection;
 using NightRaven.Network.UO.Attributes;
 using NightRaven.Network.UO.Data.Internal.Packets;
 using NightRaven.Network.UO.Data.Packets;
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Network.UO.Types.Packets;
 
 namespace NightRaven.Network.UO.Registry;

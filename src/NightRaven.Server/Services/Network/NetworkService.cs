@@ -10,7 +10,7 @@ using NightRaven.Abstractions.Types.Metrics;
 using NightRaven.Core.Utils;
 using NightRaven.Network.Events;
 using NightRaven.Network.Server;
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Network.UO.Registry;
 using NightRaven.Server.Data.Events;
 using NightRaven.Server.Data.Network;

@@ -1,6 +1,6 @@
 using NightRaven.Network.Client;
 using NightRaven.Network.Spans;
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 
 namespace NightRaven.Server.Services.Network.Internal;
 

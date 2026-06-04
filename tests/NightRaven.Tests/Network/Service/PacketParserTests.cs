@@ -1,4 +1,4 @@
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Network.UO.Registry;
 using NightRaven.Server.Services.Network.Internal;
 using NightRaven.Tests.Network.Service.Support;

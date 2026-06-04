@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Server.Data.Network;
 using NightRaven.Server.Interfaces.Network;
 

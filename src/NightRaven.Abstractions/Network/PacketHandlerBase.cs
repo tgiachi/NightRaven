@@ -1,7 +1,7 @@
 using NightRaven.Abstractions.Data.Network;
 using NightRaven.Abstractions.Interfaces.Network;
 using NightRaven.Abstractions.Interfaces.Services;
-using NightRaven.Network.UO.Interfaces.Packets;
+using NightRaven.Abstractions.Interfaces.Network;
 
 namespace NightRaven.Abstractions.Network;
 

@@ -1,5 +1,5 @@
 using NightRaven.UO.Data.Types.Expansions;
-using NightRaven.UO.Data.Version;
+using NightRaven.Abstractions.Data.Version;
 
 namespace NightRaven.UO.Data.Data.Expansions;
 
